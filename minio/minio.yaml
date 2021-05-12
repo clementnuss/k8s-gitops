@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: minio
+  name: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  serviceName: minio
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio
+        args:
+          - "server"
+          - "/data"
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+          - name: nfs-coeuve-pvc
+            mountPath: /data
+      volumes:
+        - name: nfs-coeuve-pvc
+          persistentVolumeClaim:
+            claimName: nfs-coeuve-pvc
