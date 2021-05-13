@@ -17,7 +17,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  namespace: minio
+  namespace: storage
   name: nfs-coeuve-pvc
 spec:
   accessModes:
