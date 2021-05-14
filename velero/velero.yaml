@@ -1,0 +1,77 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: velero
+  namespace: storage
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: velero
+      version: 2.20.0
+      sourceRef:
+        kind: HelmRepository
+        name: vmware-tanzu-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    credentials:
+      existingSecret: s3-minio-coeuve
+    # disabling the job, as docker image not ARM64 compatible.
+    # we manually have to upgrade CRDs with the following command
+    # velero install --crds-only
+    upgradeCRDs: false
+    configuration:
+      provider: aws
+      backupStorageLocation:
+        name: default
+        bucket: velero
+        config:
+          region: coeuve
+          s3ForcePathStyle: true
+          s3Url: http://minio-coeuve.storage.svc:9000
+      volumeSnapshotLocation:
+        name: aws
+        config:
+          region: coeuve
+      resticTimeout: 6h
+    initContainers:
+    - name: velero-plugin-for-aws
+      image: velero/velero-plugin-for-aws:v1.2.0
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+      - mountPath: /target
+        name: plugins
+    resources:
+      requests:
+        memory: 300Mi
+        cpu: 25m
+      limits:
+        memory: 1500Mi
+    # tolerations:
+    # - key: "arm"
+    #   operator: "Exists"
+    # enableHelmHooks: false
+    metrics:
+      enabled: true
+      # serviceMonitor:
+      #   enabled: true
+    snapshotsEnabled: true
+    deployRestic: true
+    installCRDs: true
+    restic:
+      podVolumePath: /var/lib/kubelet/pods
+      privileged: false
+      tolerations:
+      # - key: "arm"
+      #   operator: "Exists"
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 15m
+        limits:
+          memory: 1000Mi
+      
