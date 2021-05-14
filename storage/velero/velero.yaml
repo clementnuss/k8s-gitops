@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: velero
-  namespace: velero
+  namespace: storage
 spec:
   interval: 5m
   chart:
@@ -16,8 +16,11 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    credentials:
+      existingSecret: s3-minio-coeuve
+
     configuration:
-      provider: aws #s3
+      provider: aws
       backupStorageLocation:
         name: default
         bucket: velero
@@ -58,8 +61,8 @@ spec:
       podVolumePath: /var/lib/kubelet/pods
       privileged: false
       tolerations:
-      - key: "arm"
-        operator: "Exists"
+      # - key: "arm"
+      #   operator: "Exists"
       - key: "node-role.kubernetes.io/master"
         operator: "Exists"
       resources:
@@ -67,14 +70,10 @@ spec:
           memory: 200Mi
           cpu: 15m
         limits:
-          memory: 3000Mi
+          memory: 1000Mi
     schedules:
       daily-backup:
         schedule: "0 6 * * *"
         template:
           ttl: "120h"
       
-  valuesFrom:
-  - kind: Secret
-    name: "velero-helm-values"
-    optional: false
