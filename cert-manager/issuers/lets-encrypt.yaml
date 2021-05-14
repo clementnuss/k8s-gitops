@@ -7,7 +7,7 @@ spec:
     email: clement@astutus.org
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: example-issuer-account-key
+      name: lets-encrypt-staging-account-key
     solvers:
     - http01:
         ingress:
