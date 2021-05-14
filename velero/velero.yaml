@@ -24,6 +24,7 @@ spec:
     upgradeCRDs: false
     configuration:
       provider: aws
+      defaultVolumesToRestic: true
       backupStorageLocation:
         name: default
         bucket: velero

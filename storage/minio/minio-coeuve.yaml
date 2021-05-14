@@ -13,6 +13,8 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+  annotations:
+    backup.velero.io/backup-volumes-excludes: nfs-coeuve-pvc
   namespace: storage
   name: minio-coeuve
 spec:
