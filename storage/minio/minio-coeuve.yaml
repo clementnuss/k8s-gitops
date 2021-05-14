@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-coeuve
+  namespace: storage
+spec:
+  selector:
+    app: minio-coeuve
+  ports:
+  - port: 9000
+    targetPort: 9000
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: storage
+  name: minio-coeuve
+spec:
+  selector:
+    matchLabels:
+      app: minio-coeuve
+  serviceName: minio-coeuve
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: minio-coeuve
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio
+        args:
+          - "server"
+          - "/data"
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+          - name: nfs-coeuve-pvc
+            mountPath: /data
+        env:
+          - name: MINIO_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: s3-coeuve-secret
+                key: access_key
+          - name: MINIO_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: s3-coeuve-secret
+                key: secret_key
+      volumes:
+        - name: nfs-coeuve-pvc
+          persistentVolumeClaim:
+            claimName: nfs-coeuve-pvc
+      
