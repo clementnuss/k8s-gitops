@@ -31,7 +31,7 @@ spec:
         config:
           region: coeuve
           s3ForcePathStyle: true
-          s3Url: http://minio.storage.svc:9000
+          s3Url: http://minio-coeuve.storage.svc:9000
       volumeSnapshotLocation:
         name: aws
         config:
