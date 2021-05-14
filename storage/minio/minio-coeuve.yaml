@@ -41,12 +41,12 @@ spec:
           - name: MINIO_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: s3-coeuve-secret
+                name: s3-minio-coeuve
                 key: access_key
           - name: MINIO_SECRET_KEY
             valueFrom:
               secretKeyRef:
-                name: s3-coeuve-secret
+                name: s3-minio-coeuve
                 key: secret_key
       volumes:
         - name: nfs-coeuve-pvc
