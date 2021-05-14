@@ -22,9 +22,9 @@ spec:
     # we manually have to upgrade CRDs with the following command
     # velero install --crds-only
     upgradeCRDs: false
-
     configuration:
       provider: aws
+      defaultVolumesToRestic: true
       backupStorageLocation:
         name: default
         bucket: velero
