@@ -18,6 +18,10 @@ spec:
   values:
     credentials:
       existingSecret: s3-minio-coeuve
+    # disabling the job, as docker image not ARM64 compatible.
+    # we manually have to upgrade CRDs with the following command
+    # velero install --crds-only
+    upgradeCRDs: false
 
     configuration:
       provider: aws
