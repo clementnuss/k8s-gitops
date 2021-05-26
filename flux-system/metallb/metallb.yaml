@@ -23,6 +23,19 @@ spec:
         protocol: layer2
         addresses:
         - 10.0.63.70-10.0.63.79
+    controller:
+      image:
+        registry: docker.io
+        repository: metallb/controller
+        tag: v0.9.6
+      tolerations:
+      - key: "arm"
+        operator: "Exists"
+    speaker:
+      image:
+        registry: docker.io
+        repository: metallb/speaker
+        tag: v0.9.6
       # peers:
       # - peer-address: 10.0.7.1
       #   peer-asn: 64512
