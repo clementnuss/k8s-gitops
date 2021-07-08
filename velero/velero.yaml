@@ -32,6 +32,7 @@ spec:
           region: coeuve
           s3ForcePathStyle: true
           s3Url: http://minio-coeuve.storage:9000
+          publicUrl: http://192.168.8.50:9000
       volumeSnapshotLocation:
         name: aws
         config:
