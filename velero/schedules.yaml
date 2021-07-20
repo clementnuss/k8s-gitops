@@ -11,7 +11,8 @@ spec:
   template:
     hooks: {}
     includedNamespaces:
-    - '*'
+    - default
+    - ferme-roy
     ttl: 120h0m0s
   useOwnerReferencesInBackup: false
 status: {}

@@ -34,8 +34,6 @@ spec:
           s3ForcePathStyle: true
           s3Url: http://10.0.0.10:9000
           publicUrl: http://10.0.0.10:9000
-        credential:
-          s3-minio-coeuve: cloud
       volumeSnapshotLocation:
         name: aws
         config:
