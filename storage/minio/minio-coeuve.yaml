@@ -1,58 +1,65 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio-coeuve
-  namespace: storage
-spec:
-  selector:
-    app: minio-coeuve
-  ports:
-  - port: 9000
-    targetPort: 9000
-  type: LoadBalancer
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  namespace: storage
-  name: minio-coeuve
-spec:
-  selector:
-    matchLabels:
-      app: minio-coeuve
-  serviceName: minio-coeuve
-  replicas: 1
-  template:
-    metadata:
-      annotations:
-        backup.velero.io/backup-volumes-excludes: nfs-coeuve-pvc
-      labels:
-        app: minio-coeuve
-    spec:
-      containers:
-      - name: minio
-        image: minio/minio
-        args:
-          - "server"
-          - "/data"
-        ports:
-        - containerPort: 9000
-        volumeMounts:
-          - name: nfs-coeuve-pvc
-            mountPath: /data
-        env:
-          - name: MINIO_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: s3-minio-coeuve
-                key: access_key
-          - name: MINIO_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: s3-minio-coeuve
-                key: secret_key
-      volumes:
-        - name: nfs-coeuve-pvc
-          persistentVolumeClaim:
-            claimName: nfs-coeuve-pvc
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: minio-plan63
+#   namespace: storage
+# spec:
+#   selector:
+#     app: minio-plan63
+#   ports:
+#   - port: 9000
+#     name: api
+#   - port: 9014
+#     name: console
+#   loadBalancerIP: 192.168.8.35
+#   type: LoadBalancer
+# ---
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   namespace: storage
+#   name: minio-plan63
+# spec:
+#   selector:
+#     matchLabels:
+#       app: minio-plan63
+#   serviceName: minio-plan63
+#   replicas: 1
+#   template:
+#     metadata:
+#       annotations:
+#         backup.velero.io/backup-volumes-excludes: nfs-plan63-pvc
+#       labels:
+#         app: minio-plan63
+#     spec:
+#       containers:
+#       - name: minio
+#         image: minio/minio
+#         args:
+#           - server
+#           - --console-address=:9014
+#           - /data
+#         ports:
+#         - containerPort: 9000
+#           name: api
+#         - containerPort: 9014
+#           name: console
+#         # volumeMounts:
+#         #   - name: nfs-coeuve-pvc
+#         #     mountPath: /data
+#         env:
+#           - name: MINIO_ACCESS_KEY
+#             valueFrom:
+#               secretKeyRef:
+#                 name: s3-minio-coeuve
+#                 key: access_key
+#           - name: MINIO_SECRET_KEY
+#             valueFrom:
+#               secretKeyRef:
+#                 name: s3-minio-plan63
+#                 key: secret_key
+#       # volumes:
+#       #   - name: nfs-coeuve-pvc
+#       #     persistentVolumeClaim:
+#       #       claimName: nfs-coeuve-pvc
       
