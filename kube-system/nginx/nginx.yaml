@@ -27,11 +27,11 @@ spec:
         externalTrafficPolicy: Local
       metrics:
         enabled: true
-        serviceMonitor:
-          enabled: true
-          namespace: kube-system
-        prometheusRule:
-          enabled: false
+        # serviceMonitor:
+        #   enabled: true
+        #   namespace: kube-system
+        # prometheusRule:
+        #   enabled: false
       extraArgs:
         default-ssl-certificate: "cert-manager/acme-crt-secret"
       # affinity:
