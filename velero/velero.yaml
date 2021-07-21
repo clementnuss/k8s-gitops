@@ -39,6 +39,9 @@ spec:
         config:
           region: coeuve
       resticTimeout: 6h
+    tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
     initContainers:
     - name: velero-plugin-for-aws
       image: velero/velero-plugin-for-aws:v1.2.0
