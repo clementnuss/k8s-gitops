@@ -11,7 +11,7 @@ spec:
     solvers:
     - http01:
         ingress:
-          class: traefik
+          class: nginx
 
 ---
 apiVersion: cert-manager.io/v1
@@ -27,4 +27,4 @@ spec:
     solvers:
     - http01:
         ingress:
-          class: traefik
+          class: nginx
