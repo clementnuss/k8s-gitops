@@ -22,7 +22,7 @@ spec:
       tag: 2021.7.4
     env:
       TZ: "Europe/Zurich"
-    hostNetwork: true
+    # hostNetwork: true
     service:
       main:
         type: LoadBalancer
