@@ -10,3 +10,14 @@ spec:
     branch: main
   url: https://github.com/clementnuss/k8s-gitops.git
 
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: ferme-roy
+  namespace: flux-system
+spec:
+  interval: 1m02s
+  ref:
+    branch: master
+  url: ssh://git@github.com/clementnuss/ferme-roy.git
