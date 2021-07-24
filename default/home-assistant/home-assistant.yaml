@@ -57,7 +57,7 @@ spec:
         size: "1Gi"
     podAnnotations:
       backup.velero.io/backup-volumes: config
-    addons:
+    # addons:
       # codeserver:
       #   enabled: true
       #   image:
