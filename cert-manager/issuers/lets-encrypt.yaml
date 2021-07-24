@@ -25,6 +25,26 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
-    - http01:
-        ingress:
-          class: nginx
+    # An empty 'selector' means that this solver matches all domains
+    - selector: {}
+      dns01:
+        cloudflare:
+          email: clement.nuss@gmail.com
+          apiKeySecretRef:
+            name: cloudflare-api-key
+            key: api-key
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: acme-crt
+  namespace: cert-manager
+spec:
+  secretName: acme-crt-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - astutus.org
+  - '*.astutus.org'
+  # - '*.'
