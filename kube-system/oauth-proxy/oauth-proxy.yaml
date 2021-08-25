@@ -32,8 +32,7 @@ spec:
       - hosts:
         - auth.astutus.org
     extraArgs:
-      provider: oidc
-      oidc-issuer-url: https://astutus-7.eu.auth0.com/
+      provider: google
       skip-provider-button:
       pass-authorization-header:
       email-domain: "*"
