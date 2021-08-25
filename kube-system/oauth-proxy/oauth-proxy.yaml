@@ -35,8 +35,8 @@ spec:
       provider: google
       skip-provider-button:
       pass-authorization-header:
-      email-domain: "*"
-      google-group: "k8s-at-home-clementnuss"
+      # email-domain: "*"
+      # google-group: "k8s-at-home-clementnuss"
       cookie-domain: .astutus.org
       whitelist-domain: .astutus.org
   valuesFrom:
