@@ -39,6 +39,11 @@ spec:
       # google-group: "k8s-at-home-clementnuss"
       cookie-domain: .astutus.org
       whitelist-domain: .astutus.org
+    
+    config:
+      configFile: |-
+        email_domains = [ ]
+        upstreams = [ "file:///dev/null" ]
   valuesFrom:
   - kind: Secret
     name: "oauth2-proxy-helm-values"
