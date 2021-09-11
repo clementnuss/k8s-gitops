@@ -22,7 +22,7 @@ spec:
       - name: default
         protocol: layer2
         addresses:
-        - 192.168.8.30-192.168.8.40
+        - 192.168.8.32-192.168.8.47
     controller:
       image:
         registry: docker.io
