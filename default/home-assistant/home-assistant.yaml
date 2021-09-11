@@ -27,6 +27,11 @@ spec:
       main:
         type: LoadBalancer
         loadBalancerIP: 192.168.8.39
+        ports:
+          homekit_tcp:
+            enabled: true
+            port: 21063
+            protocol: TCP
     ingress:
       main:
         enabled: true
