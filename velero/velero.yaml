@@ -18,7 +18,7 @@ spec:
   values:
     credentials:
       useSecret: true
-      existingSecret: s3-minio-coeuve
+      existingSecret: s3-infomaniak
     # disabling the job, as docker image not ARM64 compatible.
     # we manually have to upgrade CRDs with the following command
     # velero install --crds-only
@@ -30,14 +30,14 @@ spec:
         name: default
         bucket: velero
         config:
-          region: coeuve
+          region: ch
           s3ForcePathStyle: true
-          s3Url: http://192.168.109.10:9000
-          publicUrl: http://192.168.109.10:9000
+          s3Url: https://s3.swiss-backup02.infomaniak.com
+          publicUrl: https://s3.swiss-backup02.infomaniak.com
       volumeSnapshotLocation:
         name: aws
         config:
-          region: coeuve
+          region: ch
       resticTimeout: 6h
     tolerations:
       - key: "node-role.kubernetes.io/master"
