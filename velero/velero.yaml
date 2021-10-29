@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: velero
-      version: 2.25.0
+      version: 2.24.0
       sourceRef:
         kind: HelmRepository
         name: vmware-tanzu-charts
@@ -24,26 +24,19 @@ spec:
     # velero install --crds-only
     upgradeCRDs: false
     configuration:
-      provider: aws
+      extraSecretRef: swift-infomaniak
+      provider: community.openstack.org/openstack
       defaultVolumesToRestic: true
       backupStorageLocation:
-        name: default
-        bucket: default
-        config:
-          region: eu-ch-14
-          s3Url: https://s3.swiss-backup02.infomaniak.com
-          publicUrl: https://s3.swiss-backup02.infomaniak.com
-      volumeSnapshotLocation:
-        name: aws
-        config:
-          region: eu-ch-14
+        bucket: k8s-backups
       resticTimeout: 6h
+
     tolerations:
       - key: "node-role.kubernetes.io/master"
         operator: "Exists"
     initContainers:
-    - name: velero-plugin-for-aws
-      image: velero/velero-plugin-for-aws:v1.3.0
+    - name: velero-plugin-for-openstack
+      image: lirt/velero-plugin-for-openstack:v0.3.0-arm64
       imagePullPolicy: IfNotPresent
       volumeMounts:
       - mountPath: /target
