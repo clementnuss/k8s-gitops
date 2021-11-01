@@ -26,7 +26,9 @@ spec:
       provider: community.openstack.org/openstack
       defaultVolumesToRestic: true
       backupStorageLocation:
-        bucket: k8s-backups
+        bucket: default
+      volumeSnapshotLocation:
+        name: default
       resticTimeout: 6h
 
     tolerations:
