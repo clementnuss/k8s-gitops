@@ -17,26 +17,34 @@ spec:
       interval: 5m
   values:
     credentials:
-      extraSecretRef: swift-infomaniak
+      existingSecret: s3-infomaniak
     # disabling the job, as docker image not ARM64 compatible.
     # we manually have to upgrade CRDs with the following command
     # velero install --crds-only
     upgradeCRDs: false
     configuration:
-      provider: community.openstack.org/openstack
+      provider: aws
       defaultVolumesToRestic: true
       backupStorageLocation:
-        bucket: default
-      volumeSnapshotLocation:
         name: default
+        bucket: default
+        config:
+          region: us-east-1
+          s3ForcePathStyle: true
+          s3Url: https://s3.swiss-backup02.infomaniak.com
+          publicUrl: https://s3.swiss-backup02.infomaniak.com
+      volumeSnapshotLocation:
+        name: aws
+        config:
+          region: us-east-1
       resticTimeout: 6h
 
     tolerations:
       - key: "node-role.kubernetes.io/master"
         operator: "Exists"
     initContainers:
-    - name: velero-plugin-for-openstack
-      image: clements-mbp.lan:15000/velero-plugin-for-openstack:v0.3.0-arm64
+    - name: velero-plugin-for-aws
+      image: velero/velero-plugin-for-aws:v1.3.0
       imagePullPolicy: IfNotPresent
       volumeMounts:
       - mountPath: /target
