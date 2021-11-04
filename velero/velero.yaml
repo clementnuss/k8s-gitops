@@ -22,7 +22,6 @@ spec:
     # we manually have to upgrade CRDs with the following command
     # velero install --crds-only
     upgradeCRDs: false
-    snapshotsEnabled: false
     configuration:
       provider: aws
       defaultVolumesToRestic: true
@@ -64,7 +63,7 @@ spec:
       enabled: true
       # serviceMonitor:
       #   enabled: true
-    snapshotsEnabled: true
+    snapshotsEnabled: false
     deployRestic: true
     installCRDs: true
     restic:
