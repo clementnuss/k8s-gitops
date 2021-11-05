@@ -1,3 +1,4 @@
+# install CRDs with: kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.6.1/cert-manager.crds.yaml
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
@@ -19,7 +20,7 @@ spec:
     image:
       repository: quay.io/jetstack/cert-manager-controller-arm64
 
-    installCRDs: true
+    installCRDs: false
     webhook:
       enabled: true  
     # extraArgs:
