@@ -30,17 +30,6 @@ spec:
         isDefault: true
         allowVolumeExpansion: true
 
-  postRenderers:
-    - kustomize:
-        patchesStrategicMerge:
-          - kind: StatefulSet
-            apiVersion: apps/v1
-            metadata:
-              name: openstack-cinder-csi-controllerplugin
-            spec:
-              template:
-                spec:
-                  containers:
-                    - name: csi-provisioner
-                      args:
-                        - --feature-gates=Topology=false
+    csi:
+      provisioner:
+        topology: "false"
