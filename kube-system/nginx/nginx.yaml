@@ -24,6 +24,13 @@ spec:
         # hsts-max-age: "31449600"
       use-forwarded-headers: "true"
       service:
+        watchIngressWithoutClass: false
+        ingressClassResource:
+        name: nginx
+        enabled: true
+        default: false
+        controllerValue: "k8s.io/ingress-nginx"
+
         # externalTrafficPolicy: Local
         type: NodePort
         nodePorts:
