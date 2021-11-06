@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://kubernetes.github.io/ingress-nginx
       chart: ingress-nginx
-      version: 3.34.0
+      version: 4.0.6
       sourceRef:
         kind: HelmRepository
         name: ingress-nginx-charts
@@ -23,8 +23,13 @@ spec:
         # hsts-max-age: "31449600"
       use-forwarded-headers: "true"
       service:
-        loadBalancerIP: 192.168.8.40
-        externalTrafficPolicy: Local
+        # externalTrafficPolicy: Local
+        type: NodePort
+        nodePorts:
+          http: 80
+          https: 443
+          # tcp:
+          #  8080: 32808
       metrics:
         enabled: true
         # serviceMonitor:
