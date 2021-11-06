@@ -21,3 +21,5 @@ spec:
   ref:
     branch: master
   url: ssh://git@github.com/clementnuss/ferme-roy.git
+  secretRef:
+    name: ferme-roy-ssh-credentials
