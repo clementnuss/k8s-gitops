@@ -22,13 +22,7 @@ spec:
       name: cinder-csi-cloud-config
 
     storageClass:
-      enabled: true
-      delete:
-        isDefault: false
-        allowVolumeExpansion: true
-      retain:
-        isDefault: true
-        allowVolumeExpansion: true
+      enabled: false
 
     csi:
       provisioner:
