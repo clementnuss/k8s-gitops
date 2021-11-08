@@ -26,10 +26,10 @@ spec:
       service:
         watchIngressWithoutClass: true
         ingressClassResource:
-        name: nginx
-        enabled: true
-        default: true
-        controllerValue: "k8s.io/ingress-nginx"
+          name: nginx
+          enabled: true
+          default: true
+          controllerValue: "k8s.io/ingress-nginx"
 
         # externalTrafficPolicy: Local
         type: NodePort
