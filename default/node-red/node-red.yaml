@@ -29,7 +29,6 @@ spec:
       main:
         enabled: true
         annotations:
-          # kubernetes.io/ingress.class: "nginx"
           nginx.ingress.kubernetes.io/auth-url: "https://auth.astutus.org/oauth2/auth"
           nginx.ingress.kubernetes.io/auth-signin: https://auth.astutus.org/oauth2/start
         hosts:
@@ -41,16 +40,13 @@ spec:
         - hosts:
           - "node-red.astutus.org"
     persistence:
-      data:
-        enabled: true
-        mountPath: /data
-        accessMode: ReadWriteOnce
-        size: "1Gi"
+      enabled: true
+      mountPath: /data
+      existingClaim: node-red-data
+
     podAnnotations:
       backup.velero.io/backup-volumes: data
-    # tolerations:
-    # - key: "arm"
-    #   operator: "Exists"
+
     resources:
       requests:
         memory: 350Mi

@@ -25,11 +25,8 @@ spec:
     # hostNetwork: true
     service:
       main:
-        type: LoadBalancer
-        loadBalancerIP: 192.168.8.39
+        type: ClusterIP
         ports:
-          http:
-            port: 8123
           homekit-tcp:
             enabled: true
             port: 21063
@@ -62,13 +59,15 @@ spec:
         enabled: true
       startup:
         enabled: true
+      
     persistence:
       config:
         enabled: true
-        accessMode: ReadWriteOnce
-        size: "1Gi"
+        existingClaim: home-assistant-config
+    
     podAnnotations:
       backup.velero.io/backup-volumes: config
+    
     addons:
       codeserver:
         enabled: true
@@ -103,12 +102,6 @@ spec:
       requests:
         cpu: 100m
         memory: 500Mi
-    # postgresql:
-    #   enabled: true
-    #   postgresqlUsername: home-assistant
-    #   postgresqlDatabase: home-assistant
-    #   persistence:
-    #     enabled: true
   valuesFrom:
   - kind: Secret
     name: "home-assistant-helm-values"
