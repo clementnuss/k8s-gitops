@@ -18,11 +18,9 @@ spec:
       interval: 5m
   values:
     replicaCount: 1
-    # tolerations:
-    #   - key: "arm"
-    #     operator: "Exists"
     ingress:
       enabled: true
+      ingressClassName: nginx
       path: /oauth2
       hosts: [auth.astutus.org]
       tls:
