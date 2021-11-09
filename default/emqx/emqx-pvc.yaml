@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: emqx
+spec:
+  resources:
+    requests:
+      storage: 100Mo
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
