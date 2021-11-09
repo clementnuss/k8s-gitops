@@ -40,9 +40,10 @@ spec:
         - hosts:
           - "node-red.astutus.org"
     persistence:
-      enabled: true
-      mountPath: /data
-      existingClaim: node-red-data
+      data:
+        enabled: true
+        mountPath: /data
+        existingClaim: node-red-data
 
     podAnnotations:
       backup.velero.io/backup-volumes: data
