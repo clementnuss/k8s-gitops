@@ -20,7 +20,7 @@ spec:
     replicaCount: 1
     ingress:
       enabled: true
-      ingressClassName: nginx
+      className: nginx
       path: /oauth2
       hosts: [auth.astutus.org]
       tls:
