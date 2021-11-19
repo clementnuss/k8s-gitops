@@ -7,7 +7,7 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: main
+    branch: cluster_migration
   url: https://github.com/clementnuss/k8s-gitops.git
 
 ---
@@ -17,7 +17,9 @@ metadata:
   name: ferme-roy
   namespace: flux-system
 spec:
-  interval: 1m02s
+  interval: 1m0s
   ref:
     branch: master
   url: ssh://git@github.com/clementnuss/ferme-roy.git
+  secretRef:
+    name: ferme-roy-ssh-credentials

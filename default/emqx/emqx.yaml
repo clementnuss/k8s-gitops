@@ -21,21 +21,14 @@ spec:
     replicaCount: 1
     recreatePods: true
     service:
-      type: LoadBalancer
-      loadBalancerIP: 192.168.8.38
-    # tolerations:
-    #   - key: "arm"
-    #     operator: "Exists"
-    # affinity:
-    #   podAntiAffinity:
-    #     requiredDuringSchedulingIgnoredDuringExecution:
-    #     - labelSelector:
-    #         matchExpressions:
-    #         - key: app.kubernetes.io/name
-    #           operator: In
-    #           values:
-    #           - emqx
-    #       topologyKey: "kubernetes.io/hostname"
+      type: ClusterIP
+      nodePorts:
+        mqttssl: 32883
+
+    persistence:
+      enabled: true
+      existingClaim: "emqx"
+    
     emqxConfig:
       EMQX_ALLOW_ANONYMOUS: "false"
     #   EMQX_ACL_NOMATCH: "deny"
