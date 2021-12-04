@@ -21,9 +21,9 @@ spec:
     replicaCount: 1
     recreatePods: true
     service:
-      type: ClusterIP
+      type: NodePort
       nodePorts:
-        mqttssl: 32883
+        mqttssl: 30883
 
     persistence:
       enabled: true
