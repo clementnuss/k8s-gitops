@@ -17,16 +17,15 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-
     persistence:
       config:
         enabled: true
         mountPath: /etc/wireguard
 
-
     service:
       main:
         enabled: true
+        type: NodePort
         ports:
           http:
             enabled: false
@@ -34,4 +33,18 @@ spec:
             enabled: true
             port: 51820
             protocol: UDP
-    
+            nodePort: 31820
+
+    additionalContainers: 
+    - name: alpine
+      args:
+      - while true; do sleep 30; done;
+      command:
+      - /bin/sh
+      - -c
+      - --
+      image: alpine:latest
+      imagePullPolicy: Always
+      volumeMounts:
+      - mountPath: /etc/wireguard
+        name: config
