@@ -1,0 +1,17 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: wg-server-helm-values
+  namespace: default
+spec:
+  encryptedData:
+    values.yaml: AgA1ctzZ1S2Ptmh0TAg4SVRwMdPTZ4j6jafI5U+G+F9prWrfcj5/M+reLLTFQH3oKhWPhsC8T+HPiImMr9GIiH0oljIfj12+HDbDDG+diIhsNcFCmlmlh4gEh7aikcbPD4Bwlo4KYKt2z9u1UtAi7MF5U2c1S6AfkJtZS2zDaLkHJJFloPOH7u+UjiMLEdZzY7jL1dP/vRjrqcobHWcoRDmqKOzkigr21MJ1e70ni3jYCvE3PHppX218WUzUYkuKFzKr4Bfs7510CkRouFBbWbHorRAllAhidzStnSQDQmK0iZr56yQO+7Tw4cf9Ao630EfbtAdvqEvyeedHbv7/3Nw8D18h/YkM+uzcCri8DvPIfzuEhldtH5ruKUMOYasJXq/UUAr/khYGJRa971z7aBC/V8sU0xyNkm4YXnKhE4lbam+BgV2MVjvolxc8HgAPDHAqZu/SF9Z51cLu0zsuwgqk+xGREMzB+FaLU0blVHTc1eJACsW+jd+wirTI/gg0Y7oX4/yoAxZuRZcVA0xlStNpjwxolRnJ7lgH7IQNwb0gkFLhZWCXX+lra/Lo647o5BkE3LsePNEJ1MwNllLy0kWCjSZXtuTrv6CCz3239nGLoapeHzMyBWdoP4kxJe0CO0TaoqpxIcK4Hbjh95rGsyzGca7Z9GgLTs5hZFjHDPFdbQbrHQPjo4K4VgViy7SGsprMXuyyadWd+IHAQcWUaiEo/sINFLKr4ouCnCw9lThQ9OBn5TFx3TntJpMNLUDFXeQqM3s68gdeKgepTFTkThiNCcmd4Wr4dh+0s078wt4BVNzDhKXj9LSVKD0lx7yBYE0RmLEOsb9tu0Il1cX1RqIK5nruD303b+BspqO/XHTshqjkQHKBLaYfdP5+D1+osUa8HG7y1d85Fz2+GobdWuIK+yVBUIsM43w2wcvEuboWntxs5Ufqyj4bd15yC78Ao4RWRooSHJbxbc7XdubK5aFwURdGc6Gz8lJJmk5nGS69LcYds5RfGlg6uVMCTQjJyo5V22vjtBc9BKZTT+/Uple/Yt+g2IP4Z0SvPfdJ52Usq2zyfcjjuW1dc3TeQw6oj84s2y0sMbzDDWcUtyFfPMnsmgvRmCDsSSgELIMS4ijATtXJvi/24iR99vqM
+  template:
+    data: null
+    metadata:
+      creationTimestamp: null
+      name: wg-server-helm-values
+      namespace: default
+    type: Opaque
+
