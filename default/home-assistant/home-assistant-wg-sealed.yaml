@@ -1,0 +1,17 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: home-assistant-wg-secret
+  namespace: default
+spec:
+  encryptedData:
+    vpnConfigfile: AgAEomyUqZWGg9sb0XRxZJ0vBYUGNLFXl+R++8o6PIx4z5B6QBENLctrXnkVREizXsZjqQ4h+3rzikrm9RKKRa0JLAQhfZcAwttGxkjDc5pZzP6rT4ST/enyC9VV9MigGgebnEqwPLyXbbYasRjEW/nlTlNiOuuHisRysgDZfc8um3ROcX4AKysOTQgUz4qP2pKfGQGrlHXzdwOu3gXDjXU+KUQst8Pmx9QF4+MJxv8bF35HVQGY4J+OQI9mofzXt5AwWRArRxZYR3x1DfCZtImC9L1YcEVuBLLiLlA+3v8MS6WwfNritCIbyZ+bJvl+33R98Fy5yp7+N8p9FiFKKo9bwGHIV0rir3G4oWctVnqu31DcgS7TrTMtHj67x2KJQH1EEyA7jJVfA9GqxLRDh1VbPu7kI+Eaavy7tjVkmQjjjjZaAHev45wKsJT+jukXgyCWimwYKYbtspW+wZfrjXlJ1LShsXKnx2v24UBjNDeVzbIMpP5ON8Fq1D6ev7cvI8ctTaWD0YaBtGi3vu7A3z7xVklu4d8lltTB44oo/wXMLGUOMRyoqa1ceZbjV14POke36cT8qLrvKCvCm5w2ZVkVOTvgQhBM/enEx1B4J8qVm0YIWdrwCdi/mu65LbQ1C1v2lZHRscmQveM+wT9R7GGNm8cBjAqlqNMDdrFijfANHWXOIgV4h5uf8PZ34uEGmxk0/ua3BhcQPFJ6aS5jJrLF0YrezbvskaoQQ8iLjOS8uOUXDrJ87Jv8P6T+tL+tq98F+QtPzSX5ri342qBkqpSgWL+1/S1BiEg1kPM984VCu3X9ybriyaKvhjri3sdLdG6pj/wH5f+qKe4iBZFoZFVyk/vvw2+CP0GH/kh9FFW9KtGqNi1VD6WcH6Dx4EWfqFfdA1XBLVn6l3s0cJLlNgDZQLgBiFTZkoXEb0I/RZr7rAfwqS5rD/BmWJJ9MRWsQlLxJM1H0PfEDZfLb3NUxnXOJXe8CRd8mSSjAAxXvVjSelmpopVlwYUi+BBvC/OQhdptPol23oF74jb2HiAJRfphIT6OZ2TVmQ==
+  template:
+    data: null
+    metadata:
+      creationTimestamp: null
+      name: home-assistant-wg-secret
+      namespace: default
+    type: Opaque
+

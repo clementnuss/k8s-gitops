@@ -97,6 +97,15 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
+
+      vpn:
+        enabled: true
+        type: wireguard
+
+        # -- Reference an existing secret that contains the VPN configuration file
+        # The chart expects it to be present under the `vpnConfigfile` key.
+        configFileSecret: home-assistant-wg-secret
+
     resources:
       limits:
         memory: 1500Mi
