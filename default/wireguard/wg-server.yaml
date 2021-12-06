@@ -37,15 +37,6 @@ spec:
             port: 51820
             protocol: UDP
             nodePort: 31820
-      
-      cluster:
-        enabled: true
-        type: ClusterIP
-        ports:
-          vpn:
-            enabled: true
-            port: 51820
-            protocol: UDP
 
     additionalContainers: 
     - name: alpine
