@@ -102,11 +102,12 @@ spec:
         enabled: true
         type: wireguard
 
-        image:
-          # -- Specify the WireGuard image
-          repository: ghcr.io/k8s-at-home/wireguard
-          # -- Specify the WireGuard image tag
-          tag: v1.0.20210914
+        wireguard:
+          image:
+            # -- Specify the WireGuard image
+            repository: ghcr.io/k8s-at-home/wireguard
+            # -- Specify the WireGuard image tag
+            tag: v1.0.20210914
 
         # -- Reference an existing secret that contains the VPN configuration file
         # The chart expects it to be present under the `vpnConfigfile` key.
