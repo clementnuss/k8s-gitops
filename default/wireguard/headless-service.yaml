@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wireguard-astutus-headless
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: vpn
+    port: 51820
+    protocol: UDP
+    targetPort: vpn
+  selector:
+    app.kubernetes.io/instance: wireguard-astutus
+    app.kubernetes.io/name: wireguard
+  type: ClusterIP
