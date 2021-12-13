@@ -6,6 +6,7 @@ spec:
   acme:
     email: clement@astutus.org
     server: https://acme-staging-v02.api.letsencrypt.org/directory
+    preferredChain: "ISRG Root X1"
     privateKeySecretRef:
       name: letsencrypt-staging
     solvers:
@@ -22,6 +23,7 @@ spec:
   acme:
     email: clement.nuss@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
+    preferredChain: "ISRG Root X1"
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
