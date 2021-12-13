@@ -21,7 +21,6 @@ spec:
     replicaCount: 1
     recreatePods: true
     service:
-      type: NodePort
       nodePorts:
         mqttssl: 30883
 
