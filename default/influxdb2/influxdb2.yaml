@@ -29,6 +29,7 @@ spec:
       tls: true
       hostname: influxdb.astutus.org
       annotations:
+        kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-prod
         ingress.kubernetes.io/ssl-redirect: "true"
       path: /
