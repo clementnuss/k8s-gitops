@@ -87,6 +87,7 @@ spec:
             - create
             - delete
             - error
+            - update
         - name: v1/namespaces
           namespaces:
             include:
