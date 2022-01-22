@@ -1,0 +1,17 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: emqx-helm-values
+  namespace: default
+spec:
+  encryptedData:
+    values.yaml: AgA6H63hvdrKhFQyRiRljiq/ePd6C5g9hsLKfGecP/zGM4E7Bt08psX06TBNHdP+weQSqIWDehQSfbtd2lD7g/RKv/7rOiEQolH4c999ly4ie8O6gohRkUGSgiWLnArfka8wKcgGIDJmM55BTXzfq51hpk1Q5anF/vkcfA3wpPhmFOzx4thQE+dpYZCb2uESyZicllzA0Cis/Mx1VSmevkclWXSOdSyN+TkBgogiUfIy8MRad7ZgSc0lyf2W0JO4hxsD3GU309AGSe83Db7fNO37X2enbfX2YpCt0mhBbsrtN9U49TIwSjhzFE5yhWqZ/dnPkuN28fQqJmDoVpdUogJhsOhIbwDU4G0TyVClwmL1m66EjWz4k8YIQsJXja/yN9IO+I0IzudTBgWOSWf1uzfXdtd5i2QLCwRJNoBFWlc1l8JusNDGhcWHOVQknEKV5IJUQhv5r55rgvFJsqwZ0ALJ07caGMH9ED9zlEJE5uzEpj3Arh8LC4fvDHr0PqwGMXmM26gqK1QyRcEK2R97NzErlpeiylOQz0DunsuprLhWaNI/Zrj869CQFlNpCp43V7pRIUIXs+zdLFBG5r350xxduhrLy5T4KPoaG5NfMJwD3EVrVKA4SfXSnvDP565+gFSWOPbfOMOSlUVa4hVXccNO+2FRrhJ8c8+zTjHG/LAWNoiLw4Mfj+FsQpEyRsVyUEzg6E+8i1K22/ktYPF0AQLtzAOwSnv4u94Fb1Gb2qbwb6oZI+9b8sgWB1UQhoCDmuPSTDX1alNtnUdFoWMtKsuMrGRLDGksvB9yUm3plNKUHJ1+R+0y9yQGM3vpnNYigMPwshxw2XNS+fVUkE4gUcsNJBuOWY5HhlPfSq9o6Cp0SLwu+6Y60EGvNmsq9Lcny1ES1wSzySWkum8gNgRVD5ujTLWmG59+IVrRfETsEwWg7A5fDaRBbwE7xFUOcmcMRMoHXe5jclhlnpo+vWThb7FDl+jmkwN9jYbKu2MXD+/6hsBh5Bj/8kwnzj6ZAoeo3rgFG1mSxhSpeD7FceiWOYhxbmSU5gm4rTRUGgkH2PtI3G820/ty9yi0ASiYdP3hd500ICic0TM0v7+jzji958SqEyMtW+zZ0Ey8hC488Twu48ki1NQfPebJ/DMhIGEIUCqFDkrsVrLsX5jwndL4d0rs8bRKxJWi
+  template:
+    data: null
+    metadata:
+      creationTimestamp: null
+      name: emqx-helm-values
+      namespace: default
+    type: Opaque
+
