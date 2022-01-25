@@ -10,16 +10,16 @@ spec:
   chart:
     spec:
       chart: cert-manager
-      version: v1.4.0
+      version: v1.6.1
       sourceRef:
         kind: HelmRepository
         name: jetstack-charts
         namespace: flux-system
       interval: 5m
   values:
-    installCRDs: false
+    installCRDs: true
     webhook:
-      enabled: true  
+      enabled: true
     # extraArgs:
     # - --dns01-recursive-nameservers=1.1.1.1:53
     # - --dns01-recursive-nameservers-only
