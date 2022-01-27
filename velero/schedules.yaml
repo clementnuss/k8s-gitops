@@ -1,4 +1,4 @@
---- 
+---
 #created with: velero schedule create daily-backup --ttl=120h --schedule="0 3 * * *" -o yaml
 apiVersion: velero.io/v1
 kind: Schedule
@@ -15,4 +15,19 @@ spec:
     - ferme-roy
     ttl: 120h0m0s
   useOwnerReferencesInBackup: false
-status: {}
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  creationTimestamp: null
+  name: weekly-backup
+  namespace: velero
+spec:
+  schedule: "@every 168h"
+  template:
+    hooks: {}
+    includedNamespaces:
+    - default
+    - ferme-roy
+    ttl:  2160h0m0s
+  useOwnerReferencesInBackup: false
