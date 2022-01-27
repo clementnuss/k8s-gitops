@@ -88,6 +88,10 @@ spec:
             - delete
             - error
             - update
+          updateSetting:
+            includeDiff: true
+            fields:
+              - status.conditions[*]
         - name: v1/namespaces
           namespaces:
             include:
