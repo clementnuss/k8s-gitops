@@ -23,3 +23,17 @@ spec:
   url: ssh://git@github.com/clementnuss/ferme-roy.git
   secretRef:
     name: ferme-roy-ssh-credentials
+
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: private-k8s-workloads
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  url: ssh://git@github.com/clementnuss/private-k8s-workloads
+  secretRef:
+    name: private-k8s-workloads
