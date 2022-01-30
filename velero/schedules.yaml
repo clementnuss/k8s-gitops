@@ -13,6 +13,8 @@ spec:
     includedNamespaces:
     - default
     - ferme-roy
+    - zaco
+    - astutus
     ttl: 120h0m0s
   useOwnerReferencesInBackup: false
 ---
@@ -29,5 +31,7 @@ spec:
     includedNamespaces:
     - default
     - ferme-roy
+    - zaco
+    - astutus
     ttl:  2160h0m0s
   useOwnerReferencesInBackup: false
