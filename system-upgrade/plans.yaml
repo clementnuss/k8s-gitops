@@ -16,8 +16,7 @@ spec:
   serviceAccountName: system-upgrade
   upgrade:
     image: rancher/k3s-upgrade
-  channel: https://update.k3s.io/v1-release/channels/stable
- # version: v1.17.4+k3s1
+  version: v1.22.6+k3s1
 ---
 # Agent plan
 apiVersion: upgrade.cattle.io/v1
@@ -40,5 +39,4 @@ spec:
   serviceAccountName: system-upgrade
   upgrade:
     image: rancher/k3s-upgrade
-  # version: v1.17.4+k3s1
-  channel: https://update.k3s.io/v1-release/channels/stable
+  version: v1.22.6+k3s1
