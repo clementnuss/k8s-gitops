@@ -9,13 +9,14 @@ spec:
   chart:
     spec:
       chart: kyverno
-      version: 4.1.3
+      version: 2.4.1
       sourceRef:
         kind: HelmRepository
         name: kyverno-charts
         namespace: flux-system
       interval: 5m
   values:
+    namespace: kube-system
 
     webhooks:
       # Exclude namespaces
@@ -25,7 +26,6 @@ spec:
             operator: In
             values:
               - kube-system
-              - kyverno
       # Exclude objects
       # - objectSelector:
       #     matchExpressions:
