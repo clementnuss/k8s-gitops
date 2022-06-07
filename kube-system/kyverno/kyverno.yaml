@@ -1,0 +1,33 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kyverno
+  namespace: kube-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: kyverno
+      version: 4.1.3
+      sourceRef:
+        kind: HelmRepository
+        name: kyverno-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+
+    webhooks:
+      # Exclude namespaces
+      - namespaceSelector:
+          matchExpressions:
+          - key: kubernetes.io/metadata.name
+            operator: In
+            values:
+              - kube-system
+              - kyverno
+      # Exclude objects
+      # - objectSelector:
+      #     matchExpressions:
+      #     - key: webhooks.kyverno.io/exclude
+      #       operator: DoesNotExist
