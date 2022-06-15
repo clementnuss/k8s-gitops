@@ -20,3 +20,6 @@ spec:
             name: kubernetes-dashboard
             port:
               number: 8443
+  tls:
+  - hosts:
+    - k8s-dashboard.astutus.org
