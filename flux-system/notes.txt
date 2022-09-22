@@ -1,0 +1,3 @@
+# update gotk-components with:
+
+flux install --network-policy=false --export --toleration-keys node-role.kubernetes.io/master --export > gotk-components.yaml
