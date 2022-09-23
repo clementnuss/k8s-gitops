@@ -3,6 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: emqx
   namespace: default
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+    kustomize.toolkit.fluxcd.io/ssa: merge
 spec:
   resources:
     requests:
