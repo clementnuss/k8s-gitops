@@ -59,15 +59,15 @@ spec:
         enabled: true
       startup:
         enabled: true
-      
+
     persistence:
       config:
         enabled: true
         existingClaim: home-assistant-config
-    
+
     podAnnotations:
       backup.velero.io/backup-volumes: config
-    
+
     addons:
       codeserver:
         enabled: true
@@ -98,29 +98,6 @@ spec:
         - name: config
           mountPath: /config
 
-      vpn:
-        enabled: true
-        type: wireguard
-
-        wireguard:
-          image:
-            # -- Specify the WireGuard image
-            repository: ghcr.io/k8s-at-home/wireguard
-            # -- Specify the WireGuard image tag
-            tag: v1.0.20210914
-
-        # -- Reference an existing secret that contains the VPN configuration file
-        # The chart expects it to be present under the `vpnConfigfile` key.
-        configFileSecret: home-assistant-wg-secret
-        # livenessProbe: 
-        #   exec:
-        #     command:
-        #       - sh
-        #       - -c
-        #       - ping -c 1 10.29.63.1
-        #   initialDelaySeconds: 30
-        #   periodSeconds: 60
-        #   failureThreshold: 1
 
     resources:
       limits:
