@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: cinder-csi-cloud-config
+    namespace: kube-system
+type: Opaque
+stringData:
+    cloud-config: ENC[AES256_GCM,data:tdl4itHu8YMtLCHLWJJLyCIe7T7J2zYo8rgAxwFBaRAIcf3a6tF9OknygdRB78YFFqEwGJhSTEBo4I6+2GqR5dc1UB5Xhbw6NkqShUB9a2Ulp8B+hctRGOqErbtHAeTcxYo939T7PK6agP664HXdh4vDZP3FAuiRuIzd7ox+4iiXPoYYYCp49cBTwTliWJ3K9mb+8pzdo3C6PnYU9Djgsagy/kue+WW3vscVPcxY7E1v++B3kMzQA7ew8P7kuiYmWQ0UEp4KDgbRTJdwveTEFfx10P6KiqFi4BsoKnSmnwf9AjdCADLxSK8nhVV5VSBvv84xU0Qf2c10tfnw,iv:s/PXSozAHHS40VRCkJ5HesbjgyrQWQoM/yFbPVRJ5Ro=,tag:nf4MtOkUkS8W0uSrYkNiwA==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBWL2tjM0NUblJhWXhjUkdL
+            NFQxZnp2WVRzQ0NNVDdIVEZSb0NueUVpQ0hJCkEwNFg5U1VxMS9ZVjdiVlIyNG8x
+            WGFWVmtVQVR5R3pPWmd2dUpiZDRhVTQKLS0tIFpzRjNlZ2JFTTNXbnJiNEg4Tm1J
+            Z1VXdWIyd3FIdkJPa1lPN3YycDM2TEUKwBeqeQNLMz94sAgGRQzqx4dVz/dhBfKR
+            zOwFCElf7AHi6s0W7AW6FWqA0cWi96kA9FxpXn69u6J/hrtE+Lqx9A==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2022-09-24T12:15:25Z"
+    mac: ENC[AES256_GCM,data:nodXf/hoW2AgFmo2YZWWdfIhFancx4LOy5jWCQbb9LLLut9wn7J3DKZLekq5RbjfczMQlVHNMmyDIbqVffF2ya75ELAKOOlfkpfeKH3cOo0VgXC3+e+7h6o7/duft9At2WNp3WLnWpXyQ/x3P4wImZGd5+4/MAFMkBLDlU4BcKA=,iv:gzoCLR5qhD5iG7O0eAO9YOJhkCueHsm0HoigzibB6Ro=,tag:zqa+yjj2ybLAYZIQPYGfRQ==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.7.3
