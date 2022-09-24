@@ -11,16 +11,19 @@ spec:
     replicaCount: 2
     extraArgs:
       dedup.minScrapeInterval: 15s
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8481"
     storageDataPath: "/vm-data"
     affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: "app.kubernetes.io/name"
-                operator: In
-                values:
-                - "vmstorage"
+                - key: "app.kubernetes.io/name"
+                  operator: In
+                  values:
+                    - "vmstorage"
             topologyKey: "kubernetes.io/hostname"
     storage:
       volumeClaimTemplate:
@@ -37,16 +40,19 @@ spec:
     replicaCount: 2
     extraArgs:
       dedup.minScrapeInterval: 15s
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8481"
     cacheMountPath: "/select-cache"
     affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: "app.kubernetes.io/name"
-                operator: In
-                values:
-                - "vmselect"
+                - key: "app.kubernetes.io/name"
+                  operator: In
+                  values:
+                    - "vmselect"
             topologyKey: "kubernetes.io/hostname"
 
     storage:
@@ -62,15 +68,18 @@ spec:
 
   vminsert:
     replicaCount: 2
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8481"
     affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: "app.kubernetes.io/name"
-                operator: In
-                values:
-                - "vminsert"
+                - key: "app.kubernetes.io/name"
+                  operator: In
+                  values:
+                    - "vminsert"
             topologyKey: "kubernetes.io/hostname"
     resources:
       limits:
