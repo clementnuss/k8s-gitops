@@ -5,9 +5,12 @@ metadata:
   namespace: metrics
 spec:
   retentionPeriod: "6"
+  replicationFactor: 2
 
   vmstorage:
     replicaCount: 2
+    extraArgs:
+      dedup.minScrapeInterval: 15s
     storageDataPath: "/vm-data"
     affinity:
         podAntiAffinity:
@@ -32,6 +35,8 @@ spec:
 
   vmselect:
     replicaCount: 2
+    extraArgs:
+      dedup.minScrapeInterval: 15s
     cacheMountPath: "/select-cache"
     affinity:
         podAntiAffinity:
