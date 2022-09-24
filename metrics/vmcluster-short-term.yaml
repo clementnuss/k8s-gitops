@@ -9,11 +9,12 @@ spec:
 
   vmstorage:
     replicaCount: 2
+    # podMetadata:
+    #   annotations:
+    #     prometheus.io/scrape: "true"
+    #     prometheus.io/port: "8482"
     extraArgs:
       dedup.minScrapeInterval: 15s
-    podAnnotations:
-      prometheus.io/scrape: "true"
-      prometheus.io/port: "8481"
     storageDataPath: "/vm-data"
     affinity:
       podAntiAffinity:
@@ -40,9 +41,10 @@ spec:
     replicaCount: 2
     extraArgs:
       dedup.minScrapeInterval: 15s
-    podAnnotations:
-      prometheus.io/scrape: "true"
-      prometheus.io/port: "8481"
+    # podMetadata:
+    #   annotations:
+    #     prometheus.io/scrape: "true"
+    #     prometheus.io/port: "8481"
     cacheMountPath: "/select-cache"
     affinity:
       podAntiAffinity:
@@ -68,9 +70,10 @@ spec:
 
   vminsert:
     replicaCount: 2
-    podAnnotations:
-      prometheus.io/scrape: "true"
-      prometheus.io/port: "8481"
+    # podMetadata:
+    #   annotations:
+    #     prometheus.io/scrape: "true"
+    #     prometheus.io/port: "8480"
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
