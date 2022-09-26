@@ -16,7 +16,7 @@ spec:
     - job_name: vmagent
       static_configs:
         - targets: ["localhost:8429"]
-    - job_name: "kubernetes-apiservers"
+    - job_name: "apiserver"
       kubernetes_sd_configs:
         - role: endpoints
       scheme: https

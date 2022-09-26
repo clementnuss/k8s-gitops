@@ -4,17 +4,13 @@ metadata:
   name: vmcluster-short-term
   namespace: metrics
 spec:
-  retentionPeriod: "6"
-  replicationFactor: 2
+  retentionPeriod: "3"
+  replicationFactor: 1
 
   vmstorage:
-    replicaCount: 2
-    # podMetadata:
-    #   annotations:
-    #     prometheus.io/scrape: "true"
-    #     prometheus.io/port: "8482"
+    replicaCount: 3
     extraArgs:
-      dedup.minScrapeInterval: 15s
+      dedup.minScrapeInterval: 30s
     storageDataPath: "/vm-data"
     affinity:
       podAntiAffinity:
@@ -40,11 +36,7 @@ spec:
   vmselect:
     replicaCount: 2
     extraArgs:
-      dedup.minScrapeInterval: 15s
-    # podMetadata:
-    #   annotations:
-    #     prometheus.io/scrape: "true"
-    #     prometheus.io/port: "8481"
+      dedup.minScrapeInterval: 30s
     cacheMountPath: "/select-cache"
     affinity:
       podAntiAffinity:
@@ -70,10 +62,6 @@ spec:
 
   vminsert:
     replicaCount: 2
-    # podMetadata:
-    #   annotations:
-    #     prometheus.io/scrape: "true"
-    #     prometheus.io/port: "8480"
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
