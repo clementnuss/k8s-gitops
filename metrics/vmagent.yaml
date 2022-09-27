@@ -8,7 +8,7 @@ spec:
   podScrapeNamespaceSelector: {}
   podScrapeSelector: {}
   serviceScrapeSelector: {}
-  scrapeInterval: 60s
+  scrapeInterval: 30s
   replicaCount: 2
   remoteWrite:
     - url: "http://vminsert-vmcluster-short-term.metrics.svc.cluster.local:8480/insert/0/prometheus/"
