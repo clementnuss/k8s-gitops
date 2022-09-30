@@ -16,6 +16,10 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    grafana.ini:
+      unified_alerting.screenshots:
+        capture: true
+
     persistence:
       type: pvc
       enabled: true
@@ -48,8 +52,5 @@ spec:
         - grafana.astutus.org
 
       tls:
-      - hosts:
-        - grafana.astutus.org
-
-
-
+        - hosts:
+            - grafana.astutus.org
