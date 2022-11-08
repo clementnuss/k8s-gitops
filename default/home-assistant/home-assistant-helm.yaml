@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: home-assistant-helm-values
+    namespace: default
+type: Opaque
+stringData:
+    values.yaml: ENC[AES256_GCM,data:jVU0Ek7ywSNU7QsiA+Fik61sBg++5bBJJPYWXxNn0i+SltyZejQu4ze/swJmEJFopW6UrpWyDGjkH3I7KYVghK5PbbaMsA==,iv:KgMDiiqDYqW+jz88gCj5cwayUj1rgs8rHeT7YFrJe6A=,tag:EYugJSzWkeKIP/tNrMCPmQ==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHRGhuOGx0eVZsWU9jWW5q
+            N0tHVlVKRlo5ZDJZNVh2UnhOR3dtcFhZVVhZClRnd0t2TjdWdlZraThRVCtHSVQr
+            dmJVN01OMWhVMWJ0Q2tZSWpOOE94MHcKLS0tIFowNGhqMmpVK24xWlR3UWZzU2ZL
+            L0NCbHFnR2RLS1RDSWh5MU5LUGNqNVkKoVWe0fSncLiXanxRXfm9bbwQb3MZRTxZ
+            81cfST5YdoSPpsXNOV6rdhKW3W8MyK8/XcqHn43ZiDtTWsW1/UmQMQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2022-11-08T06:26:50Z"
+    mac: ENC[AES256_GCM,data:0RXyvc88+hG8DnM/Y3Li5FMDtFXtXgb30Js1guF6ApgQNDXjEEySpe8XuwUNN8fCjrwls8OxxhEqEmU6Sh33rUhqc3ZDDy4//zxXlropkg1HfkpPs0ncGy3QNOd7UBCQqdfEPImPIN2csSmqhwpSRwJGirqFVzsFdDRrZ89ZQWo=,iv:3esNn3kbmpJkGB+kD4HapuDB7rx/gL3jnPd7CDcKC6A=,tag:N/9SytzjNu7DbGHXULNNjQ==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.7.3

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: emqx-helm-values
+    namespace: default
+type: Opaque
+stringData:
+    values.yaml: ENC[AES256_GCM,data:NkcNT68QKgMu3oRi5SqMathZ+75KT4urBykVmjvwrkxdUFjGTceJvxuiR//oSSFOTC8QUiAGRCfB4pNW0EmkcH7KmG3AGUDG0zd75VTzRi4pV6OMz1CwMqpw2/BcfCWyzvP9TpAGT4qlnrCWhpY9mpiyWCqny6RTfgmGDu3hlS4hjjm4NCxxOJCZE/rVYOfdRwSsQyRn9FBdTQj2MUCTDOdcAOnvd8Aw4wxg5VdLFLjdP/5ilzFU1LVjht/2mfkRAjjlNA==,iv:b/WL9X+VdP3O3kYLzV90m6uxDqQwvOqC1yu9fCiWZP4=,tag:UWuJ2z2lnlrnsSvzWlymTw==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBtK2E0STV0NzJCeDRoQU51
+            REkrZFNYNWRqeDM5L0c5M0U5SDMrL1hQQURRCnFDdGE2enF0eExQMTlBb0E5Ylhz
+            Qnk2VVd2aWN4cjNyZlFFakhvVGlubVkKLS0tIHFrMFpHWDEram52YWplMndyaXpF
+            T1NRK25KZ1A1U3NKd1FFbHc1S1ZRVlEKLcO4x2AC0mV5/Fymem7/Cr/nMbfH6zg8
+            RZcnraVLZPWhxbU4LPpwiQHlgs2K+wsBcEk55wFKzGsgzKVEXIXLqw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2022-11-08T06:26:50Z"
+    mac: ENC[AES256_GCM,data:BqoA43QiKLTJqNpIs9dP+B7BIcvACZkPbxNzZCj+goJPJ4lOGkXMUpsP7nm0oAtcVL4xrzQNFC+JoRgw9OaXS4T/p3ARUYwPXUJJl7TABwI/ayVRQu7UDPoG4hJIFEYilVceGdXNLBknzqZGRk3X3aBLJWIS/anN3DEwplIjf5U=,iv:SEGwvRQIovGim21zAofEqk9k+XPH48G/eZrt7a9QDfY=,tag:pcsWBIopmrbCdpgMd5I91g==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.7.3
