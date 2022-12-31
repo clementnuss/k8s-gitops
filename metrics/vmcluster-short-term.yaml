@@ -8,7 +8,7 @@ spec:
   replicationFactor: 1
 
   vmstorage:
-    replicaCount: 3
+    replicaCount: 2
     extraArgs:
       dedup.minScrapeInterval: 30s
     storageDataPath: "/vm-data"
@@ -27,10 +27,10 @@ spec:
         spec:
           resources:
             requests:
-              storage: 10Gi
+              storage: 20Gi
     resources:
       limits:
-        cpu: "1"
+        cpu: "2"
         memory: 2048Mi
 
   vmselect:
