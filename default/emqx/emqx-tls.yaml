@@ -5,7 +5,7 @@ metadata:
   name: emqx-tls
   namespace: default
 spec:
-  secretName: emqx-crt-secret
+  secretName: emqx-tls
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer

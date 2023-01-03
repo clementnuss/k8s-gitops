@@ -1,0 +1,41 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: cilium
+      version: 1.12.2
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+        namespace: flux-system
+      interval: 5m
+  values:
+    k8s-api-server: "https://192.168.250.80:6443"
+
+    prometheus:
+      enabled: true
+
+    ipam:
+    # -- Configure IP Address Management mode.
+    # ref: https://docs.cilium.io/en/stable/concepts/networking/ipam/
+    mode: "cluster-pool"
+    operator:
+      # -- Deprecated in favor of ipam.operator.clusterPoolIPv4PodCIDRList.
+      # IPv4 CIDR range to delegate to individual nodes for IPAM.
+      clusterPoolIPv4PodCIDR: "172.16.0.0/16"
+      # -- IPv4 CIDR mask size to delegate to individual nodes for IPAM.
+      clusterPoolIPv4MaskSize: 24
+      # -- Deprecated in favor of ipam.operator.clusterPoolIPv6PodCIDRList.
+      # IPv6 CIDR range to delegate to individual nodes for IPAM.
+      # clusterPoolIPv6PodCIDR: "fd00::/104"
+      # -- IPv6 CIDR mask size to delegate to individual nodes for IPAM.
+      # clusterPoolIPv6MaskSize: 120
+      prometheus:
+        enabled: true
+
