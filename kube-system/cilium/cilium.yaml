@@ -16,26 +16,25 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    k8s-api-server: "https://192.168.250.80:6443"
+    k8sServiceHost: 192.168.250.80
+    k8sServicePort: 6443
+
+    kubeProxyReplacement: "strict"
 
     prometheus:
       enabled: true
 
     ipam:
-    # -- Configure IP Address Management mode.
-    # ref: https://docs.cilium.io/en/stable/concepts/networking/ipam/
-    mode: "cluster-pool"
-    operator:
-      # -- Deprecated in favor of ipam.operator.clusterPoolIPv4PodCIDRList.
-      # IPv4 CIDR range to delegate to individual nodes for IPAM.
-      clusterPoolIPv4PodCIDR: "172.16.0.0/16"
-      # -- IPv4 CIDR mask size to delegate to individual nodes for IPAM.
-      clusterPoolIPv4MaskSize: 24
-      # -- Deprecated in favor of ipam.operator.clusterPoolIPv6PodCIDRList.
-      # IPv6 CIDR range to delegate to individual nodes for IPAM.
-      # clusterPoolIPv6PodCIDR: "fd00::/104"
-      # -- IPv6 CIDR mask size to delegate to individual nodes for IPAM.
-      # clusterPoolIPv6MaskSize: 120
-      prometheus:
-        enabled: true
-
+      # -- Configure IP Address Management mode.
+      # ref: https://docs.cilium.io/en/stable/concepts/networking/ipam/
+      mode: "cluster-pool"
+      operator:
+        clusterPoolIPv4PodCIDRList:
+          - 172.16.0.0/16
+        clusterPoolIPv4MaskSize: 24
+        # clusterPoolIPv6PodCIDRList:
+        # - "fd00::/104"
+        # -- IPv6 CIDR mask size to delegate to individual nodes for IPAM.
+        # clusterPoolIPv6MaskSize: 120
+        prometheus:
+          enabled: true
