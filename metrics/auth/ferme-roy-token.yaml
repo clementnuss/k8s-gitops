@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: ferme-roy-token
+    namespace: metrics
+type: Opaque
+stringData:
+    token: ENC[AES256_GCM,data:bTbLjt7HxkMMONpxWvf6i5/8vpYvTiQqckfzC08I,iv:y4rRg8iVr1ZsOH5kWvb4Ntk4AXsQ67b4SZe2OxMuVtc=,tag:Que2z5iB2LRvKUt0DSiqxg==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBzY01nWHQyUEx4OTFSay9P
+            ZUVyMFNaVVBLS0NEejNKZW1uQlozb1ZJS25BCmIxOERjVjM5dEJQV0l1Qk1kU1ZX
+            SUE2VEtYUWtVa0FDWlFobHFSbWRGVlUKLS0tIHFJYVh4QTlwM21WVkJDa0lhUkhM
+            VWdaQzBIOEh2ZnhzK3JNbytleFQ5em8K0y54wTqtrhna5FGnU+O1hvBRWEVHZ2rX
+            IzghUaH0yfPTupnMiK9mfSic4IfeUsN87nYJa9yFPvcAnNvrmJMacg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2023-01-10T05:16:27Z"
+    mac: ENC[AES256_GCM,data:/qBYFtEd2xj8nIHUY+34venzIfk8Ohv/Kh5i0LeUQt/ognfVQmQXBbCuzUpUrAwf6KQgCMwXDkQRYIeGSTbD5rvAAbLrGkSwBEXWouV48xiXkFgxx7HKHX5XxlVoHJc0peK+eMUAzBY7bCq96VSAUrMxF0WtURTwfu16XZPlMIM=,iv:1/D6WhVgugTh5kSr3HLaYxwN3VJi96iObZhwwvSm94A=,tag:CbMlf+MW+aZPX+/xu2me3A==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.7.3
