@@ -7,11 +7,17 @@ spec:
   selectAllByDefault: true
   scrapeInterval: 30s
   replicaCount: 2
+  remoteWriteSettings:
+    useMultiTenantMode: true
+  resources:
+    limits:
+      cpu: 0
+      memory: 2048M
   remoteWrite:
-    - url: "http://vminsert-vmcluster-short-term.metrics.svc.cluster.local:8480/insert/0/prometheus/"
-    - url: "http://vminsert-vmcluster-long-term.metrics.svc.cluster.local:8480/insert/0/prometheus/"
+    - url: http://vminsert-vmcluster-short-term.metrics.svc.cluster.local:8480/
+    - url: http://vminsert-vmcluster-long-term.metrics.svc.cluster.local:8480/
       inlineUrlRelabelConfig:
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_retention]
+        - source_labels: [retention_period]
           regex: "long-term"
           action: keep
 
