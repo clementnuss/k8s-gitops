@@ -12,16 +12,6 @@ spec:
     extraArgs:
       dedup.minScrapeInterval: 300s
     storageDataPath: "/vm-data"
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: "app.kubernetes.io/name"
-                  operator: In
-                  values:
-                    - "vmstorage"
-            topologyKey: "kubernetes.io/hostname"
     storage:
       volumeClaimTemplate:
         spec:
@@ -38,16 +28,6 @@ spec:
     extraArgs:
       dedup.minScrapeInterval: 300s
     cacheMountPath: "/select-cache"
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: "app.kubernetes.io/name"
-                  operator: In
-                  values:
-                    - "vmselect"
-            topologyKey: "kubernetes.io/hostname"
 
     storage:
       volumeClaimTemplate:
@@ -62,16 +42,6 @@ spec:
 
   vminsert:
     replicaCount: 1
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: "app.kubernetes.io/name"
-                  operator: In
-                  values:
-                    - "vminsert"
-            topologyKey: "kubernetes.io/hostname"
     resources:
       limits:
         cpu: "0.5"
