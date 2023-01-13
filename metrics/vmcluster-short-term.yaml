@@ -34,31 +34,11 @@ spec:
         memory: 2048Mi
 
   vmselect:
-    replicaCount: 2
+    replicaCount: 1
     extraArgs:
       dedup.minScrapeInterval: 30s
     cacheMountPath: "/select-cache"
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: "app.kubernetes.io/name"
-                  operator: In
-                  values:
-                    - "vmselect"
-            topologyKey: "kubernetes.io/hostname"
 
-    storage:
-      volumeClaimTemplate:
-        spec:
-          resources:
-            requests:
-              storage: 2Gi
-    resources:
-      limits:
-        cpu: "0.5"
-        memory: "500Mi"
 
   vminsert:
     replicaCount: 2

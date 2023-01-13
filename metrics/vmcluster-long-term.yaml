@@ -27,18 +27,7 @@ spec:
     replicaCount: 1
     extraArgs:
       dedup.minScrapeInterval: 300s
-    cacheMountPath: "/select-cache"
 
-    storage:
-      volumeClaimTemplate:
-        spec:
-          resources:
-            requests:
-              storage: 1Gi
-    resources:
-      limits:
-        cpu: "0.5"
-        memory: "500Mi"
 
   vminsert:
     replicaCount: 1
