@@ -10,16 +10,24 @@ spec:
   remoteWriteSettings:
     useMultiTenantMode: true
   resources:
+    requests:
+      cpu: 200m
+      memory: 256M
     limits:
-      cpu: 0
+      cpu: 1500m
       memory: 2048M
   remoteWrite:
     - url: http://vminsert-vmcluster-short-term.metrics.svc.cluster.local:8480/
+      inlineUrlRelabelConfig:
+        - action: labeldrop
+          regex: "retention_period"
     - url: http://vminsert-vmcluster-long-term.metrics.svc.cluster.local:8480/
       inlineUrlRelabelConfig:
         - source_labels: [retention_period]
           regex: "long-term"
           action: keep
+        - action: labeldrop
+          regex: "retention_period"
 
   # inlineScrapeConfig: |
   #   - job_name: vmagent
