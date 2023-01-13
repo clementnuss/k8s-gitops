@@ -14,20 +14,6 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
-  name: ferme-roy
-  namespace: flux-system
-spec:
-  interval: 1m0s
-  ref:
-    branch: master
-  url: ssh://git@github.com/clementnuss/ferme-roy.git
-  secretRef:
-    name: ferme-roy-ssh-credentials
-
----
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: GitRepository
-metadata:
   name: private-k8s-workloads
   namespace: flux-system
 spec:
