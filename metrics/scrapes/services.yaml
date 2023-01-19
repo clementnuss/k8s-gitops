@@ -8,30 +8,32 @@ spec:
   jobLabel: "app.kubernetes.io/name"
   endpoints:
     - relabelConfigs:
-        - sourceLabels:
-            [__meta_kubernetes_service_annotation_prometheus_io_scrape]
-          action: keep
+        - action: keep
           regex: "true"
-        - sourceLabels:
-            [__meta_kubernetes_service_annotation_prometheus_io_scheme]
-          action: replace
-          targetLabel: __scheme__
+          sourceLabels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scrape
+        - action: replace
           regex: (https?)
-        - sourceLabels:
-            [__meta_kubernetes_service_annotation_prometheus_io_path]
-          action: replace
-          targetLabel: __metrics_path__
+          sourceLabels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scheme
+          targetLabel: __scheme__
+        - action: replace
           regex: (.+)
-        - sourceLabels:
-            [
-              __address__,
-              __meta_kubernetes_service_annotation_prometheus_io_port,
-            ]
-          action: replace
-          targetLabel: __address__
+          sourceLabels:
+            - __meta_kubernetes_service_annotation_prometheus_io_path
+          targetLabel: __metrics_path__
+        - action: keep_if_equal
+          source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_port
+            - __meta_kubernetes_pod_container_port_number
+        - action: replace
           regex: ([^:]+)(?::\d+)?;(\d+)
           replacement: $1:$2
-      # port: metrics
+          sourceLabels:
+            - __address__
+            - __meta_kubernetes_service_annotation_prometheus_io_port
+          targetLabel: __address__
+          # port: metrics
   namespaceSelector:
     any: true
   selector: {}

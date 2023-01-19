@@ -21,6 +21,8 @@ spec:
       inlineUrlRelabelConfig:
         - action: labeldrop
           regex: "retention_period"
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_tenant]
+          target_label: __tenant_id__
     - url: http://vminsert-vmcluster-long-term.metrics.svc.cluster.local:8480/
       inlineUrlRelabelConfig:
         - source_labels: [retention_period]
@@ -28,6 +30,8 @@ spec:
           action: keep
         - action: labeldrop
           regex: "retention_period"
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_tenant]
+          target_label: __tenant_id__
 
   # inlineScrapeConfig: |
   #   - job_name: vmagent
