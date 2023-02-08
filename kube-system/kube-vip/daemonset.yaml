@@ -52,7 +52,7 @@ spec:
           value: "1"
         - name: address
           value: 192.168.250.80
-        image: ghcr.io/kube-vip/kube-vip:v0.5.8
+        image: ghcr.io/kube-vip/kube-vip:v0.5.9
         imagePullPolicy: Always
         name: kube-vip
         resources: {}
