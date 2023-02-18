@@ -3,29 +3,33 @@
 apiVersion: velero.io/v1
 kind: Schedule
 metadata:
-  creationTimestamp: null
   name: daily-backup
   namespace: velero
 spec:
-  schedule: 0 3 * * *
+  schedule: 30 12 * * *
   template:
-    hooks: {}
-    includedNamespaces:
-    - appl-*
+    excludedNamespaces:
+    - kube-system
+    - flux-system
     ttl: 120h0m0s
-  useOwnerReferencesInBackup: false
+  excludedResources:
+    - secret
+  defaultVolumesToFsBackup: true
+  snapshotVolumes: false
 ---
 apiVersion: velero.io/v1
 kind: Schedule
 metadata:
-  creationTimestamp: null
   name: weekly-backup
   namespace: velero
 spec:
-  schedule: "@every 168h"
+  schedule: "14 03 * * 1" # on monday, at 03:14AM
   template:
-    hooks: {}
-    includedNamespaces:
-    - appl-*
+    excludedNamespaces:
+    - kube-system
+    - flux-system
     ttl:  2160h0m0s
-  useOwnerReferencesInBackup: false
+  excludedResources:
+    - secret
+  defaultVolumesToFsBackup: true
+  snapshotVolumes: false
