@@ -23,7 +23,7 @@ spec:
       defaultVolumesToRestic: true
       backupStorageLocation:
         name: default
-        bucket: default
+        bucket: velero
         config:
           region: us-east-1
           s3ForcePathStyle: true

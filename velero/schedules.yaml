@@ -11,10 +11,7 @@ spec:
   template:
     hooks: {}
     includedNamespaces:
-    - default
-    - ferme-roy
-    - zaco
-    - astutus
+    - appl-*
     ttl: 120h0m0s
   useOwnerReferencesInBackup: false
 ---
@@ -29,9 +26,6 @@ spec:
   template:
     hooks: {}
     includedNamespaces:
-    - default
-    - ferme-roy
-    - zaco
-    - astutus
+    - appl-*
     ttl:  2160h0m0s
   useOwnerReferencesInBackup: false
