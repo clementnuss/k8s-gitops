@@ -18,10 +18,6 @@ spec:
   values:
     credentials:
       existingSecret: s3-infomaniak
-    # disabling the job, as docker image not ARM64 compatible.
-    # we manually have to upgrade CRDs with the following command
-    # velero install --crds-only
-    upgradeCRDs: false
     configuration:
       provider: aws
       defaultVolumesToRestic: true
@@ -55,23 +51,15 @@ spec:
         cpu: 25m
       limits:
         memory: 500Mi
-    # tolerations:
-    # - key: "arm"
-    #   operator: "Exists"
-    # enableHelmHooks: false
     metrics:
       enabled: true
-      # serviceMonitor:
-      #   enabled: true
     snapshotsEnabled: false
-    deployRestic: true
+    deployNodeAgent: true
     installCRDs: true
-    restic:
+    nodeAgent:
       podVolumePath: /var/lib/kubelet/pods
-      privileged: false
+      privileged: true
       tolerations:
-      # - key: "arm"
-      #   operator: "Exists"
       - key: "node-role.kubernetes.io/master"
         operator: "Exists"
       resources:
@@ -80,4 +68,3 @@ spec:
           cpu: 15m
         limits:
           memory: 1000Mi
-      
