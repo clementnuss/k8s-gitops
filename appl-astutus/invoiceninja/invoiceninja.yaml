@@ -1,0 +1,47 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: invoiceninja
+  namespace: appl-astutus
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://invoiceninja.github.io/dockerfiles
+      chart: invoiceninja
+      version: 0.10.1
+      sourceRef:
+        kind: HelmRepository
+        name: invoiceninja
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: invoiceninja/invoiceninja
+      tag: 5.5.71
+    mariadb:
+      enabled: false
+    updateStrategy:
+      type: Recreate
+    ingress:
+      certManager: true
+      ingressClassName: nginx
+      tls: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    redis:
+      sentinel:
+        getMasterTimeout: 45
+        failoverTimeout: 90000
+      master:
+        persistence:
+          size: 1Gi
+      replica:
+        persistence:
+          size: 1Gi
+
+  valuesFrom:
+  - kind: Secret
+    name: "invoiceninja-helm-values"
+    optional: false
