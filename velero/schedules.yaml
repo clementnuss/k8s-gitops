@@ -6,16 +6,17 @@ metadata:
   name: daily-backup
   namespace: velero
 spec:
-  schedule: 30 12 * * *
+  schedule: 0 18 * * *
   template:
+    defaultVolumesToFsBackup: true
     excludedNamespaces:
     - kube-system
     - flux-system
+    - system-upgrade
     ttl: 120h0m0s
-  excludedResources:
-    - secret
-  defaultVolumesToFsBackup: true
-  snapshotVolumes: false
+    excludedResources:
+      - secret
+    snapshotVolumes: false
 ---
 apiVersion: velero.io/v1
 kind: Schedule
@@ -25,11 +26,12 @@ metadata:
 spec:
   schedule: "14 03 * * 1" # on monday, at 03:14AM
   template:
+    defaultVolumesToFsBackup: true
     excludedNamespaces:
     - kube-system
     - flux-system
+    - system-upgrade
     ttl:  2160h0m0s
-  excludedResources:
-    - secret
-  defaultVolumesToFsBackup: true
-  snapshotVolumes: false
+    excludedResources:
+      - secret
+    snapshotVolumes: false
