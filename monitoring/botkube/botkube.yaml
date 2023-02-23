@@ -18,12 +18,10 @@ spec:
       interval: 5m
   values:
     image:
-      repository: infracloudio/botkube
-      tag: v0.12.1
       pullPolicy: Always
     config:
       settings:
-        clustername: k8s
+        clusterName: cjmn-infomaniak
       resources:
         - name: velero.io/v1/backups
           namespaces:
