@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: oauth2-proxy-helm-values
+    namespace: kube-system
+type: Opaque
+stringData:
+    values.yaml: ENC[AES256_GCM,data:hcqUxdbMKPpq7AdmFGJUewriT0U9EQ5KiTWQeR9L9zaY7IEJcz/307GoRDLNOgFhC4sbvgIxqMjw4lTRLppjuFH8d0uwUH5+i0Co62Bpwjmi6pDwIC8LUs6wFjNslpchErLxDeee52VwrS84e1Ogw1kqN23E8IWsWtrS9DY09ko/6e+rrouqhfVI0yCN4cQCTHK2e4KBnK5PpARZ5zWDchlNwpwEgeFflMYFeBDmJ1GxnfWVFuA2c4jKqwnCkS/jWxx5WO5ImYPPF3r1pjBmx4SL8qPUX1M6s9YadaEeEWsb3ehEx+un9H6KEnTusAr1TdUfgq6rm4rir5Unfh1ptzZDOmIgVnxayenpzOmaq5VScYMHcUTZP8MRNqWqzR9uvQ==,iv:DvzbceEzp28D4d/fuPQRYIbPsgjuZpfi8cWEyVh271w=,tag:kWBiJrhaox9+LAqWhIf8nA==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2MVFNaWhPVFRVR095UEVQ
+            cXc5bGxrMk95U2JpQWdLWlNlQlViUlc1NlhJCm9VemRraWRDSS8yekY1dVJOMWo4
+            ZUVncFVSMytRRWN2V1FxWTVzem1POFUKLS0tIHVMWXNCWVVvenljSG5HdmVjUVZZ
+            N3ZhbEtTNk8xNDg5a3hMWFRUeEUvcmsKqRVvDFC8PX0q09DtLEpnlXJ+JuNELh0j
+            om5K3QX9otTGsl9iEmuJZR3Ek5U0TIrysz95oWC2YAY+67Jn6yvsDg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2022-11-08T06:27:45Z"
+    mac: ENC[AES256_GCM,data:QydLf7N9RLR64SPeOQ/BbZGIjBdv0rAeEyCmEVge0YiK3MYnFmCEudS3+euw4/Z7xpwDnqLRy/sMUhhmY5B5bH9get0N8iF8Ky7JF7V7MdQP8ApEGicRdwsr+wSizDdhzEuHz1nIOTURvhlhw6Vc2F4GIyIray7PW9KpAClAaLw=,iv:k1bQzRSTaUIR0eNG6ghns4jmpE7WElpfntW8iBFDzrY=,tag:yTBqHKpiJ5AuxvMOrJZJ9A==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.7.3
