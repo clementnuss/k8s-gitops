@@ -8,6 +8,7 @@ provisioner: cinder.csi.openstack.org
 parameters:
   availability: nova
 reclaimPolicy: Retain
+allowVolumeExpansion: true
 
 ---
 apiVersion: storage.k8s.io/v1
@@ -18,4 +19,5 @@ provisioner: cinder.csi.openstack.org
 parameters:
   availability: nova
 reclaimPolicy: Delete
+allowVolumeExpansion: true
 
