@@ -24,6 +24,11 @@ spec:
     prometheus:
       enabled: true
 
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+
     proxy:
       prometheus:
         enabled: false
