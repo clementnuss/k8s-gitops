@@ -27,7 +27,7 @@ spec:
         spec:
           resources:
             requests:
-              storage: 20Gi
+              storage: 22Gi
     resources:
       limits:
         cpu: "2"
