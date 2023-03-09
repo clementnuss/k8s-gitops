@@ -33,7 +33,9 @@ spec:
             - __address__
             - __meta_kubernetes_service_annotation_prometheus_io_port
           targetLabel: __address__
-          # port: metrics
+        - source_labels: [__meta_kubernetes_pod_node_name]
+          action: replace
+          target_label: kubernetes_node
   namespaceSelector:
     any: true
   selector: {}
