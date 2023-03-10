@@ -37,6 +37,7 @@ spec:
     replicaCount: 1
     extraArgs:
       dedup.minScrapeInterval: 30s
+      clusternativeListenAddr: ":8401"
     cacheMountPath: "/select-cache"
 
 

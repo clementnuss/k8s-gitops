@@ -27,6 +27,7 @@ spec:
     replicaCount: 1
     extraArgs:
       dedup.minScrapeInterval: 300s
+      clusternativeListenAddr: ":8401"
 
 
   vminsert:
