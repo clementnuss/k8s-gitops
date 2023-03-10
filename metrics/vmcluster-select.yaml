@@ -8,7 +8,7 @@ spec:
   vmselect:
     replicaCount: 2
     extraArgs:
-      storageNode: vmstorage-vmcluster-short-term-0.vmstorage-vmcluster-short-term.metrics:8401,vmstorage-vmcluster-short-term-1.vmstorage-vmcluster-short-term.metrics:8401,vmstorage-vmcluster-long-term-0.vmstorage-vmcluster-long-term.metrics:8401
+      storageNode: vmselect-vmcluster-short-term.metrics:8401,vmselect-vmcluster-long-term.metrics:8401
 
     cacheMountPath: "/select-cache"
     storage:
