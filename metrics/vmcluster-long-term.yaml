@@ -19,20 +19,26 @@ spec:
             requests:
               storage: 20Gi
     resources:
+      requests:
+        cpu: 200m
       limits:
-        cpu: "2"
-        memory: 2048Mi
+        memory: "1Gi"
 
   vmselect:
     replicaCount: 1
     extraArgs:
       dedup.minScrapeInterval: 300s
       clusternativeListenAddr: ":8401"
-
+    resources:
+      requests:
+        cpu: 200m
+      limits:
+        memory: "0.5Gi"
 
   vminsert:
     replicaCount: 1
     resources:
+      requests:
+        cpu: 200m
       limits:
-        cpu: "0.5"
-        memory: "500Mi"
+        memory: "0.5Gi"

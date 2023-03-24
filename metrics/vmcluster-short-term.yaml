@@ -29,8 +29,10 @@ spec:
             requests:
               storage: 22Gi
     resources:
+      requests:
+        cpu: 200m
+        memory: 2048Mi
       limits:
-        cpu: "2"
         memory: 2048Mi
 
   vmselect:
@@ -39,13 +41,18 @@ spec:
       dedup.minScrapeInterval: 30s
       clusternativeListenAddr: ":8401"
     cacheMountPath: "/select-cache"
+    resources:
+      requests:
+        cpu: 200m
+      limits:
+        memory: "512Mi"
 
 
   vminsert:
     replicaCount: 2
     affinity:
       podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
+        preferredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
                 - key: "app.kubernetes.io/name"
@@ -54,6 +61,7 @@ spec:
                     - "vminsert"
             topologyKey: "kubernetes.io/hostname"
     resources:
+      requests:
+        cpu: 200m
       limits:
-        cpu: "0.5"
-        memory: "500Mi"
+        memory: "512Mi"
