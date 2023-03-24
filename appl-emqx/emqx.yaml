@@ -21,9 +21,11 @@ spec:
     replicaCount: 3
     recreatePods: true
     service:
-      type: NodePort
+      type: LoadBalancer
       nodePorts:
         mqttssl: 30883
+      annotations:
+        metallb.universe.tf/loadBalancerIPs: 192.168.250.143
 
     persistence:
       enabled: true
