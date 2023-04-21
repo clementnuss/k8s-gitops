@@ -19,7 +19,7 @@ spec:
   values:
     image:
       repository: invoiceninja/invoiceninja
-      tag: 5.5.102
+      tag: 5.5.106
     mariadb:
       enabled: false
     updateStrategy:
