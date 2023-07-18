@@ -19,31 +19,6 @@ spec:
   values:
     image:
       pullPolicy: Always
-    config:
-      settings:
-        clusterName: cjmn-infomaniak
-      resources:
-        - name: velero.io/v1/backups
-          namespaces:
-            include:
-              - ".*"
-          events:
-            - error
-          updateSetting:
-            includeDiff: true
-            fields:
-              - status.phase
-        - name: velero.io/v1/restores
-          namespaces:
-            include:
-              - ".*"
-          events:
-            types:
-            - error
-          updateSetting:
-            includeDiff: true
-            fields:
-              - status.phase
   valuesFrom:
   - kind: Secret
     name: "botkube-helm-values"
