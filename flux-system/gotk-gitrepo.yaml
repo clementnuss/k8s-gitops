@@ -1,5 +1,5 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: k8s-gitops
@@ -11,7 +11,7 @@ spec:
   url: https://github.com/clementnuss/k8s-gitops.git
 
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: private-k8s-workloads
