@@ -31,7 +31,7 @@ spec:
         - name: port
           value: "6443"
         - name: vip_interface
-          value: k8s_lan
+          value: ens3
         - name: vip_cidr
           value: "32"
         - name: cp_enable
@@ -51,7 +51,7 @@ spec:
         - name: vip_retryperiod
           value: "1"
         - name: address
-          value: 192.168.250.80
+          value: 10.0.0.80
         image: ghcr.io/kube-vip/kube-vip:v0.6.0
         imagePullPolicy: Always
         name: kube-vip
@@ -66,11 +66,6 @@ spec:
       serviceAccountName: kube-vip
       tolerations:
       - effect: NoSchedule
-        key: node-role.kubernetes.io/master
+        operator: Exists
       - effect: NoExecute
         operator: Exists
-  updateStrategy:
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
-    type: RollingUpdate
