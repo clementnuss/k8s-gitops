@@ -16,10 +16,23 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    k8sServiceHost: 10.0.0.80
+    k8sServiceHost: 10.0.0.169
     k8sServicePort: 6443
 
     kubeProxyReplacement: "strict"
+
+    bpf:
+      masquerade: true
+    enableIPv6Masquerade: false
+
+    ipv6:
+      enabled: true
+
+    # ipv6NativeRoutingCIDR: "2001:1600:11:4::/64"
+
+    # extraConfig:
+    #   enable-ipv6-ndp: "true"
+    #   ipv6-mcast-device: "ens3"
 
     prometheus:
       enabled: true
@@ -41,9 +54,8 @@ spec:
         clusterPoolIPv4PodCIDRList:
           - 172.16.0.0/16
         clusterPoolIPv4MaskSize: 24
-        # clusterPoolIPv6PodCIDRList:
-        # - "fd00::/104"
-        # -- IPv6 CIDR mask size to delegate to individual nodes for IPAM.
-        # clusterPoolIPv6MaskSize: 120
+        clusterPoolIPv6PodCIDRList:
+          - fc00:cafe:beef:0::/104
+        clusterPoolIPv6MaskSize: 120
         prometheus:
           enabled: true
