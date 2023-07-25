@@ -13,6 +13,9 @@ spec:
       operator: In
       values:
       - "true"
+  tolerations:
+  - {key: cjmn.plan63, effect: NoSchedule}
+  - {key: "node-role.kubernetes.io/control-plane", effect: NoSchedule}
   serviceAccountName: system-upgrade
   upgrade:
     image: rancher/k3s-upgrade
