@@ -19,9 +19,10 @@ spec:
   values:
     controller:
       replicaCount: 1
-      config:
-        use-proxy-protocol: "true"
+      # config:
+      #   use-proxy-protocol: "true"
         # hsts-max-age: "31449600"
+
       use-forwarded-headers: "true"
       service:
         watchIngressWithoutClass: true
@@ -31,13 +32,14 @@ spec:
           default: true
           controllerValue: "k8s.io/ingress-nginx"
 
-        # externalTrafficPolicy: Local
-        type: NodePort
-        nodePorts:
-          http: 32080
-          https: 32443
-          # tcp:
-          #  8080: 32808
+        type: LoadBalancer
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: 10.0.0.239, 2001:1600:11:4:cafe:beef::80
+        ipFamilyPolicy: "RequireDualStack"
+        ipFamilies:
+          - IPv4
+          - IPv6
+
       metrics:
         enabled: true
         # serviceMonitor:
