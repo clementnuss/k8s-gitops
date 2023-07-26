@@ -1,0 +1,17 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMNodeScrape
+metadata:
+  name: etcd
+  namespace: metrics
+spec:
+  interval: "30s"
+  scrapeTimeout: "5s"
+  port: "2381"
+  scheme: "http"
+  path: "/metrics"
+  selector:
+    matchLabels:
+      node_role_kubernetes_io_etcd: "true"
+  relabelConfigs:
+    - targetLabel: "job"
+      replacement: "etcd"
