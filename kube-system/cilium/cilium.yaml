@@ -46,6 +46,13 @@ spec:
       prometheus:
         enabled: false
 
+    tolerations:
+      - key: "node.kubernetes.io/unreachable"
+        effect: "NoExecute"
+        operator: "Exists"
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+
     ipam:
       # -- Configure IP Address Management mode.
       # ref: https://docs.cilium.io/en/stable/concepts/networking/ipam/

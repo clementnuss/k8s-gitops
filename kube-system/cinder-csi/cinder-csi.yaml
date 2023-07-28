@@ -28,3 +28,12 @@ spec:
     csi:
       provisioner:
         topology: "false"
+
+      plugin:
+        nodePlugin:
+          tolerations:
+            - key: "node.kubernetes.io/unreachable"
+              effect: "NoExecute"
+              operator: "Exists"
+            - key: "node.kubernetes.io/not-ready"
+              operator: "Exists"
