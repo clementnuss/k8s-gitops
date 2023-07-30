@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: cilium
-      version: 1.14.0
+      version: 1.13.4
       sourceRef:
         kind: HelmRepository
         name: cilium
@@ -23,31 +23,26 @@ spec:
 
     bpf:
       masquerade: true
+
+    enableIPv4Masquerade: true
     enableIPv6Masquerade: false
 
     ipv6:
       enabled: true
 
-    # ipv6NativeRoutingCIDR: "2001:1600:11:4::/64"
+    tolerations:
+    - operator: Exists
+
+  # - key: "key"
+  #   operator: "Equal|Exists"
+  #   value: "value"
+  #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
+
+    ipv6NativeRoutingCIDR: "fc00:cafe:beef:0::/104"
 
     # extraConfig:
     #   enable-ipv6-ndp: "true"
     #   ipv6-mcast-device: "ens3"
-
-    prometheus:
-      enabled: true
-
-    hubble:
-      enabled: true
-      relay:
-        enabled: true
-
-    proxy:
-      prometheus:
-        enabled: false
-
-    tolerations:
-      - operator: Exists
 
     ipam:
       # -- Configure IP Address Management mode.
@@ -62,3 +57,15 @@ spec:
         clusterPoolIPv6MaskSize: 120
         prometheus:
           enabled: true
+
+    prometheus:
+      enabled: true
+
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+
+    proxy:
+      prometheus:
+        enabled: false
