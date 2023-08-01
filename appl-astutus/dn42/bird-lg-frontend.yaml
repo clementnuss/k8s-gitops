@@ -52,6 +52,9 @@ kind: Ingress
 metadata:
   name: bird-lg-frontend
   namespace: appl-astutus
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: "true"
   labels:
     name: bird-lg-frontend
 spec:
@@ -67,5 +70,20 @@ spec:
             name: bird-lg-frontend
             port:
               number: 5000
+  - host: lg.dn42.astutus.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: bird-lg-frontend
+            port:
+              number: 5000
+  tls:
+  - hosts:
+    - dn42.astutus.org
+    - lg.dn42.astutus.org
+    secretName: lg-dn42.astutus.org-tls
 
 
