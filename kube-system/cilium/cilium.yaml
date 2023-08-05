@@ -38,7 +38,7 @@ spec:
   #   value: "value"
   #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
-    ipv6NativeRoutingCIDR: "fc00:cafe:beef:0::/104"
+    # ipv6NativeRoutingCIDR: "fc00:cafe:beef:0::/104"
 
     # extraConfig:
     #   enable-ipv6-ndp: "true"
