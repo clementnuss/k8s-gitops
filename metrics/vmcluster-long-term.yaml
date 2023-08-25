@@ -29,6 +29,7 @@ spec:
     extraArgs:
       dedup.minScrapeInterval: 300s
       clusternativeListenAddr: ":8401"
+    cacheMountPath: "/select-cache"
     resources:
       requests:
         cpu: 200m

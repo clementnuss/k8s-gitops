@@ -15,13 +15,17 @@ spec:
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: "app.kubernetes.io/name"
-                  operator: In
-                  values:
-                    - "vmstorage"
-            topologyKey: "kubernetes.io/hostname"
+        - labelSelector:
+            matchExpressions:
+            - key: "app.kubernetes.io/instance"
+              operator: In
+              values:
+              - "vmcluster-short-term"
+            - key: "app.kubernetes.io/name"
+              operator: In
+              values:
+              - "storage"
+          topologyKey: "kubernetes.io/hostname"
     storage:
       volumeClaimTemplate:
         spec:
@@ -52,14 +56,18 @@ spec:
     replicaCount: 2
     affinity:
       podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: "app.kubernetes.io/name"
-                  operator: In
-                  values:
-                    - "vminsert"
-            topologyKey: "kubernetes.io/hostname"
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: "app.kubernetes.io/instance"
+              operator: In
+              values:
+              - "vmcluster-short-term"
+            - key: "app.kubernetes.io/name"
+              operator: In
+              values:
+              - "vminsert"
+          topologyKey: "kubernetes.io/hostname"
     resources:
       requests:
         cpu: 200m
