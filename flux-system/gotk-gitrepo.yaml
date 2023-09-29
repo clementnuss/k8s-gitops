@@ -7,7 +7,8 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: main
+    # branch: main
+    branch: k8s-at-home
   url: https://github.com/clementnuss/k8s-gitops.git
 
 ---

@@ -49,4 +49,6 @@ spec:
   dnsNames:
   - astutus.org
   - '*.astutus.org'
+  - n8r.ch
+  - '*.n8r.ch'
   # - '*.'

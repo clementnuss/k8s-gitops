@@ -15,5 +15,5 @@ metadata:
   namespace: kube-system
 spec:
   addresses:
-  - 2001:1600:11:4:cafe:beef::/96
-  - 10.0.0.224/28
+  - 2001:1620:5386:cafe::/96
+  - 192.168.63.224/28
