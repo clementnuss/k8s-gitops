@@ -16,33 +16,30 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    k8sServiceHost: 192.168.63.80
-    k8sServicePort: 6443
 
+    k8sServiceHost: 192.168.63.80
+    k8sServicePort: 6444
     kubeProxyReplacement: "strict"
 
     bpf:
       masquerade: true
 
     enableIPv4Masquerade: true
+    autoDirectNodeRoutes: true
+    ipv4NativeRoutingCIDR: 172.16.0.0/16
+
     enableIPv6Masquerade: false
 
     ipv6:
       enabled: true
-
     tolerations:
-    - operator: Exists
+      - operator: Exists
 
-  # - key: "key"
-  #   operator: "Equal|Exists"
-  #   value: "value"
-  #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
+    tunnel: disabled
 
-    # ipv6NativeRoutingCIDR: "fc00:cafe:beef:0::/104"
-
-    # extraConfig:
-    #   enable-ipv6-ndp: "true"
-    #   ipv6-mcast-device: "ens3"
+    extraArgs:
+      - --enable-ipv6-ndp
+      - --ipv6-mcast-device=eno1
 
     ipam:
       # -- Configure IP Address Management mode.
@@ -57,15 +54,12 @@ spec:
         clusterPoolIPv6MaskSize: 120
         prometheus:
           enabled: true
-
     prometheus:
       enabled: true
-
     hubble:
       enabled: true
       relay:
         enabled: true
-
     proxy:
       prometheus:
         enabled: false
