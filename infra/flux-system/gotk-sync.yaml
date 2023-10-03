@@ -2,7 +2,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: flux-system
+  name: infrastructure
   namespace: flux-system
 spec:
   interval: 5m0s
@@ -10,12 +10,29 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
-  path: ./
+  path: ./infra/
   prune: true
   sourceRef:
     kind: GitRepository
     name: k8s-gitops
 
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: workloads
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  path: ./workloads/
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops
 # ---
 # apiVersion: kustomize.toolkit.fluxcd.io/v1
 # kind: Kustomization
