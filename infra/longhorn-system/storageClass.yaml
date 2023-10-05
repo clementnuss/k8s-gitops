@@ -1,0 +1,29 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+  name: longhorn-2-replicas
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  dataLocality: "best-effort"
+  numberOfReplicas: "2"
+  fromBackup: ""
+  fsType: "ext4"
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: longhorn-3-replicas
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  dataLocality: "best-effort"
+  numberOfReplicas: "3"
+  fromBackup: ""
+  fsType: "ext4"
