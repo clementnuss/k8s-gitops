@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
-  name: appl-astutus
+  name: appl-n8r

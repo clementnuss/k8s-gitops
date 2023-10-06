@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: invoiceninja-helm-values
+    namespace: appl-n8r
+type: Opaque
+stringData:
+    values.yaml: ENC[AES256_GCM,data:+gTsH0Y1yYpIy+J2aEpE7gi6FuLnombhMH+rv8eIWGAAgwesdGZzKI1juARsXHKk/f2fMAW9xHMlxZkqPfbcdhFPna/ck8leSikwMCTpZu/3LheQeC6NSmc4VA4eX/16Ob4Yo8ZwSbZXE9URBip8o1nM2Vz9yS1rn/pzqyKq0XOyjZf17SrxC135nEEcy27RcZZXuApV2peMx1ox+kOon1NxDFwTRJpq4xkwMSjDB+/zVAo+khdoP9lbp3t1irsRC1lUhTswK/8SvFvQuXFoJgvVEsG6Gj75TbsiZ141u7n9S7xgr2P7yi3O8tFz4qn+vfWcQK+Pe7gjp5nZQ3LCAGrdNxB2kSZj2eg31RdSUq9krZrftyOi8MW/yA+ogaqISqUwjysn1N5xJss2Mh+YUUg2j7QVaLeCg81ALZNr1B7y7zpj5YHFqfYYhHn0QoHen9PjIOrfjIUMqRTLNYP1WtwdRPLP5Xjp00XsfWumANDGc8a/AJXHgWgWALC19GTabPzixatyUob09BIRxRjQ6EhsJZfcZT+SeGm+oJ5WPKKkTIwQG/pZ8EYT5w==,iv:zAworE+S6ttKGFPRNKb3DZqjoHoSxyIbXGOLOdwuVkI=,tag:ocVfWbpptMNFYEsAafsgNQ==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBFUS85OXducHN2SUtyMjBT
+            YWE4cEo4YmlsQXVNTzAzRHpBUlUwSVVOQ2dVCm8vZmFPdFJHNGo0RzBpTWVwZVJh
+            VmswdFZQREZPZHpydVRBRnFVbUtiWTgKLS0tIDdyeTdYV0w2L29Na0YxUXJ1UWtv
+            UVN1Nm1GUEdWbURGUy83NW8xZzlKUkkK5xYCP6n6/COh1mr0XgSvWbQ1sadp2wXw
+            xQPLdP7zNZd5D92INTb8NblgjaQEWFPppicmipNkKvL80h1mfzuEzA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2023-10-06T05:23:26Z"
+    mac: ENC[AES256_GCM,data:AT+Y0d19nQGKESYBBksdqGDGpdZZOmHlJqq3nC8rilqLNY0oxtpt4qA0NU9mjAq6tbaY4SjhKh2JE2WoG9A4Gc6HZ5YnsxL2C34ZRHaNzPf3IFvwYTGOxH8H9Tc6GyHrCy3EAk9eAJ9Tn2Hsqt64iDVcg5BniMBhvm5ZCJHX0bw=,iv:gqGeAhPJVS/NjFXh0ZOuaoe7W588ZJHBNXOuD1z8xwI=,tag:YgkSCvZdXtBdAX7HH05rTw==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.7.3

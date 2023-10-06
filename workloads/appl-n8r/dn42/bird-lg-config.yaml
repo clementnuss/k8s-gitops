@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: bird-lg-frontend-config
-  namespace: appl-astutus
+  namespace: appl-n8r
 data:
   bird-lg.yaml: |
     servers: "gva01"

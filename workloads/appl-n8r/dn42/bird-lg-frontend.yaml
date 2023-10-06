@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bird-lg-frontend
-  namespace: appl-astutus
+  namespace: appl-n8r
 spec:
   selector:
     matchLabels:
@@ -39,7 +39,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bird-lg-frontend
-  namespace: appl-astutus
+  namespace: appl-n8r
 spec:
   selector:
     app: bird-lg-frontend
@@ -51,7 +51,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: bird-lg-frontend
-  namespace: appl-astutus
+  namespace: appl-n8r
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/tls-acme: "true"
