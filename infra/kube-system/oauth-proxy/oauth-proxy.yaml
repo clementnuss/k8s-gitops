@@ -22,18 +22,18 @@ spec:
       enabled: true
       className: nginx
       path: /oauth2
-      hosts: [auth.astutus.org]
+      hosts: [auth.n8r.ch]
       tls:
       - hosts:
-        - auth.astutus.org
+        - auth.n8r.ch
     extraArgs:
       provider: google
       skip-provider-button:
       pass-authorization-header:
       # email-domain: "*"
       # google-group: "k8s-at-home-clementnuss"
-      cookie-domain: .astutus.org
-      whitelist-domain: .astutus.org
+      cookie-domain: .n8r.ch
+      whitelist-domain: .n8r.ch
 
     config:
       configFile: |-

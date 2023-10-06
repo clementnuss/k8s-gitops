@@ -26,7 +26,7 @@ spec:
           - name: HOSTLOOKUPER_DNS_SERVERS
             value: "udp://1.1.1.1:53,tcp://1.1.1.1:53,udp://8.8.8.8:53,tcp://8.8.8.8:53"
           - name: HOSTLOOKUPER_HOSTS
-            value: "blog.astutus.org,google.ch,cloudflare.com,ch.ch"
+            value: "blog.n8r.ch,google.ch,cloudflare.com,ch.ch"
         ports:
         - containerPort: 9090
 ---
