@@ -62,21 +62,21 @@
 #       #   path: /
 #       #   pathType: ImplementationSpecific
 #       #   hosts:
-#       #   - emqx-ws.astutus.org
+#       #   - emqx-ws.n8r.ch
 #       #   tls:
 #       #   - hosts:
-#       #     - emqx-ws.astutus.org
+#       #     - emqx-ws.n8r.ch
 
 #       dashboard:
 #         enabled: true
 #         ingressClassName: nginx
 #         annotations:
-#           nginx.ingress.kubernetes.io/auth-url: "https://auth.astutus.org/oauth2/auth"
-#           nginx.ingress.kubernetes.io/auth-signin: https://auth.astutus.org/oauth2/start
+#           nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
+#           nginx.ingress.kubernetes.io/auth-signin: https://auth.n8r.ch/oauth2/start
 #         path: /
 #         hosts:
-#         - emqx-dashboard.astutus.org
+#         - emqx-dashboard.n8r.ch
 #         tls:
 #         - hosts:
-#           - emqx-dashboard.astutus.org
+#           - emqx-dashboard.n8r.ch
 

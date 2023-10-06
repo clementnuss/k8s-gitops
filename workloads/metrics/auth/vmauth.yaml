@@ -22,4 +22,4 @@ spec:
     # annotations:
     #   cert-manager.io/cluster-issuer: base
     class_name: nginx
-    host: vm-access.astutus.org
+    host: vm-access.n8r.ch
