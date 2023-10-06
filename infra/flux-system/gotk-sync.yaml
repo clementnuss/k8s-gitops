@@ -41,6 +41,10 @@ metadata:
   namespace: flux-system
 spec:
   interval: 5m0s
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
   path: ./
   prune: true
   sourceRef:
