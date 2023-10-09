@@ -16,3 +16,7 @@ spec:
         name: prometheus-community
         namespace: flux-system
       interval: 5m
+  values:
+    service:
+      annotations:
+        prometheus.io/port: "8080"
