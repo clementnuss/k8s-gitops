@@ -1,0 +1,26 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: k8s-gitops
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    # branch: main
+    branch: k8s-at-home
+  url: https://github.com/clementnuss/k8s-gitops.git
+
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: private-k8s-workloads
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: k8s-planchettes
+  url: ssh://git@github.com/clementnuss/private-k8s-workloads
+  secretRef:
+    name: private-k8s-workloads

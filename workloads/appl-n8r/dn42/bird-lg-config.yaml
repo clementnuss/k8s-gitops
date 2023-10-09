@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bird-lg-frontend-config
+  namespace: appl-n8r
+data:
+  bird-lg.yaml: |
+    servers: "gva01"
+    domain: "dn42.astutus.org"
+    title_brand: "ASTUTUS DN42 - Looking glass"
+    navbar_brand: "ASTUTUS"

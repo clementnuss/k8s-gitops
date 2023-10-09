@@ -1,0 +1,81 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: emqx
+  namespace: appl-emqx
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://repos.emqx.io/charts
+      chart: emqx
+      version: 5.2.1
+      sourceRef:
+        kind: HelmRepository
+        name: emqx-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    replicaCount: 1
+    recreatePods: true
+    service:
+      type: LoadBalancer
+      nodePorts:
+        mqttssl: 30883
+      annotations:
+        metallb.universe.tf/loadBalancerIPs: 192.168.63.238, 2001:1620:5386:cafe::8883
+      # ipFamilyPolicy: "RequireDualStack"
+      # ipFamilies:
+      #   - IPv4
+      #   - IPv6
+
+    persistence:
+      enabled: true
+
+    emqxConfig:
+      EMQX_ALLOW_ANONYMOUS: "false"
+      EMQX_CLUSTER__DISCOVERY_STRATEGY: "dns"
+      EMQX_DASHBOARD__LISTENERS__HTTP__INET6: "true"
+      EMQX_LISTENERS__TCP__DEFAULT__BIND: ":::1883"
+      EMQX_LISTENERS__SSL__DEFAULT__BIND: ":::8883"
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: /tmp/ssl/tls.crt
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: /tmp/ssl/tls.key
+
+    ssl:
+      enabled: true
+      useExisting: true
+      existingName: emqx-tls
+
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 150Mi
+
+    ingress:
+      # mqtt:
+      #   enabled: true
+      #   ingressClassName: nginx
+      #   path: /
+      #   pathType: ImplementationSpecific
+      #   hosts:
+      #   - emqx-ws.n8r.ch
+      #   tls:
+      #   - hosts:
+      #     - emqx-ws.n8r.ch
+
+      dashboard:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
+          nginx.ingress.kubernetes.io/auth-signin: https://auth.n8r.ch/oauth2/start
+        path: /
+        hosts:
+        - emqx-dashboard.n8r.ch
+        tls:
+        - hosts:
+          - emqx-dashboard.n8r.ch
+

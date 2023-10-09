@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    namespace: appl-n8r
+    name: invoiceninja-env
+type: Opaque
+stringData:
+    MAIL_MAILER: ENC[AES256_GCM,data:j/h2Ng==,iv:fUMLaqehswxKRQQZWTMHvD0yEINjxuiW7UCBhJTjFGw=,tag:UF2u+2snwyKF3WFq4YHKqw==,type:str]
+    MAIL_HOST: ENC[AES256_GCM,data:nQTfWtmYw/89ew6EkyC9WxfJdA==,iv:yjNrhjmI1gzwN14QhhDNO5CEo7TJmxTL01Uxnr+XNbI=,tag:5ASx70QPtRdlowGvJmeNTw==,type:str]
+    MAIL_PORT: ENC[AES256_GCM,data:eEcM,iv:+Ws8xw9EN1y6HjcPxyhK4Vhs3x7Vr5CRz2Y3gAxvYYs=,tag:51s85TnXrYYTmuElLXdFfQ==,type:str]
+    MAIL_USERNAME: ENC[AES256_GCM,data:OQk9l4l4izCVrKqWsyPka+Tfdfk=,iv:PRdu5SDKn4gYWbFjTjy7Sr0k3zCdiLJqo71kz4F2f6A=,tag:fUdWfmq9Xj3L9B0FhUJs9w==,type:str]
+    MAIL_PASSWORD: ENC[AES256_GCM,data:UMy/G1nhJ+phJPvypB6GwKHRGgU9pn6NbcbD8PjW,iv:6FjnE8hiIfDsncmxxMiDmbPYq1xuno+3DmI8eFkS3sA=,tag:u0hQG55FyezXD4K4qlvqLg==,type:str]
+    MAIL_ENCRYPTION: ENC[AES256_GCM,data:7XSB,iv:59DP6RmIRAMb5Gde5Tn264W6jAAfKlYXXUqVO5OFwC0=,tag:n39l6GkaC2yhoICQjIzdvw==,type:str]
+    MAIL_FROM_ADDRESS: ENC[AES256_GCM,data:ef/9k2ptlxi/KGOGBYYgfthz7+o=,iv:SC5o02SssygpmkKWXbom8K4ByipQvUA6JPd5TxJYvfQ=,tag:ihaGoM0Jtu0d8+2o2I+8uw==,type:str]
+    MAIL_FROM_NAME: ENC[AES256_GCM,data:9JtsaB4Fa0YgV0jPTUmfx9KIbPIo,iv:9ihbaK7no5/nNnkJnWcSOM2ftFtd2cdNail1k77Qh3M=,tag:v5ovVIOt64WiD7uwrEu8fg==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSByaFUrQ21oOFVIVk1zMlVS
+            T2pUaDRZdVVIb2owTlJGZDBuV21xL0tWR0NrClFNczZpT1dXQVRMbWRsQUoySU81
+            ZTROMUY3K0ZCOEtyckFjcWJHTWoxMTAKLS0tIGtHZnF4NTBIU2lpVmM2MWpldTRR
+            bkx3bTB4QUlmNU1xWHN0K3Nsa1FmMDQKZBTluf/AQLIy5V6TpAT7SxFqm+PFpNG6
+            YyCBBKnI50Xltb/LVHaB2+WQHD/CobR2e9DlVMzvvDAipmpF4ygMkg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2023-10-06T05:12:16Z"
+    mac: ENC[AES256_GCM,data:dAbx49gPRWQpSGjCJr/MT1ObHXTnbIXKbo/Bw24Obk5dnmmUn4jF2utOIrZ+C7tAhy2etf3PpzskRRS3DndhUh+MD/eVLlVaNhmppS/F9bQSDhiFPPGZyYXPvCvHs7I+btkzHgGzdfdrsy1pWlsH1Xrr0ADSEGebW54jl96x2AA=,iv:aQFkVuA6SPS3x3Jz9r5b//7Yf/SHTd46T+O/+PXhTtg=,tag:Zht9MxCHoptxhe4mddPQBg==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.7.3
