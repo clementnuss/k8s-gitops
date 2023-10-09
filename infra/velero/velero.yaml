@@ -23,7 +23,7 @@ spec:
       backupStorageLocation:
         - name: default
           provider: aws
-          bucket: velero
+          bucket: velero-planchettes
           config:
             region: us-east-1
             s3ForcePathStyle: true
