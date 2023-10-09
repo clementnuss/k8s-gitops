@@ -11,4 +11,5 @@ spec:
     kind: ClusterIssuer
   dnsNames:
   - emqx.n8r.ch
+  - emqx-local.n8r.ch
 
