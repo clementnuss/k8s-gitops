@@ -23,12 +23,12 @@ spec:
       backupStorageLocation:
         - name: default
           provider: aws
-          bucket: k8s-planchettes-backup
+          bucket: velero-planchettes
           config:
             region: us-east-1
             s3ForcePathStyle: true
-            s3Url: https://fb6a4cc65b21852cc00f4c6e2e4be124.r2.cloudflarestorage.com
-            publicUrl: https://fb6a4cc65b21852cc00f4c6e2e4be124.r2.cloudflarestorage.com
+            s3Url: https://s3.swiss-backup02.infomaniak.com
+            publicUrl: https://s3.swiss-backup02.infomaniak.com
 
       # volumeSnapshotLocation:
       #   - name: aws
