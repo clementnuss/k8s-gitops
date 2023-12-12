@@ -37,7 +37,7 @@ spec:
     envFrom:
       - secretRef:
           name: home-assistant-secret
-    # hostNetwork: true
+    hostNetwork: true
     service:
       main:
         type: ClusterIP
