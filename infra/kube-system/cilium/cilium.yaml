@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: cilium
-      version: 1.13.4
+      version: 1.14.5
       sourceRef:
         kind: HelmRepository
         name: cilium
@@ -19,7 +19,7 @@ spec:
 
     k8sServiceHost: 192.168.63.80
     k8sServicePort: 6444
-    kubeProxyReplacement: "strict"
+    kubeProxyReplacement: "true"
 
     bpf:
       masquerade: true
