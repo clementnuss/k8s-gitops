@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8r-ch-redirect
+  namespace: appl-n8r
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/permanent-redirect: http://blog.n8r.ch$request_uri
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - n8r.ch
+  rules:
+  - host: n8r.ch
