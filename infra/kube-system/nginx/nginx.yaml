@@ -20,6 +20,8 @@ spec:
     controller:
       replicaCount: 2
       use-forwarded-headers: "true"
+      config:
+        proxy-body-size: 10m
       service:
         watchIngressWithoutClass: true
         ingressClassResource:
