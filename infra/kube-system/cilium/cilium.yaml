@@ -28,18 +28,19 @@ spec:
     autoDirectNodeRoutes: true
     ipv4NativeRoutingCIDR: 172.16.0.0/16
 
-    enableIPv6Masquerade: false
-
     ipv6:
       enabled: true
     tolerations:
       - operator: Exists
 
-    tunnel: disabled
+
+    enableIPv6Masquerade: true
+    routingMode: native
+    ipv6NativeRoutingCIDR: 2001:1620:5386:beef:0::/104
 
     extraArgs:
       - --enable-ipv6-ndp
-      - --ipv6-mcast-device=eno1
+      # - --ipv6-mcast-device=eno1
 
     ipam:
       # -- Configure IP Address Management mode.
