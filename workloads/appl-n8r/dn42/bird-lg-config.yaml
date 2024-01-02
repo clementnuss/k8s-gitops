@@ -5,7 +5,7 @@ metadata:
   namespace: appl-n8r
 data:
   bird-lg.yaml: |
-    servers: "gva01"
+    servers: "gva01,zrh01"
     domain: "dn42.astutus.org"
     title_brand: "ASTUTUS DN42 - Looking glass"
     navbar_brand: "ASTUTUS"
