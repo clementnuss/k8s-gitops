@@ -27,13 +27,8 @@ spec:
           config:
             region: us-east-1
             s3ForcePathStyle: true
-            s3Url: https://s3.swiss-backup02.infomaniak.com
-            publicUrl: https://s3.swiss-backup02.infomaniak.com
-
-      # volumeSnapshotLocation:
-      #   - name: aws
-      #     config:
-      #       region: us-east-1
+            s3Url: https://s3.swiss-backup03.infomaniak.com
+            publicUrl: https://s3.swiss-backup03.infomaniak.com
 
     tolerations:
       - key: "node-role.kubernetes.io/master"
