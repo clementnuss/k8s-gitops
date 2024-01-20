@@ -4,6 +4,9 @@ metadata:
   name: vmagent
   namespace: metrics
 spec:
+  podMetadata:
+    labels:
+      velero.io/exclude-from-backup: "true"
   selectAllByDefault: true
   scrapeInterval: 30s
   replicaCount: 2

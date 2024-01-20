@@ -9,6 +9,9 @@ spec:
     replicaCount: 2
     extraArgs:
       storageNode: vmselect-vmcluster-short-term.metrics:8401,vmselect-vmcluster-long-term.metrics:8401
+    podMetadata:
+      labels:
+        velero.io/exclude-from-backup: "true"
 
     cacheMountPath: "/select-cache"
     storage:
