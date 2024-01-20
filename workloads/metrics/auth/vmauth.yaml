@@ -7,6 +7,7 @@ spec:
   podMetadata:
     labels:
       component: vmauth
+      velero.io/exclude-from-backup: "true"
   userSelector: {}
   userNamespaceSelector: {}
   replicaCount: 2

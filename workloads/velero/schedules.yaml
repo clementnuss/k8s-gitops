@@ -10,6 +10,7 @@ spec:
   template:
     defaultVolumesToFsBackup: true
     excludedNamespaces:
+    - appl-grafana
     - cert-manager
     - default
     - flux-system
@@ -24,6 +25,7 @@ spec:
     ttl: 120h0m0s
     excludedResources:
       - secret
+      - serviceaccount
     snapshotVolumes: false
 ---
 apiVersion: velero.io/v1
@@ -36,6 +38,7 @@ spec:
   template:
     defaultVolumesToFsBackup: true
     excludedNamespaces:
+    - appl-grafana
     - cert-manager
     - default
     - flux-system
@@ -50,4 +53,5 @@ spec:
     ttl:  2160h0m0s
     excludedResources:
       - secret
+      - serviceaccount
     snapshotVolumes: false
