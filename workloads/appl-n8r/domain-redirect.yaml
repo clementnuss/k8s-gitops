@@ -5,7 +5,7 @@ metadata:
   namespace: appl-n8r
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/permanent-redirect: http://blog.n8r.ch$request_uri
+    nginx.ingress.kubernetes.io/permanent-redirect: http://clement.n8r.ch$request_uri
 spec:
   ingressClassName: nginx
   tls:
