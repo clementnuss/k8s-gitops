@@ -11,5 +11,7 @@ spec:
   tls:
     - hosts:
       - n8r.ch
+      - www.n8r.ch
   rules:
   - host: n8r.ch
+  - host: www.n8r.ch
