@@ -1,45 +1,51 @@
-# # Server plan
-# apiVersion: upgrade.cattle.io/v1
-# kind: Plan
-# metadata:
-#   name: server-plan
-#   namespace: system-upgrade
-# spec:
-#   concurrency: 1
-#   cordon: true
-#   nodeSelector:
-#     matchExpressions:
-#     - key: node-role.kubernetes.io/control-plane
-#       operator: In
-#       values:
-#       - "true"
-#   tolerations:
-#   - {key: cjmn.plan63, effect: NoSchedule}
-#   - {key: "node-role.kubernetes.io/control-plane", effect: NoSchedule}
-#   serviceAccountName: system-upgrade
-#   upgrade:
-#     image: rancher/k3s-upgrade
-#   version: v1.27.4+k3s1
-# ---
-# # Agent plan
-# apiVersion: upgrade.cattle.io/v1
-# kind: Plan
-# metadata:
-#   name: agent-plan
-#   namespace: system-upgrade
-# spec:
-#   concurrency: 1
-#   cordon: true
-#   nodeSelector:
-#     matchExpressions:
-#     - key: node-role.kubernetes.io/control-plane
-#       operator: DoesNotExist
-#   prepare:
-#     args:
-#     - prepare
-#     - server-plan
-#     image: rancher/k3s-upgrade
-#   serviceAccountName: system-upgrade
-#   upgrade:
-#     image: rancher/k3s-upgrade
-#   version: v1.27.4+k3s1
+# Server plan
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: k8s-cp-update
+  namespace: system-upgrade
+  labels:
+    rke2-upgrade: server
+spec:
+  concurrency: 1
+  nodeSelector:
+    matchExpressions:
+       - {key: node-role.kubernetes.io/control-plane, operator: In, values: ["true"]}
+  tolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Equal"
+    value: "true"
+    effect: "NoExecute"
+  serviceAccountName: system-upgrade
+  cordon: true
+#  drain:
+#    force: true
+  upgrade:
+    image: rancher/rke2-upgrade
+  version: v1.27.10+rke2r1
+---
+# Agent plan
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: k8s-worker-update
+  namespace: system-upgrade
+  labels:
+    rke2-upgrade: agent
+spec:
+  concurrency: 2
+  nodeSelector:
+    matchExpressions:
+      - {key: node-role.kubernetes.io/control-plane, operator: NotIn, values: ["true"]}
+  prepare:
+    args:
+    - prepare
+    - server-plan
+    image: rancher/rke2-upgrade
+  serviceAccountName: system-upgrade
+  cordon: true
+  drain:
+    force: true
+  upgrade:
+    image: rancher/rke2-upgrade
+  version: v1.27.10+rke2r1
