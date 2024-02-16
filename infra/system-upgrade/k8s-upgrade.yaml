@@ -18,11 +18,12 @@ spec:
     effect: "NoExecute"
   serviceAccountName: system-upgrade
   cordon: true
-#  drain:
-#    force: true
+  # drain:
+  #   force: false
+  #   skipWaitForDeleteTimeout: 300
   upgrade:
     image: rancher/rke2-upgrade
-  version: v1.27.10+rke2r1
+  version: v1.28.6+rke2r1
 ---
 # Agent plan
 apiVersion: upgrade.cattle.io/v1
@@ -33,7 +34,7 @@ metadata:
   labels:
     rke2-upgrade: agent
 spec:
-  concurrency: 2
+  concurrency: 1
   nodeSelector:
     matchExpressions:
       - {key: node-role.kubernetes.io/control-plane, operator: NotIn, values: ["true"]}
@@ -44,8 +45,9 @@ spec:
     image: rancher/rke2-upgrade
   serviceAccountName: system-upgrade
   cordon: true
-  drain:
-    force: true
+  # drain:
+  #   force: false
+  #   skipWaitForDeleteTimeout: 300
   upgrade:
     image: rancher/rke2-upgrade
-  version: v1.27.10+rke2r1
+  version: v1.28.6+rke2r1
