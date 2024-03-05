@@ -1,0 +1,24 @@
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kubenurse
+  namespace: kube-nurse
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: kubenurse
+      version: 1.10.0
+      sourceRef:
+        kind: HelmRepository
+        name: kubenurse
+        namespace: flux-system
+      interval: 5m
+  values:
+    ingress:
+      enabled: true
+      className: nginx
+      # KUBENURSE_INGRESS_URL
+      url: kubenurse.n8r.ch
