@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpipam-cron
+  namespace: appl-n8r
+spec:
+  selector:
+    matchLabels:
+      app: phpipam-cron
+  template:
+    metadata:
+      labels:
+        app: phpipam-cron
+    spec:
+      hostNetwork: true
+      containers:
+        - name: phpipam-cron
+          image: phpipam/phpipam-cron
+          envFrom:
+            - secretRef:
+                name: phpipam-cron-env
+          resources:
+            limits:
+              memory: "256Mi"

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpipam
+  namespace: appl-n8r
+spec:
+  selector:
+    matchLabels:
+      app: phpipam
+  template:
+    metadata:
+      labels:
+        app: phpipam
+    spec:
+      containers:
+        - name: phpipam
+          image: phpipam/phpipam-www
+          envFrom:
+            - secretRef:
+                name: phpipam-env
+          resources:
+            limits:
+              memory: "256Mi"
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpipam
+  namespace: appl-n8r
+spec:
+  selector:
+    app: phpipam
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: phpipam
+  namespace: appl-n8r
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: "true"
+  labels:
+    name: phpipam
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: phpipam.n8r.ch
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: phpipam
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - phpipam.n8r.ch
+      secretName: phpipam.n8r.ch-tls
