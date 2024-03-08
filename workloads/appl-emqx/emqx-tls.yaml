@@ -10,6 +10,6 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-  - emqx.n8r.ch
+  - mqtt.n8r.ch
   - emqx-local.n8r.ch
 
