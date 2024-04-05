@@ -37,6 +37,8 @@ spec:
         - source_labels: [__meta_kubernetes_pod_node_name]
           action: replace
           target_label: kubernetes_node
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
   namespaceSelector:
     any: true
   selector: {}
