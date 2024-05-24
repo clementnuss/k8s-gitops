@@ -34,6 +34,8 @@ spec:
             - __address__
             - __meta_kubernetes_service_annotation_prometheus_io_port
           targetLabel: __address__
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_tenant]
+          target_label: __tenant_id__
         - source_labels: [__meta_kubernetes_pod_node_name]
           action: replace
           target_label: kubernetes_node
