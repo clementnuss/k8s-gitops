@@ -20,7 +20,7 @@ spec:
     extraEnvVarsSecret: invoiceninja-env
     image:
       repository: invoiceninja/invoiceninja
-      tag: 5.8.24
+      tag: 5.9.9
     mariadb:
       enabled: false
     updateStrategy:
