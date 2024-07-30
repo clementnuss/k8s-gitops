@@ -31,7 +31,7 @@ spec:
   values:
     image:
       repository: homeassistant/home-assistant
-      tag: 2024.7.3
+      tag: 2024.7.4
     env:
       TZ: "Europe/Zurich"
     envFrom:
