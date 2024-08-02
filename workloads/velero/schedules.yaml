@@ -6,9 +6,14 @@ metadata:
   name: daily-backup
   namespace: velero
 spec:
+  paused: true
   schedule: 0 18 * * *
   template:
-    defaultVolumesToFsBackup: true
+    defaultVolumesToFsBackup: false
+    csiSnapshotTimeout: 1h # quite long, as with only 3 nodes and 1 upload at a time it can be a long process
+    snapshotVolumes: true
+    snapshotMoveData: true
+    storageLocation: exoscale
     excludedNamespaces:
     - appl-grafana
     - cert-manager
@@ -26,7 +31,6 @@ spec:
     excludedResources:
       - secret
       - serviceaccount
-    snapshotVolumes: false
 ---
 apiVersion: velero.io/v1
 kind: Schedule
@@ -34,9 +38,14 @@ metadata:
   name: weekly-backup
   namespace: velero
 spec:
+  paused: true
   schedule: "14 03 * * 6" # on saturday, at 03:14AM UTC
   template:
-    defaultVolumesToFsBackup: true
+    defaultVolumesToFsBackup: false
+    csiSnapshotTimeout: 1h # quite long, as with only 3 nodes and 1 upload at a time it can be a long process
+    snapshotVolumes: true
+    snapshotMoveData: true
+    storageLocation: backblaze
     excludedNamespaces:
     - appl-grafana
     - cert-manager
@@ -54,4 +63,3 @@ spec:
     excludedResources:
       - secret
       - serviceaccount
-    snapshotVolumes: false
