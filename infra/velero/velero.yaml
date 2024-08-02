@@ -17,21 +17,38 @@ spec:
       interval: 5m
   values:
     credentials:
-      existingSecret: s3-infomaniak
+      existingSecret: s3-credentials
     configuration:
-      defaultVolumesToFsBackup: true
+      features: EnableCSI
+      defaultVolumesToFsBackup: false
+      backupSyncPeriod: 60m
+      defaultRepoMaintainFrequency: 120m
       backupStorageLocation:
-        - name: default
+        - name: backblaze
           provider: aws
+          credential:
+            name: s3-credentials
+            key: backblaze
           bucket: velero-planchettes
           config:
-            region: us-east-1
-            s3ForcePathStyle: true
-            s3Url: https://s3.swiss-backup03.infomaniak.com
-            publicUrl: https://s3.swiss-backup03.infomaniak.com
+            region: eu-central-003
+            checksumAlgorithm: ""
+            # s3ForcePathStyle: true
+            s3Url: https://s3.eu-central-003.backblazeb2.com
+            publicUrl: https://s3.eu-central-003.backblazeb2.com
+        - name: exoscale
+          provider: aws
+          credential:
+            name: s3-credentials
+            key: exoscale
+          bucket: velero-planchettes
+          config:
+            region: ch-dk-2
+            s3Url: https://sos-ch-dk-2.exo.io
+            publicUrl: https://sos-ch-dk-2.exo.io
 
     tolerations:
-      - key: "node-role.kubernetes.io/master"
+      - key: "node-role.kubernetes.io/control-plane"
         operator: "Exists"
     initContainers:
     - name: velero-plugin-for-aws
