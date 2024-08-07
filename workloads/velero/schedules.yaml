@@ -6,7 +6,7 @@ metadata:
   name: daily-backup
   namespace: velero
 spec:
-  paused: true
+  paused: false
   schedule: 0 18 * * *
   template:
     defaultVolumesToFsBackup: false
@@ -38,7 +38,7 @@ metadata:
   name: weekly-backup
   namespace: velero
 spec:
-  paused: true
+  paused: false
   schedule: "14 03 * * 6" # on saturday, at 03:14AM UTC
   template:
     defaultVolumesToFsBackup: false
