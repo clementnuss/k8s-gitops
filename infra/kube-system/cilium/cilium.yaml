@@ -40,7 +40,7 @@ spec:
 
     extraArgs:
       - --enable-ipv6-ndp
-      # - --ipv6-mcast-device=eno1
+      - --ipv6-mcast-device=eno1
 
     ipam:
       # -- Configure IP Address Management mode.
