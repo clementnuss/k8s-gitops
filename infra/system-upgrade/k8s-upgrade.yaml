@@ -23,7 +23,7 @@ spec:
   #   skipWaitForDeleteTimeout: 300
   upgrade:
     image: rancher/rke2-upgrade
-  version: v1.28.6+rke2r1
+  version: v1.29.9+rke2r1
 ---
 # Agent plan
 apiVersion: upgrade.cattle.io/v1
@@ -50,4 +50,4 @@ spec:
   #   skipWaitForDeleteTimeout: 300
   upgrade:
     image: rancher/rke2-upgrade
-  version: v1.28.6+rke2r1
+  version: v1.29.9+rke2r1
