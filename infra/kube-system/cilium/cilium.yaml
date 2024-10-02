@@ -61,6 +61,3 @@ spec:
       enabled: true
       relay:
         enabled: true
-    proxy:
-      prometheus:
-        enabled: false
