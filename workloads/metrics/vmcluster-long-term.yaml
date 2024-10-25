@@ -25,6 +25,8 @@ spec:
         memory: "1Gi"
 
   vmselect:
+    image:
+      tag: v1.105.0-cluster
     replicaCount: 1
     extraArgs:
       dedup.minScrapeInterval: 300s
