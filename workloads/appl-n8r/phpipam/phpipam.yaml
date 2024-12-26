@@ -15,6 +15,10 @@ spec:
       containers:
         - name: phpipam
           image: phpipam/phpipam-www
+          imagePullPolicy: Always
+          env:
+          - name: IPAM_DISABLE_INSTALLER
+            value: "1"
           envFrom:
             - secretRef:
                 name: phpipam-env
