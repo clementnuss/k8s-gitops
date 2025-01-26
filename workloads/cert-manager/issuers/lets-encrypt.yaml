@@ -21,7 +21,7 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    email: clement.nuss@gmail.com
+    email: clement@n8r.ch
     server: https://acme-v02.api.letsencrypt.org/directory
     preferredChain: "ISRG Root X1"
     privateKeySecretRef:
@@ -31,7 +31,7 @@ spec:
     - selector: {}
       dns01:
         cloudflare:
-          email: clement.nuss@gmail.com
+          email: clement@n8r.ch
           apiKeySecretRef:
             name: cloudflare-api-key
             key: api-key
