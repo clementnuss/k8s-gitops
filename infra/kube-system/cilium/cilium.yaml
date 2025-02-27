@@ -16,7 +16,6 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-
     k8sServiceHost: 192.168.63.80
     k8sServicePort: 6444
     kubeProxyReplacement: "true"
@@ -32,7 +31,6 @@ spec:
       enabled: true
     tolerations:
       - operator: Exists
-
 
     enableIPv6Masquerade: true
     routingMode: native
@@ -61,3 +59,25 @@ spec:
       enabled: true
       relay:
         enabled: true
+
+    # talos compatibility:
+    securityContext:
+      capabilities:
+        ciliumAgent:
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          # - SYS_MODULE # incompatible with talos
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+        cleanCiliumState:
+          - NET_ADMIN
+          # - SYS_MODULE # incompatible with talos
+          - SYS_ADMIN
+          - SYS_RESOURCE
