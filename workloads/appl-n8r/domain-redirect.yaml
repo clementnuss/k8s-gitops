@@ -5,13 +5,13 @@ metadata:
   namespace: appl-n8r
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/permanent-redirect: http://clement.n8r.ch$request_uri
+    nginx.ingress.kubernetes.io/permanent-redirect: https://clement.n8r.ch/
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - n8r.ch
-      - www.n8r.ch
+        - n8r.ch
+        - www.n8r.ch
   rules:
-  - host: n8r.ch
-  - host: www.n8r.ch
+    - host: n8r.ch
+    - host: www.n8r.ch
