@@ -4,6 +4,7 @@ metadata:
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
+    pod-security.kubernetes.io/enforce: privileged
     kubernetes.io/metadata.name: monitoring
     name: monitoring
   name: monitoring
