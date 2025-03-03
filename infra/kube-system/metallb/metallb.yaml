@@ -19,3 +19,5 @@ spec:
   values:
     prometheus:
       scrapeAnnotations: true
+    speaker:
+      ignoreExcludeLB: true
