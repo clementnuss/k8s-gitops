@@ -17,7 +17,7 @@ spec:
       interval: 5m
   values:
     k8sServiceHost: 192.168.63.80
-    k8sServicePort: 6444
+    k8sServicePort: 6443
     kubeProxyReplacement: "true"
 
     bpf:
