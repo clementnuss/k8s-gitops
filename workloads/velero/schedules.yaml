@@ -59,7 +59,7 @@ spec:
     - monitoring
     - system-upgrade
     - velero
-    ttl:  2160h0m0s
+    ttl:  720h0m0s
     excludedResources:
       - secret
       - serviceaccount
