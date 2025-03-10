@@ -24,7 +24,7 @@ spec:
       nodePorts:
         mqttssl: 30883
       annotations:
-        metallb.universe.tf/loadBalancerIPs: 192.168.63.238, 2001:1620:5386:cafe::8883
+        metallb.io/loadBalancerIPs: 192.168.63.238, 2001:1620:5386:cafe::8883
       # ipFamilyPolicy: "RequireDualStack"
       # ipFamilies:
       #   - IPv4
