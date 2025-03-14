@@ -3,4 +3,6 @@ kind: Namespace
 metadata:
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
   name: appl-n8r
