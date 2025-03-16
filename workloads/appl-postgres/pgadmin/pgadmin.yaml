@@ -1,0 +1,49 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pgadmin
+  namespace: appl-postgres
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://charts.bitnami.com/bitnami
+      chart: pgadmin4
+      version: 1.36.0
+      sourceRef:
+        kind: HelmRepository
+        name: runix
+        namespace: flux-system
+      interval: 5m
+  values:
+    env:
+      email: clement@n8r.ch
+    existingSecret: postgres-credentials
+    secretKeys:
+      pgadminPasswordKey: postgres-password
+    serverDefinitions:
+      enabled: true
+      servers:
+        postgres-n8r:
+          Name: "postgres n8r cluster"
+          Group: "Servers"
+          Port: 5432
+          Username: "postgres"
+          Host: "postgres-postgresql.appl-postgres.svc.cluster.local"
+          SSLMode: "prefer"
+          MaintenanceDB: "postgres"
+    persistentVolume:
+      enabled: false
+      size: 1Gi
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - host: pgadmin.n8r.ch
+          paths:
+            - path: /
+              pathType: Prefix
+      annotations:
+        nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
+        nginx.ingress.kubernetes.io/auth-signin: https://auth.n8r.ch/oauth2/start"
