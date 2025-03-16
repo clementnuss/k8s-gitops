@@ -75,35 +75,35 @@ spec:
     podAnnotations:
       backup.velero.io/backup-volumes: config
 
-    addons:
-      codeserver:
-        enabled: true
-        image:
-          repository: codercom/code-server
-          tag: 4.98.2
-        workingDir: "/config"
-        args:
-          - --user-data-dir
-          - "/config/.vscode"
-          - --auth
-          - "none"
-        ingress:
-          enabled: true
-          ingressClassName: nginx
-          annotations:
-            nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
-            nginx.ingress.kubernetes.io/auth-signin: https://auth.n8r.ch/oauth2/start
-          hosts:
-            - host: hass-vscode.n8r.ch
-              paths:
-                - path: /
-                  pathType: Prefix
-          tls:
-            - hosts:
-                - hass-vscode.n8r.ch
-        volumeMounts:
-          - name: config
-            mountPath: /config
+    # addons:
+    #   codeserver:
+    #     enabled: true
+    #     image:
+    #       repository: codercom/code-server
+    #       tag: 4.98.2
+    #     workingDir: "/config"
+    #     args:
+    #       - --user-data-dir
+    #       - "/config/.vscode"
+    #       - --auth
+    #       - "none"
+    #     ingress:
+    #       enabled: true
+    #       ingressClassName: nginx
+    #       annotations:
+    #         nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
+    #         nginx.ingress.kubernetes.io/auth-signin: https://auth.n8r.ch/oauth2/start
+    #       hosts:
+    #         - host: hass-vscode.n8r.ch
+    #           paths:
+    #             - path: /
+    #               pathType: Prefix
+    #       tls:
+    #         - hosts:
+    #             - hass-vscode.n8r.ch
+    #     volumeMounts:
+    #       - name: config
+    #         mountPath: /config
 
     resources:
       limits:
