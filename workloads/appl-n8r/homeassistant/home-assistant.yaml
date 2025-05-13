@@ -29,43 +29,53 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    image:
-      repository: homeassistant/home-assistant
-      tag: 2025.5.1
-    env:
-      TZ: "Europe/Zurich"
-    envFrom:
-      - secretRef:
-          name: home-assistant-secret
-    hostNetwork: true
+    defaultPodOptions:
+      hostNetwork: true
+    controllers:
+      home-assistant:
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-assistant/home-assistant
+              tag: 2025.5.1
+            env:
+              TZ: "Europe/Zurich"
+              # PYTHONPATH: "/config/deps"
+              # UV_SYSTEM_PYTHON: "true"
+              # UV_NO_CACHE: "true"
+              # VENV_FOLDER: /venv
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
     service:
       main:
         type: ClusterIP
+        controller: home-assistant
         ports:
           http:
             port: 8123
     ingress:
       main:
         enabled: true
-        ingressClassName: "nginx"
+        className: "nginx"
         hosts:
           - host: hass.n8r.ch
             paths:
               - path: /
                 pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
         tls:
           - hosts:
               - "hass.n8r.ch"
-    prometheus:
-      serviceMonitor:
-        enabled: true
-    probes:
-      liveness:
-        enabled: false
-      readiness:
-        enabled: true
-      startup:
-        enabled: true
 
     persistence:
       config:
@@ -74,36 +84,6 @@ spec:
 
     podAnnotations:
       backup.velero.io/backup-volumes: config
-
-    # addons:
-    #   codeserver:
-    #     enabled: true
-    #     image:
-    #       repository: codercom/code-server
-    #       tag: 4.98.2
-    #     workingDir: "/config"
-    #     args:
-    #       - --user-data-dir
-    #       - "/config/.vscode"
-    #       - --auth
-    #       - "none"
-    #     ingress:
-    #       enabled: true
-    #       ingressClassName: nginx
-    #       annotations:
-    #         nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
-    #         nginx.ingress.kubernetes.io/auth-signin: https://auth.n8r.ch/oauth2/start
-    #       hosts:
-    #         - host: hass-vscode.n8r.ch
-    #           paths:
-    #             - path: /
-    #               pathType: Prefix
-    #       tls:
-    #         - hosts:
-    #             - hass-vscode.n8r.ch
-    #     volumeMounts:
-    #       - name: config
-    #         mountPath: /config
 
     resources:
       limits:
