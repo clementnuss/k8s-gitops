@@ -9,10 +9,8 @@
     ":enablePreCommit",
     ":automergeDigest",
     ":automergeBranchPush",
-    "github>billimek/k8s-gitops//.github/renovate/allowedVersions.json5",
-    "github>billimek/k8s-gitops//.github/renovate/autoMerge.json5",
-    "github>billimek/k8s-gitops//.github/renovate/disabledDatasources.json5",
-    "github>billimek/k8s-gitops//.github/renovate/groups.json5"
+    "github>billimek/k8s-gitops//.renovate/autoMerge.json5",
+    "github>billimek/k8s-gitops//.renovate/groups.json5"
   ],
   "enabled": true,
   "timezone": "Europe/Zurich",
