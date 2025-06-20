@@ -22,3 +22,8 @@ spec:
       # KUBENURSE_INGRESS_URL
       url: kubenurse.n8r.ch
     victoriametrics_histogram: true
+    daemonset:
+      dnsConfig: # recommended config
+        options:
+        - name: ndots
+          value: "1"
