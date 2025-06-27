@@ -11,7 +11,7 @@ spec:
   path: "/metrics"
   selector:
     matchLabels:
-      node_role_kubernetes_io_etcd: "true"
+      node_role_kubernetes_io_control_plane: ""
   relabelConfigs:
     - targetLabel: "job"
       replacement: "etcd"
