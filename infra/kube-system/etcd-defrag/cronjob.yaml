@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-defrag
+  namespace: kube-system
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+          containers:
+          - args:
+            - --endpoints=https://127.0.0.1:2379
+            - --cacert=/etc/kubernetes/pki/etcd/ca.crt
+            - --cert=/etc/kubernetes/pki/etcd/admin.crt
+            - --key=/etc/kubernetes/pki/etcd/admin.key
+            - --cluster
+            - --defrag-rule
+            - dbQuotaUsage > 0.8 || dbSize - dbSizeInUse > 30*1024*1024
+            image: ghcr.io/ahrtr/etcd-defrag:v0.28.0
+            name: etcd-defrag
+            volumeMounts:
+            - mountPath: /etc/kubernetes/pki/etcd
+              name: etcd-certs
+          hostNetwork: true
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 0
+          terminationGracePeriodSeconds: 30
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/control-plane
+          volumes:
+          - hostPath:
+              path: /system/secrets/etcd/
+            name: etcd-certs
+  schedule: 14 9 * * 1-5
+  successfulJobsHistoryLimit: 3
+  suspend: false
