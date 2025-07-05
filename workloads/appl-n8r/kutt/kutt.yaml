@@ -1,0 +1,94 @@
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kutt
+  namespace: appl-n8r
+  labels:
+    app: kutt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kutt
+  template:
+    metadata:
+      labels:
+        app: kutt
+    spec:
+      containers:
+      - name: kutt
+        image: kutt/kutt:latest
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: kutt-config
+        - secretRef:
+            name: kutt-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 20
+          periodSeconds: 30
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: kutt-service
+  namespace: appl-n8r
+  labels:
+    app: kutt
+spec:
+  selector:
+    app: kutt
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  type: ClusterIP
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kutt-ingress
+  namespace: appl-n8r
+  # annotations:
+  #   nginx.ingress.kubernetes.io/rewrite-target: /
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  #   cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Adjust based on your cert-manager setup
+spec:
+  ingressClassName: nginx  # Adjust based on your ingress controller
+  tls:
+  - hosts:
+    - kutt.n8r.ch
+    secretName: kutt-tls-secret
+  rules:
+  - host: kutt.n8r.ch
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kutt-service
+            port:
+              number: 80
