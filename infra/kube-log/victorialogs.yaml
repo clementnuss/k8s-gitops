@@ -32,5 +32,6 @@ spec:
       retentionPeriod: 10w
       persistentVolume:
         enabled: true
+        size: 10Gi
     vector:
       enabled: true
