@@ -16,9 +16,6 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    image:
-      repository: ghcr.io/clementnuss/velero
-      tag: v1.14.1-rc
     credentials:
       existingSecret: s3-credentials
     configuration:
