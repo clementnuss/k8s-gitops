@@ -24,6 +24,7 @@ spec:
         use-forwarded-headers: "true"
         enable-real-ip: "true"
         forwarded-for-header: CF-Connecting-IP
+        proxy-real-ip-cidr: "0.0.0.0/0,::/0"
       service:
         watchIngressWithoutClass: true
         ingressClassResource:
