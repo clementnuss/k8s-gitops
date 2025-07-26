@@ -5,7 +5,7 @@ metadata:
   name: k8s-net-ipv4
   namespace: kube-system
 spec:
-  cidrs:
+  blocks:
   - cidr: "192.168.63.224/28"
 
 ---
@@ -15,7 +15,7 @@ metadata:
   name: k8s-net-ipv6
   namespace: kube-system
 spec:
-  cidrs:
+  blocks:
   - cidr: "2001:1620:5386:cafe::/96"
 
 ---
