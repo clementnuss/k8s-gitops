@@ -55,6 +55,11 @@ spec:
           enabled: true
     prometheus:
       enabled: true
+    
+    # LoadBalancer IP Address Management
+    l2announcements:
+      enabled: true
+    
     hubble:
       enabled: true
       relay:

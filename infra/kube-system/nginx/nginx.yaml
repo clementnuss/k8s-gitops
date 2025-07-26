@@ -32,7 +32,7 @@ spec:
 
         type: LoadBalancer
         annotations:
-          metallb.io/loadBalancerIPs: 192.168.63.239, 2001:1620:5386:cafe::80
+          lbipam.cilium.io/ips: 192.168.63.239,2001:1620:5386:cafe::80
         ipFamilyPolicy: "RequireDualStack"
         ipFamilies:
           - IPv4
