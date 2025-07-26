@@ -23,8 +23,9 @@ spec:
         proxy-body-size: 10m
         use-forwarded-headers: "true"
         enable-real-ip: "true"
-        forwarded-for-header: CF-Connecting-IP
-        proxy-real-ip-cidr: "0.0.0.0/0,::/0"
+        forwarded-for-header: Cf-Connecting-Ip
+        # https://www.cloudflare.com/ips-v6/#
+        proxy-real-ip-cidr: "0.0.0.0/0,2400:cb00::/32,2606:4700::/32,2803:f800::/32,2405:b500::/32,2405:8100::/32,2a06:98c0::/29,2c0f:f248::/32"
       service:
         watchIngressWithoutClass: true
         ingressClassResource:
