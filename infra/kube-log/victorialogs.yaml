@@ -33,5 +33,45 @@ spec:
       persistentVolume:
         enabled: true
         size: 10Gi
+
     vector:
       enabled: true
+      service:
+        enabled: true
+        type: "LoadBalancer"
+        externalTrafficPolicy: Local
+        annotations:
+          metallb.io/loadBalancerIPs: 192.168.63.235
+        ports:
+          - name: syslog-udp
+            port: 514
+            targetPort: 514
+            protocol: UDP
+          - name: syslog-tcp
+            port: 514
+            targetPort: 514
+            protocol: TCP
+      customConfig:
+        sources:
+          syslog_udp:
+            type: socket
+            mode: udp
+            address: '0.0.0.0:514'
+          syslog_tcp:
+            type: socket
+            mode: tcp
+            address: '0.0.0.0:514'
+        transforms:
+          parse_syslog:
+            type: remap
+            inputs:
+              - syslog_udp
+              - syslog_tcp
+            source: |
+              parsed, err = parse_syslog(.message)
+              if err == null {
+                . |= parsed
+              }
+        sinks:
+          vlogs:
+            inputs: [parser, parse_syslog]
