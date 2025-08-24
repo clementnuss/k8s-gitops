@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://th0th.github.io/helm-charts
       chart: listmonk
-      version: 5.0.0
+      version: 5.0.3
       sourceRef:
         kind: HelmRepository
         name: th0th-github-io
