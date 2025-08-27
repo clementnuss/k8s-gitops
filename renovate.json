@@ -2,13 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "docker:enableMajor",
-    ":disableRateLimiting",
-    ":dependencyDashboard",
-    ":semanticCommits",
-    ":enablePreCommit",
-    ":automergeDigest",
-    ":automergeBranch",
     "github>billimek/k8s-gitops//.renovate/autoMerge.json5",
     "github>billimek/k8s-gitops//.renovate/groups.json5"
   ],
