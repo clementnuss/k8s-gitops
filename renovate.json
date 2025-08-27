@@ -162,6 +162,26 @@
         "renovate/helm",
         "dep/patch"
       ]
+    },
+    {
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "schedule": [
+        "after 2am and before 10pm"
+      ]
+    },
+    {
+      "matchPackagePatterns": [
+        "mariadb",
+        "postgres",
+        "postgresql",
+        "invoiceninja",
+        "cilium"
+      ],
+      "automerge": false
     }
   ]
 }
