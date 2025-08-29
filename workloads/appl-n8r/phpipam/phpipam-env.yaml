@@ -5,50 +5,12 @@ metadata:
     namespace: appl-n8r
 type: Opaque
 stringData:
-    TZ: ENC[AES256_GCM,data:VxqRHTrKmf0HORw9Rg==,iv:PjOjk8eJ+ONk1oNlSXxHSmaF5Qd8T1YRoPvfOmFHhc4=,tag:3AqQTb/iNmd9v2IHMN75kA==,type:str]
-    IPAM_DATABASE_HOST: ENC[AES256_GCM,data:LaONOK2xhUNLr+aFytD3juh+6Y6QrxbeIChG4aOqIRMwu0G+ks4=,iv:uOTuCsO2m2IjbBV0bkUPEQGx3hKpYTj/jrtCqXZvElk=,tag:n9e+TiDRp7RroWF3LTpedg==,type:str]
-    IPAM_DATABASE_USER: ENC[AES256_GCM,data:w/8ApEX4sg==,iv:6zVpzyHf8XBH2pATN5a+vrd4tS0GjmLs3rpg67+6Bmw=,tag:18/39FgcHNmxsOYj3AQfIg==,type:str]
-    IPAM_DATABASE_PASS: ENC[AES256_GCM,data:CDcpchTp+T1BW1hTmbQPpw==,iv:Rtpc7RcqK24KUaFTOr0178gml+RxZpEv1d7r2vltpFs=,tag:7mhXuCeNoYNfWM1qx1ygrQ==,type:str]
-    IPAM_DATABASE_NAME: ENC[AES256_GCM,data:HkesI9SIwg==,iv:I1iun9Y5M7KIREXkpPq4xkOGGjMFYtcQjw6ht3zx9oc=,tag:6JibBbLcgPbX7Csa+fdzRg==,type:str]
-sops:
-    kms: []
-    gcp_kms: []
-    azure_kv: []
-    hc_vault: []
-    age:
-        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
-          enc: |
-            -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBEblFXaTVvemxjck1KUG9K
-            TGNQNzBXZlk2cW5mMGtLMWZRY1F4UHU0VlRvCnZLUWRLYk5FWkJlM25xWUsrTnli
-            VlM4RGlNTXN1UjlvcW9xMWg0RG0xalkKLS0tIG9FTlF0VFVNMGVySFhWSlZtejBa
-            VkZEK1ZleE1DMG5lRnc2ZFJucFk2eWMKgSCz72gy49a3pfqiH9otKrqsrW4YPKwq
-            pL5fjIWKWHWnAj1h76mE5E2Wp/MpQAlOhoGZhZKM+V/bGvIWl/w4Qw==
-            -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-03-08T15:09:22Z"
-    mac: ENC[AES256_GCM,data:9hCyIo8NAR/AlNuBxMAXDIvOC88O9KqTU/5+CQ3lsGZUYhWMVpYbMdm1/oyhOs47X1KjWZyWZzaaDA1/LZXMdzqC+oho0ZBVlmVXfYLNXKFOqD0IiKjUAh8r6vsQ0z3ssTF9J9ftFxyAle/Ezcbt8UJE+wxu7lpb9qcJ+bAlPOU=,iv:Cc4N1vNMo2Hu+dAum879ZDU13tDRqnHWKrJF0umWdWo=,tag:wU4yilQnyi7OkfxaERcDTw==,type:str]
-    pgp: []
-    encrypted_regex: ^(data|stringData)$
-    version: 3.8.1
----
-apiVersion: v1
-kind: Secret
-metadata:
-    name: phpipam-cron-env
-    namespace: appl-n8r
-type: Opaque
-stringData:
     TZ: ENC[AES256_GCM,data:EUJO7zMdMtVI0K2jKQ==,iv:JX8omDn/1oFOnAb0E1nfaK/WTBIlRJiqvNYPnTz5dXc=,tag:cH7gt6BV3cSp8OAoLgi8kg==,type:str]
-    SCAN_INTERVAL: ENC[AES256_GCM,data:oro=,iv:+64f4gNh7ilWrnvG3j2yhWDgZ8Nt7ysyonQ0kxLsyiA=,tag:7dbL3oeRvIyLUlh0BCWixA==,type:str]
-    IPAM_DATABASE_HOST: ENC[AES256_GCM,data:KoIHj/PxLoMYy4XZA/8=,iv:GPQcCNSjh1k0vBdNJa+z3iQdxs4uu31GLd78UusVPXo=,tag:8SkkFhIeBKPB7pBlinhx0Q==,type:str]
+    IPAM_DATABASE_HOST: ENC[AES256_GCM,data:dYETuiyvG/TvK16OKyZHvl7IS6+9rU2sarTADYocjQT+q9X8fKm0Zj7IdxaM7nRhVQ==,iv:iDbqjy4AM6HLJr34UBgOgDHL1rQjPZx/oCrkIy7+JQM=,tag:JOD9Nptgzl2OdW5GllPtEw==,type:str]
     IPAM_DATABASE_USER: ENC[AES256_GCM,data:N/+JYbz5Ww==,iv:cE1E8IUPUVJe+1DMUIPSPWYiDrbMdbRY9B0PncJOk2g=,tag:Wtz77ckXnW18Yta0z9f63g==,type:str]
-    IPAM_DATABASE_PASS: ENC[AES256_GCM,data:xQc3yhFXB0crjSLXFXhukw==,iv:XayD+RZfeImcoTb6XXihIp8FB7ppM1VL92TSnR5kxIw=,tag:JvFqDmAF53EVcu9nJP47yw==,type:str]
+    IPAM_DATABASE_PASS: ENC[AES256_GCM,data:BFuwEHlCooMOkbZSMhyLomsEtN2gIBHy,iv:7D9ZZLYlFhqNvLSR1hES/jQfW1UNrKOgyxOzS9dH/b4=,tag:XfGlbVG+d6JxWzf31g6eXQ==,type:str]
     IPAM_DATABASE_NAME: ENC[AES256_GCM,data:9+VPL08POw==,iv:0k4tuByN+yPJ20xyzD3d8ndx2RSA1E+cfXqW5IWXwkQ=,tag:OgrNm87Q1kqf9CQhkGrd3g==,type:str]
 sops:
-    kms: []
-    gcp_kms: []
-    azure_kv: []
-    hc_vault: []
     age:
         - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
           enc: |
@@ -59,8 +21,7 @@ sops:
             VkZEK1ZleE1DMG5lRnc2ZFJucFk2eWMKgSCz72gy49a3pfqiH9otKrqsrW4YPKwq
             pL5fjIWKWHWnAj1h76mE5E2Wp/MpQAlOhoGZhZKM+V/bGvIWl/w4Qw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-03-08T15:09:22Z"
-    mac: ENC[AES256_GCM,data:9hCyIo8NAR/AlNuBxMAXDIvOC88O9KqTU/5+CQ3lsGZUYhWMVpYbMdm1/oyhOs47X1KjWZyWZzaaDA1/LZXMdzqC+oho0ZBVlmVXfYLNXKFOqD0IiKjUAh8r6vsQ0z3ssTF9J9ftFxyAle/Ezcbt8UJE+wxu7lpb9qcJ+bAlPOU=,iv:Cc4N1vNMo2Hu+dAum879ZDU13tDRqnHWKrJF0umWdWo=,tag:wU4yilQnyi7OkfxaERcDTw==,type:str]
-    pgp: []
+    lastmodified: "2025-08-29T05:46:43Z"
+    mac: ENC[AES256_GCM,data:G3eaKiclq4rM5j5IrEkMeI45YgQ/5k7HiNvvixAlQYP99RN9z7SETp7gHpehC84KO5WEZevq+nqPALXaoxcH6c+UEt+t5Ll5p7TDe3HDNM1yadYEOTseRCc2rGZv54woXvCoPr2adkQ0TiuhWXTyUs8+aAy++lxEq/8pmdp6D50=,iv:fASQ99oSzcbBZg9BGJRlXF3dMz48l3cd4nfdwDRoHJM=,tag:H9k1oiI13NSQtGaT+0u8Jg==,type:str]
     encrypted_regex: ^(data|stringData)$
-    version: 3.8.1
+    version: 3.10.2
