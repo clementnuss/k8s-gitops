@@ -74,4 +74,4 @@ spec:
       requests:
         cpu: 200m
       limits:
-        memory: "512Mi"
+        memory: "1Gi"
