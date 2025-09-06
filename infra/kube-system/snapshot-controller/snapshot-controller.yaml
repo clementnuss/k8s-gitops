@@ -1,0 +1,33 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: snapshot-controller
+  namespace: kube-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://piraeus.io/helm-charts/
+      chart: snapshot-controller
+      version: 3.0.6
+      sourceRef:
+        kind: HelmRepository
+        name: piraeus-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    replicaCount: 2
+    image:
+      repository: registry.k8s.io/sig-storage/snapshot-controller
+      tag: v8.1.0
+    args:
+      - --leader-election=true
+      - --http-endpoint=:8080
+    resources:
+      requests:
+        cpu: 10m
+        memory: 20Mi
+      limits:
+        cpu: 100m
+        memory: 100Mi
