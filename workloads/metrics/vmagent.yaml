@@ -22,14 +22,17 @@ spec:
       inlineUrlRelabelConfig:
         - action: labeldrop
           regex: "retention_period"
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_tenant]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_tenant]
           target_label: __tenant_id__
     - url: http://vminsert-vmcluster-long-term.metrics.svc.cluster.local:8480/insert/multitenant/prometheus
       inlineUrlRelabelConfig:
-        - source_labels: [retention_period]
-          regex: "long-term"
+        - if:
+            - '{retention_period="long-term"}'
+            - '{__meta_kubernetes_service_annotation_prometheus_io_retention_period="long-term"}'
           action: keep
         - action: labeldrop
           regex: "retention_period"
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_tenant]
+        - source_labels:
+            [__meta_kubernetes_service_annotation_prometheus_io_tenant]
           target_label: __tenant_id__
