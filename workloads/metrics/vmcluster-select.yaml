@@ -6,7 +6,7 @@ metadata:
 spec:
   retentionPeriod: 1d
   vmselect:
-    replicaCount: 2
+    replicaCount: 1
     extraArgs:
       storageNode: vmselect-vmcluster-short-term.metrics:8401,vmselect-vmcluster-long-term.metrics:8401
     podMetadata:

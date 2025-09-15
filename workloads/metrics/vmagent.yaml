@@ -29,7 +29,7 @@ spec:
       inlineUrlRelabelConfig:
         - if:
             - '{retention_period="long-term"}'
-            - '{__meta_kubernetes_service_annotation_prometheus_io_retention_period="long-term"}'
+            - '{__meta_kubernetes_service_annotation_prometheus_io_retention_period="long-term"}' # not yet 100% working
           action: keep
         - action: labeldrop
           regex: "retention_period"
