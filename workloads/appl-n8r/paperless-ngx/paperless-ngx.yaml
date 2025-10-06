@@ -35,13 +35,15 @@ spec:
           app:
             image:
               repository: ghcr.io/paperless-ngx/paperless-ngx
-              tag: 2.14.7
+              tag: 2.18.4
             env:
               TZ: "Europe/Zurich"
               PAPERLESS_REDIS: "redis://localhost:6379"
               PAPERLESS_TIME_ZONE: "Europe/Zurich"
-              PAPERLESS_OCR_LANGUAGE: "eng"
+              PAPERLESS_OCR_LANGUAGE: "fra+eng"
               PAPERLESS_URL: "https://paperless.n8r.ch"
+              PAPERLESS_CONSUMER_RECURSIVE: "true"
+              PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: "true"
             envFrom:
               - secretRef:
                   name: paperless-ngx-secret
@@ -50,7 +52,7 @@ spec:
                 cpu: 100m
                 memory: 256Mi
               limits:
-                memory: 512Mi
+                memory: 2Gi
 
           redis:
             image:
@@ -63,6 +65,25 @@ spec:
               limits:
                 memory: 128Mi
 
+          ftpd:
+            image:
+              repository: stilliard/pure-ftpd
+              tag: hardened
+            env:
+              PUBLICHOST: "192.168.63.234"
+              FTP_USER_NAME: "paperless"
+              FTP_USER_PASS: "scanner123"
+              FTP_USER_HOME: "/home/paperless"
+              FTP_USER_UID: "1000"
+              FTP_USER_GID: "1000"
+              ADDED_FLAGS: "-p 30000:30005"
+            resources:
+              requests:
+                cpu: 50m
+                memory: 32Mi
+              limits:
+                memory: 64Mi
+
     service:
       main:
         type: ClusterIP
@@ -70,6 +91,40 @@ spec:
         ports:
           http:
             port: 8000
+
+      ftp:
+        type: LoadBalancer
+        controller: paperless-ngx
+        annotations:
+          metallb.io/loadBalancerIPs: 192.168.63.234
+        ports:
+          ftp:
+            port: 21
+            targetPort: 21
+          passive-30000:
+            port: 30000
+            targetPort: 30000
+            protocol: TCP
+          passive-30001:
+            port: 30001
+            targetPort: 30001
+            protocol: TCP
+          passive-30002:
+            port: 30002
+            targetPort: 30002
+            protocol: TCP
+          passive-30003:
+            port: 30003
+            targetPort: 30003
+            protocol: TCP
+          passive-30004:
+            port: 30004
+            targetPort: 30004
+            protocol: TCP
+          passive-30005:
+            port: 30005
+            targetPort: 30005
+            protocol: TCP
 
     ingress:
       main:
@@ -111,6 +166,8 @@ spec:
         accessMode: ReadWriteOnce
         globalMounts:
           - path: /usr/src/paperless/consume
+          - path: /home/paperless
+            subPath: ""
 
       export:
         enabled: true
