@@ -32,21 +32,10 @@ spec:
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
     redis:
-      commonLabels:
-        velero.io/exclude-from-backup: "true"
-      sentinel:
-        getMasterTimeout: 45
-        failoverTimeout: 90000
-      master:
-        podLabels:
-          velero.io/exclude-from-backup: "true"
-        persistence:
-          size: 1Gi
-      replica:
-        podLabels:
-          velero.io/exclude-from-backup: "true"
-        persistence:
-          size: 1Gi
+      enabled: false
+    externalRedis:
+      host: invoiceninja-redis
+      port: 6379
 
   valuesFrom:
   - kind: Secret
