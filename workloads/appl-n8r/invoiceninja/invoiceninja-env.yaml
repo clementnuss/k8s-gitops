@@ -5,6 +5,9 @@ metadata:
     name: invoiceninja-env
 type: Opaque
 stringData:
+    APP_KEY: ENC[AES256_GCM,data:VKmWMdLlFM5YWXim43GtekXiZeeZRT5M6CJoFmfMWuc=,iv:ZifGiTSILcgpkBCJ/rePq0Wpm+pK4el67PNB9aDHOmw=,tag:pFteM2bNsApnJdHLTQIRxA==,type:str]
+    DB_PASSWORD: ENC[AES256_GCM,data:83iZd5nob0CwJqYW2JrN3v2Zd/p4XQ==,iv:AU1G7ynVXOC8rnD3Lyrd26N+T/lfnGloqGmn1nczlmk=,tag:59Gps7KHG3p+PTdl90gKZQ==,type:str]
+    REDIS_PASSWORD: ENC[AES256_GCM,data:j2Thhmb15lWdJbZNemTuWQWe8ltPK7ujMFTZ2Ru4bqI=,iv:vdXl8MXXhsIsxLugb8lfsRsPxL7inpqQgddv1+LCu4k=,tag:w8EgsN3BZAEuCqCqDudxWg==,type:str]
     MAIL_MAILER: ENC[AES256_GCM,data:j/h2Ng==,iv:fUMLaqehswxKRQQZWTMHvD0yEINjxuiW7UCBhJTjFGw=,tag:UF2u+2snwyKF3WFq4YHKqw==,type:str]
     MAIL_HOST: ENC[AES256_GCM,data:nQTfWtmYw/89ew6EkyC9WxfJdA==,iv:yjNrhjmI1gzwN14QhhDNO5CEo7TJmxTL01Uxnr+XNbI=,tag:5ASx70QPtRdlowGvJmeNTw==,type:str]
     MAIL_PORT: ENC[AES256_GCM,data:eEcM,iv:+Ws8xw9EN1y6HjcPxyhK4Vhs3x7Vr5CRz2Y3gAxvYYs=,tag:51s85TnXrYYTmuElLXdFfQ==,type:str]
@@ -14,10 +17,6 @@ stringData:
     MAIL_FROM_ADDRESS: ENC[AES256_GCM,data:lLQDKrqD0V0Wv9MWEVTr,iv:tbIX+MqpKBjYrJyfHKk0tcj8F5NSulFuMBdxCKFOJdA=,tag:HhRT+vBadX0/iwAoFIqkcA==,type:str]
     MAIL_FROM_NAME: ENC[AES256_GCM,data:xhSUKFN9AMpmwz5Nkxpn7SHASpM=,iv:6k4tCrd7TS6Y4NUhuVc/brVGHXfu/vGgkGTIrC9Y2sY=,tag:PmQKwA38jRI53rALvcz2Ag==,type:str]
 sops:
-    kms: []
-    gcp_kms: []
-    azure_kv: []
-    hc_vault: []
     age:
         - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
           enc: |
@@ -28,8 +27,7 @@ sops:
             bkx3bTB4QUlmNU1xWHN0K3Nsa1FmMDQKZBTluf/AQLIy5V6TpAT7SxFqm+PFpNG6
             YyCBBKnI50Xltb/LVHaB2+WQHD/CobR2e9DlVMzvvDAipmpF4ygMkg==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2023-12-22T08:53:21Z"
-    mac: ENC[AES256_GCM,data:7HTxF6NnP4d6NXOgOsdbE+7Vu5Qm++5PeUH/tBFJ9P/D1pYIWn6A06Bdg2PUyE/e4u3N8VuxjveDYsSJeWwAbwxU/KuyP8hztDyQnZ/7bYwXe6xleCv+kEXIkTj98oXUDTpIiiiOPco63iIQNG9du/6WF1swgSg/Y2Gpc04KrI8=,iv:s1ZsFnBz/g/l2UDeFhlxStdW7bISudgijht4Uc81zHA=,tag:y4UsSvcHMj4762wCvw0yyw==,type:str]
-    pgp: []
+    lastmodified: "2025-10-20T16:27:52Z"
+    mac: ENC[AES256_GCM,data:Dh5VHinTK9B3yvQ6u/Cus6AzzH2536J0QwZEMTdM2Dz3K6GQx47hRh/kViJaNQhNdK7v+9FTvgb7tg2/UmdxlvUhuorvMiJKkyfaWZVCKDrmdMBLJeTnbg+p6tWTLQfSo9dgKKXAEn16rwvrmjpRLbvlnyEaoQnKr9zBb2o05us=,iv:qfEGW+UQfYr4oDTPiiva6yqZPSTTgRnHxm+WA1ksklA=,tag:dAl8helIQ17UtJnZm924ww==,type:str]
     encrypted_regex: ^(data|stringData)$
-    version: 3.8.1
+    version: 3.11.0
