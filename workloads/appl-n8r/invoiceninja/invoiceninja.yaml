@@ -34,7 +34,7 @@ spec:
           app:
             image:
               repository: invoiceninja/invoiceninja-debian
-              tag: 5.12.27-d
+              tag: 5.12.28-d
             env:
               APP_URL: "https://invoiceninja.n8r.ch"
               APP_ENV: production
