@@ -1,0 +1,30 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: node-feature-discovery
+  namespace: kube-node-feature-discovery
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: node-feature-discovery
+      version: 0.18.2
+      sourceRef:
+        kind: HelmRepository
+        name: node-feature-discovery
+        namespace: flux-system
+      interval: 5m
+  values:
+    worker:
+      config:
+        sources:
+          usb:
+            deviceClassWhitelist:
+              - "ff"
+              - "00"
+              - "03"
+            deviceLabelFields:
+              - "class"
+              - "vendor"
+              - "device"
