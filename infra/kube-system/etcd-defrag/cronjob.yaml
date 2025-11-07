@@ -28,7 +28,7 @@ spec:
             - --cluster
             - --defrag-rule
             - dbQuotaUsage > 0.8 || dbSize - dbSizeInUse > 30*1024*1024
-            image: ghcr.io/ahrtr/etcd-defrag:v0.31.0
+            image: ghcr.io/ahrtr/etcd-defrag:v0.36.0
             name: etcd-defrag
             volumeMounts:
             - mountPath: /etc/kubernetes/pki/etcd
