@@ -40,7 +40,7 @@ spec:
               APP_ENV: production
               REQUIRE_HTTPS: "true"
               TRUSTED_PROXIES: "*"
-              DB_HOST: "mariadb-ha-primary.appl-mariadb.svc.cluster.local"
+              DB_HOST: "mariadb.appl-mariadb.svc.cluster.local"
               DB_PORT: "3306"
               DB_DATABASE: "invoiceninja-n8r"
               DB_USERNAME: "invoiceninja-n8r"
