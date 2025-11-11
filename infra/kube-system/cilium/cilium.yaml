@@ -36,6 +36,9 @@ spec:
     routingMode: native
     ipv6NativeRoutingCIDR: 2001:1620:5386:beef:0::/104
 
+    bandwidthManager:
+      enabled: true
+
     extraArgs:
       - --enable-ipv6-ndp
       - --ipv6-mcast-device=eno1
