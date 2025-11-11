@@ -10,6 +10,9 @@ spec:
   selectAllByDefault: true
   scrapeInterval: 30s
   replicaCount: 2
+  inlineRelabelConfig:
+    - action: labeldrop
+      regex: "feature_node_kubernetes_io_.+"
   remoteWriteSettings:
     useMultiTenantMode: true
   resources:
