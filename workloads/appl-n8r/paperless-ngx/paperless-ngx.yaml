@@ -44,6 +44,8 @@ spec:
               PAPERLESS_URL: "https://paperless.n8r.ch"
               PAPERLESS_CONSUMER_RECURSIVE: "true"
               PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: "true"
+              PAPERLESS_DBENGINE: mariadb
+              PAPERLESS_DBHOST: mariadb.appl-mariadb.svc.cluster.local
             envFrom:
               - secretRef:
                   name: paperless-ngx-secret
