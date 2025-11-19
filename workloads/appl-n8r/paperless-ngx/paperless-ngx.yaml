@@ -35,7 +35,7 @@ spec:
           app:
             image:
               repository: ghcr.io/paperless-ngx/paperless-ngx
-              tag: 2.19.4
+              tag: 2.19.6
             env:
               TZ: "Europe/Zurich"
               PAPERLESS_REDIS: "redis://localhost:6379"
