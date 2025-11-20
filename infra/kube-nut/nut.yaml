@@ -59,12 +59,39 @@ spec:
                   secretKeyRef:
                     name: nut-secret
                     key: api-password
+              # used for kubectl exec -n kube-nut deployment/nut -- upsrw -s battery.charge.low=30 -u upsmon -p PASSWORD ups@localhost
+              ACTIONS: "SET"
+              INSTCMDS: "ALL"
               MAXAGE: "15"
 
             securityContext:
               privileged: true
 
             probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /bin/sh
+                      - -c
+                      - upsc ups@localhost 2>&1 | grep -q "ups.status"
+                  initialDelaySeconds: 5
+                  periodSeconds: 2
+                  failureThreshold: 30
+
+            lifecycle:
+              postStart:
+                exec:
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                      sleep 10
+                      PASSWORD=$(cat /etc/nut/upsd.users | grep "password = " | awk '{print $3}')
+                      upsrw -s battery.charge.low=40 -u upsmon -p "$API_PASSWORD" ups@localhost || true
+
               liveness:
                 enabled: true
                 custom: true
