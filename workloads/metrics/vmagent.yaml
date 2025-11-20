@@ -15,6 +15,8 @@ spec:
       regex: "feature_node_kubernetes_io_.+"
   remoteWriteSettings:
     useMultiTenantMode: true
+  extraArgs:
+     promscrape.dropOriginalLabels: "false"
   resources:
     requests:
       cpu: 200m
