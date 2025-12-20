@@ -16,6 +16,14 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
+    preUpgradeChecker:
+      upgradeVersionCheck: false
+
+    image:
+      longhorn:
+        manager:
+          tag: v1.10.1-hotfix-2
+
     persistence:
       defaultClass: false
       defaultDataLocality: best-effort
