@@ -1,0 +1,8 @@
+---
+machine:
+  network:
+    interfaces:
+      - interface: eno1
+        dhcp: true
+        vip:
+          ip: 192.168.63.80

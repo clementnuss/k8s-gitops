@@ -1,0 +1,41 @@
+clusterName: planchettes63
+clusterEndpoint: https://192.168.63.80:6443
+kubernetesVersion: v1.32.8
+nodes:
+    - host: talos-node-01
+      ip: 192.168.63.193
+      role: control-plane
+    - host: talos-node-02
+      ip: 192.168.63.181
+      role: control-plane
+    - host: talos-node-03
+      ip: 192.168.63.141
+      role: control-plane
+    - host: talos-node-04
+      ip: 192.168.63.107
+      role: control-plane
+data:
+    nutClientPassword: ENC[AES256_GCM,data:sh5jiPrC1U4=,iv:01u9hC9e5ctUz/albM0hQIc/x6tSEpsi/4PY5ANTXS8=,tag:R5sGheoFlmDEYBdd8IxEdA==,type:str]
+    additionalControlPlaneEndpoint: ENC[AES256_GCM,data:VBFhgn9kFHJof/Tb5w==,iv:WyKeUP7Uj+Ee9NnVle7ktTYi45k4BXCNVsmqgCbtx6I=,tag:FW6yiYVrQjhM9sSzbUzzTw==,type:str]
+# customization:
+#     systemExtensions:
+#         officialExtensions:
+#             - siderolabs/iscsi-tools
+#             - siderolabs/nfs-utils
+#             - siderolabs/nut-client
+#             - siderolabs/util-linux-tools
+sops:
+    age:
+        - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBEYTRjWWxBZVM1TUN5Q2ha
+            ZmRDKytMU0dQdkdUZnl0TzVtNjVjOUFZRXpJCldvS3BxUWdMYXRBV1Z1aWhEQ0wz
+            Rmp0M3VRbnBld0FRQVA4Mi9CY1dmUlEKLS0tIDEvZ281V2tUcnVBNmwrSmZaT3VQ
+            ODV3enZhc2hCa3E2UE5YYi9pUngzUWMKzOBStnpMhlKDfJfN1zEPcElJSpldoksH
+            k+N5rJAD9kSKhuoVHHkiERZq5CE0hg4m/MTHVGxleBycD1Cn/3GvbA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-12-31T15:52:17Z"
+    mac: ENC[AES256_GCM,data:La+n78WMP0z0n14lP9gXfDJcPJLNZ5a2naqe840g1JD9BZWqEnu7P5RhD6LjxmyuIlZdTbE/qz8+WtVcGVFQ0tAWIqm1G5XvR5Lm1/7yTEUHu+7AvpCtlre4vwEDevACYlNo8gyj9ISDbzqawA2VxPCH8xTiMOTI3XPcfaHpHU8=,iv:drrSFuCt/pCs/kkEqhMPBtWVSE74v1PiBjEWRRZ5rU8=,tag:gd62jVE8sTtTzb7yp53uIw==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0

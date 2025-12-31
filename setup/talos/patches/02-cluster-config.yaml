@@ -1,0 +1,20 @@
+---
+cluster:
+  network:
+    cni:
+      name: none
+    podSubnets:
+      - 172.16.0.0/16
+      - 2001:1620:5386:beef:0::/96
+    serviceSubnets:
+      - 172.30.0.0/16
+      - fc00:cafe:beef:ffff::/112
+  controllerManager:
+    extraArgs:
+      allocate-node-cidrs: "false"
+      node-cidr-mask-size-ipv6: "112"
+  proxy:
+    disabled: true
+  discovery:
+    enabled: true
+  allowSchedulingOnControlPlanes: true

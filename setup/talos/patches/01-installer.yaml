@@ -1,0 +1,5 @@
+---
+machine:
+  install:
+    disk: /dev/nvme0n1
+    image: factory.talos.dev/metal-installer/71a9162d597063a16ad79b3326516612936ff69a246f1a47b850d8eedd756d2e:v1.12.0
