@@ -34,8 +34,21 @@ spec:
         enabled: true
         size: 10Gi
 
+      resources:
+        limits:
+          memory: 2Gi
+        requests:
+          cpu: 100m
+          memory: 1Gi
+
     vector:
       enabled: true
+      resources:
+        limits:
+          memory: 512Mi
+        requests:
+          cpu: 50m
+          memory: 256Mi
       service:
         enabled: true
         type: "LoadBalancer"
@@ -51,6 +64,10 @@ spec:
             port: 514
             targetPort: 514
             protocol: TCP
+          - name: talos-logs
+            port: 5044
+            targetPort: 5044
+            protocol: TCP
       customConfig:
         sources:
           syslog_udp:
@@ -61,6 +78,12 @@ spec:
             type: socket
             mode: tcp
             address: '0.0.0.0:514'
+          talos_logs:
+            type: socket
+            mode: tcp
+            address: '0.0.0.0:5044'
+            decoding:
+              codec: json
         transforms:
           parse_syslog:
             type: remap
@@ -74,4 +97,4 @@ spec:
               }
         sinks:
           vlogs:
-            inputs: [parser, parse_syslog]
+            inputs: [parser, parse_syslog, talos_logs]
