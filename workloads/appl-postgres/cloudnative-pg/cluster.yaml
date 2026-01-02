@@ -1,0 +1,80 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-cnpg
+  namespace: appl-postgres
+spec:
+  instances: 1
+
+  # Disable superuser access for security (use app users instead)
+  enableSuperuserAccess: false
+
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.1
+
+  # Managed configuration for application access
+  managed:
+    roles:
+    - name: app_admin
+      ensure: present
+      login: true
+      superuser: true
+      createdb: true
+      createrole: true
+      inherit: true
+      passwordSecret:
+        name: app-admin-secret
+
+  bootstrap:
+    initdb:
+      database: postgres
+      owner: postgres
+      secret:
+        name: postgres-cnpg-superuser
+
+  storage:
+    storageClass: longhorn-3-replicas
+    size: 10Gi
+
+  monitoring:
+    enablePodMonitor: false
+
+  # Backup configuration (optional but recommended)
+  # backup:
+  #   barmanObjectStore:
+  #     destinationPath: s3://your-bucket/postgres
+  #     s3Credentials:
+  #       accessKeyId:
+  #         name: backup-credentials
+  #         key: ACCESS_KEY_ID
+  #       secretAccessKey:
+  #         name: backup-credentials
+  #         key: SECRET_ACCESS_KEY
+  #   retentionPolicy: "30d"
+
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: "256MB"
+      effective_cache_size: "1GB"
+      maintenance_work_mem: "64MB"
+      checkpoint_completion_target: "0.9"
+      wal_buffers: "16MB"
+      default_statistics_target: "100"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      work_mem: "2621kB"
+      min_wal_size: "1GB"
+      max_wal_size: "4GB"
+
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+
+  affinity:
+    podAntiAffinityType: required
+    topologyKey: kubernetes.io/hostname

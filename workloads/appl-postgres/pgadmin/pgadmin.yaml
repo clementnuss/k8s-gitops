@@ -19,9 +19,9 @@ spec:
   values:
     env:
       email: clement@n8r.ch
-    existingSecret: postgres-credentials
+    existingSecret: app-admin-secret
     secretKeys:
-      pgadminPasswordKey: postgres-password
+      pgadminPasswordKey: password
     serverDefinitions:
       enabled: true
       servers:
@@ -29,8 +29,8 @@ spec:
           Name: "postgres n8r cluster"
           Group: "Servers"
           Port: 5432
-          Username: "postgres"
-          Host: "postgres-postgresql.appl-postgres.svc.cluster.local"
+          Username: "app_admin"
+          Host: "postgres-cnpg-rw.appl-postgres.svc.cluster.local"
           SSLMode: "prefer"
           MaintenanceDB: "postgres"
     persistentVolume:
