@@ -8,7 +8,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      version: 0.11.23
+      version: 0.11.24
       chart: victoria-logs-single
       sourceRef:
         kind: HelmRepository
