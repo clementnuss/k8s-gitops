@@ -34,13 +34,15 @@ spec:
         upstreams = [ "file:///dev/null" ]
 
     extraArgs:
-      provider: google
+      provider: oidc
+      oidc-issuer-url: https://dex.n8r.ch
       skip-provider-button: true
       pass-authorization-header: true
       set-xauthrequest: true
       cookie-domain: .n8r.ch
       whitelist-domain: .n8r.ch
       authenticated-emails-file: /etc/oauth2-proxy/allowed-emails
+      prompt: none
 
     extraVolumes:
       - name: allowed-emails
