@@ -5,6 +5,7 @@ stringData:
     PAPERLESS_DBPORT: ENC[AES256_GCM,data:GaGVIg==,iv:MbN6nHiKomHnNIUMasB+6beS/g9YL6kf0rwgFM2DEEk=,tag:a5dN7Z8lvTFxjWXqB0uh1Q==,type:str]
     PAPERLESS_DBUSER: ENC[AES256_GCM,data:ApQkNQ6EwTnRdsgOmQ==,iv:2/sVwzNvbHJvnGHkrr76aO5E0xZMWPNLAoHrxxC84WA=,tag:5jiffVhPBPfe5OCXkqZFjQ==,type:str]
     PAPERLESS_SECRET_KEY: ENC[AES256_GCM,data:RrY9OfG7Gam7ylxh1ITgb8R2gVW9XwpkBMcZsSRIHcQKPZowxExyxxUz9KuU8yibOgbMIQ==,iv:qJvlqUb5iSnQfQ0qteMrwp7iB5HDwnsVaiRppGfirpw=,tag:Bzg81jk9nID1A9rTlMPpfg==,type:str]
+    PAPERLESS_SOCIALACCOUNT_PROVIDERS: ENC[AES256_GCM,data:RQwSOjyIV33/itqd2IvtzNG3U4nAKc1rYsxYypX/FsgeYlouOvngc+B23V1RZLFsFOEIthl9mHL/bT2+LnuCx+Ql6XYcLPTM2BN6s2sXBYyEXsJdMl7eGScCWHnRQnPXm2B8gWEWpN9RcrZHN1nc2QGey8jP5ipn7VI/jx/9Kk4dar+sJnlM2GqvTYreZMounQFE1iYlKFyd/9sxvUM3OBYQ3CDCXcW8V6U00oQWku1GiNYyXMdZN/tvClnnLDDi/WVD4/o0CC5CfuMq3Fr7lpTbvaL3ohj2ua0+PKg/UK588+V19iEhTrs9iFfmFdb0kA72aKQ8ypjkvdsOUGzQxz9lYax8/3RfgQGrxfhExXc0KRCchRAvleqq+zDR+e1UTR5EzCGyJikOR+JkJPU8zHufUctyLFk/f4+rI/rU9o8wii2CzU/g2pcQOurumqlpy5pjcyS4kkXx+Sr20g==,iv:KhUaBzrI7/quZNEh8i3KhtCsSyNlizoxw65GgPhURTc=,tag:3IawyTRr3ch0RtOLdJUDSA==,type:str]
 kind: Secret
 metadata:
     name: paperless-ngx-secret
@@ -20,7 +21,7 @@ sops:
             dFM3K3FjU2szTjJsTjI1RUwybVAyWUkKWBIc5iKFo4JyTR86fAr/zPMtnCkqKrSR
             xIGRuraH5wy/z5fKma3MpTGObOVosqd0Njb92vAGIKgRGu4SOAPQTg==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-11-11T06:32:53Z"
-    mac: ENC[AES256_GCM,data:wyYlRjSVdBbMSd4vuV5oNbdmHVLqNAuwT8RX/WzzCdBy7W/SQHvvAySXslxAZMXp8HDk8NPEM7/wC7qbstSWM1nuQEEuWCsYk14r3QsKH6Rw17vfYtvlPwjNi0hUpkxTrsKwim6zHaO+n/M02+vkExREJ2inZzNKeCmhW+ODcbc=,iv:ARcLHB+8pi2Z+PRbJbJvik+7wTUlWSyZACHBpTlCcW4=,tag:KQWEwYDk7ihnOHiXCPu/6g==,type:str]
+    lastmodified: "2026-01-23T16:42:06Z"
+    mac: ENC[AES256_GCM,data:UmFN/aHPDAGjn56gtkmQFybfq+21L+5wDoAYCTVuZ0BG1GKM1q0Esb11WYMVRgg78/YBKpvKJiwHTAFLoyr9AR35Z4fBFtywQAM3nPb9Yf1eo7sNpkAqjwZEQ5jfXSfHdCmmP1cWixfUbFhZus2bHue45KHtCrESmVjMiZa5Sw4=,iv:1FtcFOfEyzCtzICvwWnybTFWqjjOPPAEoL//iC+EEKs=,tag:Ljw/ZVSalnk0b6AQFdq3Rg==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.11.0
