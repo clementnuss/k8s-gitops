@@ -8,24 +8,89 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://th0th.github.io/helm-charts
-      chart: listmonk
-      version: 5.0.3
+      chart: app-template
+      version: 4.5.0
       sourceRef:
         kind: HelmRepository
-        name: th0th-github-io
+        name: bjw-s
         namespace: flux-system
-      interval: 5m
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  uninstall:
+    keepHistory: false
   values:
-    ingress:
-      annotations:
-        nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
-        nginx.ingress.kubernetes.io/auth-signin: https://auth.n8r.ch/oauth2/start
-      host: listmonk.n8r.ch
-      enabled: true
-      className: nginx
+    controllers:
+      listmonk:
+        initContainers:
+          init-db:
+            image:
+              repository: listmonk/listmonk
+              tag: v6.0.0
+            command:
+              - /bin/sh
+              - -c
+              - ./listmonk --install --idempotent --yes && ./listmonk --upgrade --yes
+            envFrom:
+              - secretRef:
+                  name: listmonk-secret
 
-  valuesFrom:
-  - kind: Secret
-    name: "listmonk-helm-values"
-    optional: false
+        containers:
+          app:
+            image:
+              repository: listmonk/listmonk
+              tag: v6.0.0
+            envFrom:
+              - secretRef:
+                  name: listmonk-secret
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+
+    service:
+      main:
+        type: ClusterIP
+        controller: listmonk
+        ports:
+          http:
+            port: 9000
+
+    ingress:
+      main:
+        enabled: true
+        className: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
+          nginx.ingress.kubernetes.io/auth-signin: "https://auth.n8r.ch/oauth2/start"
+        hosts:
+          - host: listmonk.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - listmonk.n8r.ch
+
+    persistence:
+      uploads:
+        enabled: true
+        type: persistentVolumeClaim
+        size: 1Gi
+        accessMode: ReadWriteOnce
+        globalMounts:
+          - path: /listmonk/uploads
