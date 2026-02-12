@@ -17,13 +17,6 @@ nodes:
 data:
     nutClientPassword: ENC[AES256_GCM,data:kZD47zNseRk=,iv:05QDdKjN0P0Taknuin9IzuRZGnxUwC46MnBPtB4ia+A=,tag:PDmTHGbxpd13rkQ3ht6jHw==,type:str]
     additionalControlPlaneEndpoint: ENC[AES256_GCM,data:iWbP8Lc7+sr0pRhSAQ==,iv:kK/9NyG3tYHuBhm8yhRR45qp75wfuoqWbpNkvsoU2Ek=,tag:8D2zRT6TnqgdkW4AItsRXA==,type:str]
-# customization:
-#     systemExtensions:
-#         officialExtensions:
-#             - siderolabs/iscsi-tools
-#             - siderolabs/nfs-utils
-#             - siderolabs/nut-client
-#             - siderolabs/util-linux-tools
 sops:
     age:
         - recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
@@ -40,3 +33,10 @@ sops:
     encrypted_regex: ^(data|stringData)$
     mac_only_encrypted: true
     version: 3.11.0
+# customization:
+#     systemExtensions:
+#         officialExtensions:
+#             - siderolabs/iscsi-tools
+#             - siderolabs/nfs-utils
+#             - siderolabs/nut-client
+#             - siderolabs/util-linux-tools
