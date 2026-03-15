@@ -76,7 +76,7 @@ metadata:
   #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
   #   cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Adjust based on your cert-manager setup
 spec:
-  ingressClassName: nginx  # Adjust based on your ingress controller
+  ingressClassName: traefik
   tls:
   - hosts:
     - kutt.n8r.ch

@@ -64,7 +64,7 @@ spec:
     ingress:
       main:
         enabled: true
-        className: "nginx"
+        className: "traefik"
         hosts:
           - host: hass.n8r.ch
             paths:

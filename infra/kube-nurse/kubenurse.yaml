@@ -18,7 +18,7 @@ spec:
   values:
     ingress:
       enabled: true
-      className: nginx
+      className: traefik
       # KUBENURSE_INGRESS_URL
       url: kubenurse.n8r.ch
     victoriametrics_histogram: true

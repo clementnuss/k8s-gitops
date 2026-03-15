@@ -22,5 +22,5 @@ spec:
     # tlsSecretName: vmauth-tls
     # annotations:
     #   cert-manager.io/cluster-issuer: base
-    class_name: nginx
+    class_name: traefik
     host: vm-access.n8r.ch

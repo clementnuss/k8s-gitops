@@ -57,7 +57,7 @@ spec:
     ingress:
       # mqtt:
       #   enabled: true
-      #   ingressClassName: nginx
+      #   ingressClassName: traefik
       #   path: /
       #   pathType: ImplementationSpecific
       #   hosts:
@@ -68,10 +68,9 @@ spec:
 
       dashboard:
         enabled: true
-        ingressClassName: nginx
+        ingressClassName: traefik
         annotations:
-          nginx.ingress.kubernetes.io/auth-url: "https://auth.n8r.ch/oauth2/auth"
-          nginx.ingress.kubernetes.io/auth-signin: https://auth.n8r.ch/oauth2/start
+          traefik.ingress.kubernetes.io/router.middlewares: kube-traefik-oauth2-n8r@kubernetescrd
         path: /
         hosts:
         - emqx-dashboard.n8r.ch
