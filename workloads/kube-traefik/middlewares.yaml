@@ -10,7 +10,7 @@ metadata:
   namespace: kube-traefik
 spec:
   forwardAuth:
-    address: "http://oauth2-proxy.appl-n8r.svc.cluster.local/"
+    address: "https://auth.n8r.ch/oauth2/auth"
     trustForwardHeader: true
     authResponseHeaders:
       - X-Auth-Request-User

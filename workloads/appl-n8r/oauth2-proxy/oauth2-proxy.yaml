@@ -43,7 +43,6 @@ spec:
       whitelist-domain: .n8r.ch
       authenticated-emails-file: /etc/oauth2-proxy/allowed-emails
       prompt: none
-      redirect-url: https://auth.n8r.ch/oauth2/callback
 
     extraVolumes:
       - name: allowed-emails
