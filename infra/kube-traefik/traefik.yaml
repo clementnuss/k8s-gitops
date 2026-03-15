@@ -32,7 +32,6 @@ spec:
     additionalArguments:
       - "--entryPoints.web.forwardedHeaders.trustedIPs=0.0.0.0/0,::/0"
       - "--entryPoints.websecure.forwardedHeaders.trustedIPs=0.0.0.0/0,::/0"
-      - "--serversTransport.insecureSkipVerify=true"
 
     providers:
       kubernetesCRD:
