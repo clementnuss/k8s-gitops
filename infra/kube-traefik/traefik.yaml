@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://traefik.github.io/charts
       chart: traefik
-      version: 35.0.0
+      version: 39.0.5
       sourceRef:
         kind: HelmRepository
         name: traefik
@@ -25,9 +25,9 @@ spec:
       isDefaultClass: false   # keep nginx as default while running side-by-side
       name: traefik
 
-    globalArguments:
-      - "--global.sendanonymoususage=false"
-      - "--global.checkNewVersion=false"
+    global:
+      checkNewVersion: false
+      sendAnonymousUsage: false
 
     additionalArguments:
       - "--entryPoints.web.forwardedHeaders.trustedIPs=0.0.0.0/0,::/0"
@@ -44,8 +44,12 @@ spec:
 
     ports:
       web:
-        redirectTo:
-          port: websecure
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
 
     tlsStore:
       default:
