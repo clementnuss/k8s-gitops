@@ -115,7 +115,7 @@ spec:
         type: LoadBalancer
         controller: nut
         annotations:
-          metallb.io/loadBalancerIPs: 192.168.63.233
+          lbipam.cilium.io/ips: 192.168.63.233
         ports:
           http:
             port: 3493

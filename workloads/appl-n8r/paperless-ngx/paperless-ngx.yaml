@@ -103,7 +103,7 @@ spec:
         type: LoadBalancer
         controller: paperless-ngx
         annotations:
-          metallb.io/loadBalancerIPs: 192.168.63.234
+          lbipam.cilium.io/ips: 192.168.63.234
         ports:
           ftp:
             port: 21
