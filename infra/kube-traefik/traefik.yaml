@@ -1,0 +1,78 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: kube-traefik
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://traefik.github.io/charts
+      chart: traefik
+      version: 35.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+      interval: 5m
+  values:
+    deployment:
+      replicas: 2
+
+    ingressClass:
+      enabled: true
+      isDefaultClass: false   # keep nginx as default while running side-by-side
+      name: traefik
+
+    globalArguments:
+      - "--global.sendanonymoususage=false"
+      - "--global.checkNewVersion=false"
+
+    additionalArguments:
+      - "--entryPoints.web.forwardedHeaders.trustedIPs=0.0.0.0/0,::/0"
+      - "--entryPoints.websecure.forwardedHeaders.trustedIPs=0.0.0.0/0,::/0"
+      - "--serversTransport.insecureSkipVerify=true"
+
+    providers:
+      kubernetesCRD:
+        enabled: true
+        allowCrossNamespace: true    # required for kube-traefik middlewares used cross-namespace
+      kubernetesIngress:
+        enabled: true
+        publishedService:
+          enabled: true
+
+    ports:
+      web:
+        redirectTo:
+          port: websecure
+
+    tlsStore:
+      default:
+        defaultCertificate:
+          secretName: acme-crt-secret   # issued by cert-manager into kube-traefik ns
+
+    service:
+      enabled: true
+      type: LoadBalancer
+      annotations:
+        lbipam.cilium.io/ips: 192.168.63.230,2001:1620:5386:cafe::8080
+      spec:
+        ipFamilyPolicy: RequireDualStack
+        ipFamilies:
+          - IPv4
+          - IPv6
+      externalTrafficPolicy: Local
+
+    metrics:
+      prometheus:
+        service:
+          enabled: true
+
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 25m
+      limits:
+        memory: 600Mi
