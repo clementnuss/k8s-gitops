@@ -45,4 +45,4 @@ spec:
             - path: /
               pathType: Prefix
       annotations:
-        traefik.ingress.kubernetes.io/router.middlewares: kube-traefik-oauth2-n8r@kubernetescrd
+        traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd

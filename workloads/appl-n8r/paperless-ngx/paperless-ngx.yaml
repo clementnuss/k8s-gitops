@@ -138,7 +138,7 @@ spec:
         enabled: true
         className: "traefik"
         annotations:
-          traefik.ingress.kubernetes.io/router.middlewares: kube-traefik-oauth2-n8r@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd
         hosts:
           - host: paperless.n8r.ch
             paths:

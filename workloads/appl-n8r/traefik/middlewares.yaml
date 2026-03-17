@@ -1,0 +1,16 @@
+---
+# reference as: appl-n8r-oauth2-n8r@kubernetescrd
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth2-n8r
+  namespace: appl-n8r
+spec:
+  forwardAuth:
+    address: "https://auth.n8r.ch/oauth2/auth"
+    authSigninURL: "https://auth.n8r.ch/oauth2/start"
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-Request-User
+      - X-Auth-Request-Email
+    maxResponseBodySize: 10485760  # 10MiB

@@ -70,7 +70,7 @@ spec:
         enabled: true
         ingressClassName: traefik
         annotations:
-          traefik.ingress.kubernetes.io/router.middlewares: kube-traefik-oauth2-n8r@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd
         path: /
         hosts:
         - emqx-dashboard.n8r.ch

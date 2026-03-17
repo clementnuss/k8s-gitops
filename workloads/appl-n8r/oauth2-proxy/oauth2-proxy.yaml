@@ -41,6 +41,8 @@ spec:
       set-xauthrequest: true
       cookie-domain: .n8r.ch
       whitelist-domain: .n8r.ch
+      # reverse-proxy: "true"
+      # redirect-url: https://auth.n8r.ch/oauth2/callback
       authenticated-emails-file: /etc/oauth2-proxy/allowed-emails
       prompt: none
 
