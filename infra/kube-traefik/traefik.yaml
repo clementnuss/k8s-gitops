@@ -22,7 +22,7 @@ spec:
 
     ingressClass:
       enabled: true
-      isDefaultClass: false   # keep nginx as default while running side-by-side
+      isDefaultClass: true
       name: traefik
 
     global:
