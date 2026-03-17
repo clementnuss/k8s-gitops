@@ -16,7 +16,7 @@ spec:
   listeners:
     - name: websecure
       protocol: HTTPS
-      port: 443
+      port: 8443
       tls:
         mode: Terminate
         certificateRefs:
