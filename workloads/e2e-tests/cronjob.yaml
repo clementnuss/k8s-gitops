@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: e2e-tests
+  namespace: e2e-tests
+  labels:
+    app: e2e-tests
+spec:
+  schedule: "*/15 * * * *" # Every 15 minutes
+  timeZone: UTC
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app: e2e-tests
+            job: cronjob
+        spec:
+          restartPolicy: Never
+          serviceAccountName: e2e-tests
+          containers:
+            - name: e2e-tests
+              image: ghcr.io/clementnuss/e2e-tests:latest
+              imagePullPolicy: Always
+              env:
+                - name: OTEL_SERVICE_NAME
+                  value: "e2e-tests"
+                - name: OTEL_SERVICE_VERSION
+                  value: "1.0.0"
+                - name: OTEL_EXPORTER_OTLP_ENDPOINT
+                  value: "http://vminsert-vmcluster-short-term.metrics.svc.cluster.local.:8480/insert/0/opentelemetry/v1/metrics"
+                - name: OTEL_EXPORTER_OTLP_PROTOCOL
+                  value: "http/protobuf"
+                - name: OTEL_EXPORTER_OTLP_INSECURE
+                  value: "true"
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+                limits:
+                  memory: "512Mi"
+                  cpu: "500m"
