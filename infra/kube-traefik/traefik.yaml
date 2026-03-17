@@ -41,6 +41,8 @@ spec:
         enabled: true
         publishedService:
           enabled: true
+      kubernetesGateway:
+        enabled: true
 
     ports:
       web:
