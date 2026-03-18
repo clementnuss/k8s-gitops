@@ -1,0 +1,82 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: claper
+  namespace: appl-n8r
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://bjw-s.github.io/helm-charts
+      chart: app-template
+      version: 4.6.2
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      claper:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/claperco/claper
+              tag: 2.4.0
+            env:
+              BASE_URL: https://claper.n8r.ch
+              PORT: "4000"
+              SECURE_COOKIE: "true"
+              ENABLE_ACCOUNT_CREATION: "false"
+              PRESENTATION_STORAGE_DIR: /data
+              OIDC_ISSUER: https://dex.n8r.ch
+              OIDC_PROVIDER_NAME: Dex
+              OIDC_AUTO_REDIRECT_LOGIN: "true"
+            envFrom:
+              - secretRef:
+                  name: claper-secret
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 512Mi
+
+    service:
+      app:
+        controller: claper
+        ports:
+          http:
+            port: 4000
+
+    ingress:
+      app:
+        className: traefik
+        hosts:
+          - host: claper.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts:
+              - claper.n8r.ch
+
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        size: 10Gi
+        accessMode: ReadWriteOnce
+        globalMounts:
+          - path: /data
