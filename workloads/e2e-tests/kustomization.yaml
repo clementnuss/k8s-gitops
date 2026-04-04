@@ -14,4 +14,4 @@ commonLabels:
 
 images:
   - name: ghcr.io/clementnuss/e2e-tests
-    newTag: v0.1.4
+    newTag: 0.1.5
