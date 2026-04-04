@@ -15,8 +15,15 @@ spec:
         spec:
           serviceAccountName: paperless-backup
           restartPolicy: OnFailure
-          containers:
-            - name: backup
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: paperless-ngx
+                  topologyKey: kubernetes.io/hostname
+          initContainers:
+            - name: document-exporter
               image: alpine/k8s:1.35.2
               command:
                 - /bin/sh
@@ -42,6 +49,46 @@ spec:
                   memory: 32Mi
                 limits:
                   memory: 64Mi
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.19.0
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  kopia repository connect webdav \
+                    --url="$KOPIA_WEBDAV_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS" \
+                    --override-username=paperless \
+                    --override-hostname=planchettes63 || \
+                  kopia repository create webdav \
+                    --url="$KOPIA_WEBDAV_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS"
+                  kopia snapshot create /export
+                  kopia snapshot list /export --all
+              envFrom:
+                - secretRef:
+                    name: paperless-kopia-secret
+              volumeMounts:
+                - name: export
+                  mountPath: /export
+                  readOnly: true
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: export
+              persistentVolumeClaim:
+                claimName: paperless-ngx-export
+            - name: kopia-cache
+              emptyDir: {}
 ---
 apiVersion: v1
 kind: ServiceAccount
