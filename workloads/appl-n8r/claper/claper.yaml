@@ -27,17 +27,18 @@ spec:
   values:
     controllers:
       claper:
+        type: statefulset
         containers:
           app:
             image:
               repository: ghcr.io/claperco/claper
               tag: 2.4.0
             env:
+              TZ: "Europe/Zurich"
               BASE_URL: https://claper.n8r.ch
               PORT: "4000"
               SECURE_COOKIE: "true"
               ENABLE_ACCOUNT_CREATION: "false"
-              PRESENTATION_STORAGE_DIR: /data
               OIDC_ISSUER: https://dex.n8r.ch
               OIDC_PROVIDER_NAME: Dex
               OIDC_AUTO_REDIRECT_LOGIN: "true"
@@ -79,4 +80,4 @@ spec:
         size: 10Gi
         accessMode: ReadWriteOnce
         globalMounts:
-          - path: /data
+          - path: /app/uploads
