@@ -1,0 +1,77 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+spec:
+  schedule: "30 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: paperless-backup
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: alpine/k8s:1.35.2
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  POD=$(kubectl get pods -n appl-n8r -l app.kubernetes.io/name=paperless-ngx -o jsonpath='{.items[0].metadata.name}')
+                  if [ -z "$POD" ]; then
+                    echo "ERROR: paperless-ngx pod not found"
+                    exit 1
+                  fi
+                  echo "Running document_exporter in pod $POD"
+                  kubectl exec -n appl-n8r "$POD" -c app -- \
+                    document_exporter /usr/src/paperless/export \
+                      --delete \
+                      --use-folder-prefix \
+                      --split-manifest \
+                      --compare-checksums \
+                      --no-archive \
+                      --no-thumbnail
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+subjects:
+  - kind: ServiceAccount
+    name: paperless-backup
+    namespace: appl-n8r
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: paperless-backup
