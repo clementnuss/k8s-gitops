@@ -12,6 +12,7 @@ spec:
     - nfsvers=3
     - hard
     - noac
+    - lookupcache=none
   nfs:
     server: 192.168.63.10
     path: /volume1/nfs-share/immich/
