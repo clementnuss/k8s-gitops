@@ -23,6 +23,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: immich-library
   namespace: appl-n8r
+  labels:
+    velero.io/exclude-from-backups: "true"
 spec:
   accessModes:
     - ReadWriteMany
