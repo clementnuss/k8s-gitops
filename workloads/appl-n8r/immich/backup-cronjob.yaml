@@ -1,0 +1,62 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: immich-backup
+  namespace: appl-n8r
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.22.3
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  kopia repository connect s3 \
+                    --bucket="$KOPIA_S3_BUCKET" \
+                    --access-key="$KOPIA_S3_ACCESS_KEY" \
+                    --secret-access-key="$KOPIA_S3_SECRET_KEY" \
+                    --endpoint="$KOPIA_S3_ENDPOINT" \
+                    --prefix=immich-backup/ \
+                    --override-username=immich \
+                    --override-hostname=planchettes63 || \
+                  kopia repository create s3 \
+                    --bucket="$KOPIA_S3_BUCKET" \
+                    --access-key="$KOPIA_S3_ACCESS_KEY" \
+                    --secret-access-key="$KOPIA_S3_SECRET_KEY" \
+                    --endpoint="$KOPIA_S3_ENDPOINT" \
+                    --prefix=immich-backup/
+                  kopia repository throttle set --upload-bytes-per-second=31457280
+                  kopia snapshot create /data/backups /data/library /data/upload
+                  kopia snapshot list --all
+              envFrom:
+                - secretRef:
+                    name: immich-kopia-secret
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+                  readOnly: true
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: immich-library
+            - name: kopia-cache
+              emptyDir: {}
