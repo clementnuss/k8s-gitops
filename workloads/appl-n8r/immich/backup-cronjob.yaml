@@ -37,6 +37,12 @@ spec:
                     --endpoint="$KOPIA_S3_ENDPOINT" \
                     --prefix=immich-backup/
                   kopia repository throttle set --upload-bytes-per-second=31457280
+                  kopia policy set --global \
+                    --keep-latest=7 \
+                    --keep-daily=7 \
+                    --keep-weekly=4 \
+                    --keep-monthly=6 \
+                    --keep-annual=1
                   kopia snapshot create /data/backups /data/library /data/upload
                   kopia snapshot list --all
               envFrom:
