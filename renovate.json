@@ -161,10 +161,7 @@
         "patch"
       ],
       "automerge": true,
-      "automergeType": "pr",
-      "schedule": [
-        "after 2am and before 4am"
-      ]
+      "automergeType": "pr"
     },
     {
       "matchPackagePatterns": [
