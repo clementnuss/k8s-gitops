@@ -164,13 +164,41 @@
       "automergeType": "pr"
     },
     {
-      "automerge": false,
-      "matchPackageNames": [
+      "description": "Auto-merge minor updates for non-core components",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "excludePackageNames": [
+        "/cilium/",
+        "/traefik/",
+        "/cert-manager/",
+        "/flux/",
+        "/fluxcd/",
+        "/velero/",
+        "/snapshot-controller/",
         "/mariadb/",
         "/postgres/",
         "/postgresql/",
-        "/invoiceninja/",
-        "/cilium/"
+        "/invoiceninja/"
+      ]
+    },
+    {
+      "description": "Never automerge core infrastructure components",
+      "automerge": false,
+      "matchPackageNames": [
+        "/cilium/",
+        "/traefik/",
+        "/cert-manager/",
+        "/flux/",
+        "/fluxcd/",
+        "/velero/",
+        "/snapshot-controller/",
+        "/mariadb/",
+        "/postgres/",
+        "/postgresql/",
+        "/invoiceninja/"
       ]
     }
   ]
