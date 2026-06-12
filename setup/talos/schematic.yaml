@@ -1,0 +1,7 @@
+customization:
+    systemExtensions:
+        officialExtensions:
+            - siderolabs/iscsi-tools
+            - siderolabs/nfs-utils
+            - siderolabs/nut-client
+            - siderolabs/util-linux-tools
