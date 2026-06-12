@@ -19,6 +19,8 @@ spec:
           env:
           - name: IPAM_DISABLE_INSTALLER
             value: "1"
+          - name: IPAM_TRUST_X_FORWARDED
+            value: "true"
           envFrom:
             - secretRef:
                 name: phpipam-env
