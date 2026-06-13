@@ -53,7 +53,7 @@ spec:
         type: "LoadBalancer"
         externalTrafficPolicy: Local
         annotations:
-          lbipam.cilium.io/ips: 192.168.63.235
+          metallb.io/loadBalancerIPs: 192.168.63.235
         ports:
           - name: syslog-udp
             port: 514
