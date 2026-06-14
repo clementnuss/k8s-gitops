@@ -170,19 +170,19 @@
       ],
       "automerge": true,
       "automergeType": "pr",
-      "excludePackageNames": [
-        "/cilium/",
-        "/traefik/",
-        "/cloudnative-pg/",
-        "/cnpg/",
-        "/flux/",
-        "/fluxcd/",
-        "/velero/",
-        "/longhorn/",
-        "/mariadb/",
-        "/postgres/",
-        "/postgresql/",
-        "/invoiceninja/"
+      "matchPackageNames": [
+        "!/cilium/",
+        "!/traefik/",
+        "!/cloudnative-pg/",
+        "!/cnpg/",
+        "!/flux/",
+        "!/fluxcd/",
+        "!/velero/",
+        "!/longhorn/",
+        "!/mariadb/",
+        "!/postgres/",
+        "!/postgresql/",
+        "!/invoiceninja/"
       ]
     },
     {
