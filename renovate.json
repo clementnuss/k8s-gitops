@@ -2,7 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "github>billimek/k8s-gitops//.renovate/autoMerge.json5",
     "github>billimek/k8s-gitops//.renovate/groups.json5"
   ],
   "enabled": true,
@@ -10,38 +9,25 @@
   "semanticCommits": "enabled",
   "commitBodyTable": true,
   "dependencyDashboard": true,
-  "suppressNotifications": [
-    "prIgnoreNotification"
-  ],
+  "suppressNotifications": ["prIgnoreNotification"],
   "rebaseWhen": "conflicted",
   "commitMessageTopic": "{{depName}}",
   "commitMessageExtra": "to {{newVersion}}",
   "commitMessageSuffix": "",
   "helm-values": {
-    "managerFilePatterns": [
-      "/./.+\\.yaml$/"
-    ]
+    "managerFilePatterns": ["/./.+\\.yaml$/"]
   },
   "flux": {
-    "managerFilePatterns": [
-      "/./.+\\.yaml$/"
-    ]
+    "managerFilePatterns": ["/./.+\\.yaml$/"]
   },
   "kubernetes": {
-    "managerFilePatterns": [
-      "/\\.yaml$/"
-    ],
-    "ignorePaths": [
-      "flux-system/",
-      ".github"
-    ]
+    "managerFilePatterns": ["/\\.yaml$/"],
+    "ignorePaths": ["flux-system/", ".github"]
   },
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/./.+\\.yaml$/"
-      ],
+      "managerFilePatterns": ["/./.+\\.yaml$/"],
       "matchStrings": [
         "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n"
       ],
@@ -50,124 +36,68 @@
   ],
   "packageRules": [
     {
-      "matchDatasources": [
-        "helm"
-      ],
+      "matchDatasources": ["helm"],
       "commitMessageTopic": "Helm chart {{depName}}",
       "semanticCommitScope": "charts",
       "separateMinorPatch": true,
       "ignoreDeprecated": true
     },
     {
-      "matchDatasources": [
-        "docker"
-      ],
+      "matchDatasources": ["docker"],
       "commitMessageTopic": "Docker image {{depName}}",
       "commitMessageExtra": "to {{#if isSingleVersion}}{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}",
-      "matchUpdateTypes": [
-        "major",
-        "minor",
-        "patch"
-      ],
+      "matchUpdateTypes": ["major", "minor", "patch"],
       "enabled": true
     },
     {
-      "matchDatasources": [
-        "docker"
-      ],
+      "matchDatasources": ["docker"],
       "semanticCommitScope": "images",
       "separateMinorPatch": true
     },
     {
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
       "commitMessagePrefix": "feat(images)!: ",
-      "labels": [
-        "renovate/image",
-        "dep/major"
-      ]
+      "labels": ["renovate/image", "dep/major"]
     },
     {
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchUpdateTypes": [
-        "minor"
-      ],
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["minor"],
       "semanticCommitType": "feat",
-      "labels": [
-        "renovate/image",
-        "dep/minor"
-      ]
+      "labels": ["renovate/image", "dep/minor"]
     },
     {
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchUpdateTypes": [
-        "patch"
-      ],
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["patch"],
       "semanticCommitType": "fix",
-      "labels": [
-        "renovate/image",
-        "dep/patch"
-      ]
+      "labels": ["renovate/image", "dep/patch"]
     },
     {
-      "matchDatasources": [
-        "helm"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
+      "matchDatasources": ["helm"],
+      "matchUpdateTypes": ["major"],
       "commitMessagePrefix": "feat(charts)!: ",
-      "labels": [
-        "renovate/helm",
-        "dep/major"
-      ]
+      "labels": ["renovate/helm", "dep/major"]
     },
     {
-      "matchDatasources": [
-        "helm"
-      ],
-      "matchUpdateTypes": [
-        "minor"
-      ],
+      "matchDatasources": ["helm"],
+      "matchUpdateTypes": ["minor"],
       "semanticCommitType": "feat",
-      "labels": [
-        "renovate/helm",
-        "dep/minor"
-      ]
+      "labels": ["renovate/helm", "dep/minor"]
     },
     {
-      "matchDatasources": [
-        "helm"
-      ],
-      "matchUpdateTypes": [
-        "patch"
-      ],
+      "matchDatasources": ["helm"],
+      "matchUpdateTypes": ["patch"],
       "semanticCommitType": "fix",
-      "labels": [
-        "renovate/helm",
-        "dep/patch"
-      ]
+      "labels": ["renovate/helm", "dep/patch"]
     },
     {
-      "matchUpdateTypes": [
-        "patch"
-      ],
+      "matchUpdateTypes": ["patch"],
       "automerge": true,
       "automergeType": "pr"
     },
     {
       "description": "Auto-merge minor updates for non-core components",
-      "matchUpdateTypes": [
-        "minor"
-      ],
+      "matchUpdateTypes": ["minor"],
       "automerge": true,
       "automergeType": "pr",
       "excludePackageNames": [
