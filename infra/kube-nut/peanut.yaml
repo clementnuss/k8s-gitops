@@ -40,6 +40,7 @@ spec:
               TZ: "Europe/Zurich"
               WEB_PORT: "8080"
               WEB_HOST: "0.0.0.0"
+              AUTH_DISABLED: "true"
 
             resources:
               requests:
