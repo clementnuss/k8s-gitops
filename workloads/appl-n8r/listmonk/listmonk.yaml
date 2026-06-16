@@ -35,7 +35,7 @@ spec:
           init-db:
             image:
               repository: listmonk/listmonk
-              tag: v6.0.0
+              tag: v6.1.0
             command:
               - /bin/sh
               - -c
@@ -48,7 +48,7 @@ spec:
           app:
             image:
               repository: listmonk/listmonk
-              tag: v6.0.0
+              tag: v6.1.0
             envFrom:
               - secretRef:
                   name: listmonk-secret
