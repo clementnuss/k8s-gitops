@@ -16,7 +16,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: kopia
-              image: kopia/kopia:0.22.3
+              image: kopia/kopia:0.23.0
               command:
                 - /bin/sh
                 - -c
