@@ -12,6 +12,10 @@ data:
         - path: /srv
           config:
             defaultEnabled: false
+    http:
+      trustedHeaders:
+        - X-Forwarded-For
+        - X-Real-IP
     auth:
       methods:
         password:
