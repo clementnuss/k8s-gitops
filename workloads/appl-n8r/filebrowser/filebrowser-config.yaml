@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebrowser-config
+  namespace: appl-n8r
+data:
+  config.yaml: |
+    server:
+      cacheDir: /home/filebrowser/data/tmp
+      sources:
+        - path: /srv
+          config:
+            defaultEnabled: false
+    auth:
+      methods:
+        password:
+          enabled: false
+        oidc:
+          enabled: true
+          clientId: filebrowser
+          # clientSecret is set via FILEBROWSER_OIDC_CLIENT_SECRET env var
+          issuerUrl: https://dex.n8r.ch
+          scopes: "openid email profile groups"
+          userIdentifier: email
+          adminGroup: "filebrowser-admins"
