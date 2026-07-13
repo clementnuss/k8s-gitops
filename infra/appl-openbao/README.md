@@ -151,10 +151,10 @@ Access control is handled at two layers:
 These steps assume OpenBao is initialized, unsealed, and you have the root
 token. Run them via port-forward from your laptop.
 
-**Note**: these steps are also handled by the OpenTofu config in
-`setup/openbao-tf/`. If you apply that, you can skip this section entirely.
-The manual commands below are for reference or if you prefer not to use
-OpenTofu.
+**Note**: these steps are also handled by the OpenTofu config in the
+[`iac`](https://github.com/clementnuss/iac) repo at `openbao/`. If you
+apply that, you can skip this section entirely. The manual commands
+below are for reference or if you prefer not to use OpenTofu.
 
 ```bash
 # 1. Generate a client secret for OpenBao in Dex.

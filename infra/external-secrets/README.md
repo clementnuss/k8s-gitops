@@ -155,4 +155,4 @@ stay in place - it's a no-op for directories with no SOPS files.
 | `infra/external-secrets/ns.yaml` | Namespace `external-secrets` |
 | `infra/external-secrets/external-secrets.yaml` | HelmRelease for ESO |
 | `infra/external-secrets/clustersecretstore.yaml` | ClusterSecretStore pointing at OpenBao |
-| `setup/openbao-tf/main.tf` | Kubernetes auth method + ESO policy + role (in OpenTofu) |
+| [`iac`](https://github.com/clementnuss/iac) -> `openbao/main.tf` | Kubernetes auth method + ESO policy + role (in OpenTofu) |
