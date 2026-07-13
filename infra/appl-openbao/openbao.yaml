@@ -1,0 +1,119 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openbao
+  namespace: appl-openbao
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://openbao.github.io/openbao-helm
+      chart: openbao
+      version: 0.28.4
+      sourceRef:
+        kind: HelmRepository
+        name: openbao
+        namespace: flux-system
+      interval: 5m
+  values:
+    global:
+      enabled: true
+
+    # Disable the agent injector — not needed for a standalone secret store.
+    injector:
+      enabled: false
+
+    server:
+      enabled: true
+
+      # Standalone mode: single replica, file storage backend on a PVC.
+      standalone:
+        enabled: true
+
+      image:
+        repository: openbao/openbao
+        tag: "2.5.5"
+
+      logFormat: json
+      logLevel: info
+
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
+
+      dataStorage:
+        enabled: true
+        size: 10Gi
+        storageClass: longhorn-3-replicas
+        accessMode: ReadWriteOnce
+
+      auditStorage:
+        enabled: false
+
+      # The unseal key lives in a manually-created Secret `openbao-unseal-key`
+      # (not in git). On first boot the Secret doesn't exist yet, so the
+      # postStart hook no-ops; you init + unseal manually once, create the
+      # Secret yourself, and from then on every restart is auto-unsealed.
+      volumes:
+        - name: unseal-key
+          secret:
+            secretName: openbao-unseal-key
+            optional: true
+
+      volumeMounts:
+        - name: unseal-key
+          mountPath: /openbao/unseal-key
+          readOnly: true
+
+      postStart:
+        - /bin/sh
+        - -c
+        - |
+          # Wait for the OpenBao API to come up.
+          # bao status exits 0 (unsealed) or 2 (sealed) once the API is
+          # responding; any other code means it's not ready yet.
+          for i in $(seq 1 60); do
+            bao status >/dev/null 2>&1; rc=$?
+            if [ "$rc" -eq 0 ] || [ "$rc" -eq 2 ]; then break; fi
+            sleep 2
+          done
+
+          # If the unseal key file exists and OpenBao is sealed, unseal it.
+          KEY_FILE=/openbao/unseal-key/key
+          if [ -s "${KEY_FILE}" ]; then
+            bao status >/dev/null 2>&1
+            if [ "$?" -eq 2 ]; then
+              bao operator unseal "$(cat "${KEY_FILE}")"
+            fi
+          fi
+
+      readinessProbe:
+        enabled: true
+        # Ready even when sealed/uninitialized so the postStart hook can run.
+        path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        annotations:
+          # traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+        hosts:
+          - host: openbao.n8r.ch
+            paths:
+              - /
+        tls:
+          - hosts:
+              - openbao.n8r.ch
+            secretName: openbao.n8r.ch-tls
+
+      # Single replica in standalone mode — don't anti-affinity-coerce onto a
+      # separate node that doesn't exist.
+      affinity: {}
+
+      service:
+        enabled: true
