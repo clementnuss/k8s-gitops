@@ -31,6 +31,14 @@ spec:
         - hosts:
             - dex.n8r.ch
 
+    # All secrets injected as env vars via envFrom.
+    # ESO syncs them from OpenBao into the dex-secrets Secret with
+    # uppercase keys (GOOGLE_CLIENT_ID, etc). Dex's gomplate entrypoint
+    # renders them as {{ .Env.GOOGLE_CLIENT_ID }} in the config.
+    envFrom:
+      - secretRef:
+          name: dex-secrets
+
     config:
       issuer: https://dex.n8r.ch
 
@@ -50,13 +58,51 @@ spec:
       oauth2:
         skipApprovalScreen: true
 
-      # Connectors configured via secret
-      # connectors: []
+      connectors:
+        - type: google
+          id: google
+          name: Google
+          config:
+            clientID: "{{ .Env.GOOGLE_CLIENT_ID }}"
+            clientSecret: "{{ .Env.GOOGLE_CLIENT_SECRET }}"
+            redirectURI: https://dex.n8r.ch/callback
 
-      # Static clients configured via secret
-      # staticClients: []
-
-  valuesFrom:
-    - kind: Secret
-      name: dex-secrets
-      valuesKey: helm-values.yaml
+      staticClients:
+        - id: oauth2-proxy
+          name: OAuth2 Proxy
+          secret: "{{ .Env.OAUTH2_PROXY_SECRET }}"
+          redirectURIs:
+            - https://auth.n8r.ch/oauth2/callback
+        - id: listmonk
+          name: Listmonk
+          secret: "{{ .Env.LISTMONK_SECRET }}"
+          redirectURIs:
+            - https://listmonk.n8r.ch/auth/oidc
+        - id: paperless
+          name: Paperless-ngx
+          secret: "{{ .Env.PAPERLESS_SECRET }}"
+          redirectURIs:
+            - https://paperless.n8r.ch/accounts/oidc/dex/login/callback/
+        - id: claper
+          name: Claper
+          secret: "{{ .Env.CLAPER_SECRET }}"
+          redirectURIs:
+            - https://claper.n8r.ch/users/oidc/callback
+        - id: immich
+          name: Immich
+          secret: "{{ .Env.IMMICH_SECRET }}"
+          redirectURIs:
+            - https://photos.n8r.ch/auth/login
+            - https://photos.n8r.ch/user-settings
+            - app.immich:///oauth-callback
+        - id: filebrowser
+          name: Filebrowser
+          secret: "{{ .Env.FILEBROWSER_SECRET }}"
+          redirectURIs:
+            - https://files.n8r.ch/api/auth/oidc/callback
+        - id: openbao
+          name: OpenBao
+          secret: "{{ .Env.OPENBAO_SECRET }}"
+          redirectURIs:
+            - https://openbao.n8r.ch/ui/vault/auth/dex/oidc/callback
+            - http://localhost:8250/oidc/callback
