@@ -10,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://openbao.github.io/openbao-helm
       chart: openbao
-      version: 0.28.4
+      version: 0.28.5
       sourceRef:
         kind: HelmRepository
         name: openbao
