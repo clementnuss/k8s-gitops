@@ -33,7 +33,7 @@ spec:
 
       image:
         repository: openbao/openbao
-        tag: "2.5.5"
+        tag: "2.6.0"
 
       logFormat: json
       logLevel: info
