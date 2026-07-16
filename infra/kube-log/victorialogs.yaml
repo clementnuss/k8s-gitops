@@ -94,6 +94,11 @@ spec:
               if err == null {
                 . |= parsed
               }
+          drop_auditd:
+            type: filter
+            inputs:
+              - talos_logs
+            condition: ."talos-service" != "auditd"
         sinks:
           vlogs:
-            inputs: [parser, parse_syslog, talos_logs]
+            inputs: [parser, parse_syslog, drop_auditd]
