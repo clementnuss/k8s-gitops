@@ -32,10 +32,11 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  set -euo pipefail
+                  set -eu
 
-                  SRC_URL="${KOPIA_SRC_WEBDAV_URL}/${KOPIA_REPO_PATH}"
-                  DST_URL="${KOPIA_DST_WEBDAV_URL}/${KOPIA_REPO_PATH}"
+                  # Strip any trailing slash from the base URL to avoid // in the joined path
+                  SRC_URL="${KOPIA_SRC_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
+                  DST_URL="${KOPIA_DST_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
 
                   echo "=== Connecting to source: $SRC_URL ==="
                   kopia repository connect webdav \
@@ -52,10 +53,8 @@ spec:
                     --webdav-username="$KOPIA_DST_WEBDAV_USER" \
                     --webdav-password="$KOPIA_DST_WEBDAV_PASS" \
                     --delete \
-                    --update=true \
-                    --times \
                     --parallel 8 \
-                    --atomic-writes=false
+                    --no-atomic-writes
 
                   echo "=== Disconnecting from source ==="
                   kopia repository disconnect
@@ -114,9 +113,9 @@ spec:
               resources:
                 requests:
                   cpu: 100m
-                  memory: 128Mi
+                  memory: 786Mi
                 limits:
-                  memory: 512Mi
+                  memory: 2Gi
           volumes:
             - name: kopia-cache
               emptyDir: {}
@@ -148,9 +147,10 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  set -euo pipefail
+                  set -eu
 
-                  DST_URL="${KOPIA_DST_WEBDAV_URL}/${KOPIA_REPO_PATH}"
+                  # Strip any trailing slash from the base URL to avoid // in the joined path
+                  DST_URL="${KOPIA_DST_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
 
                   echo "=== Connecting to destination for verification: $DST_URL ==="
                   kopia repository connect webdav \
