@@ -27,9 +27,28 @@ spec:
     server:
       enabled: true
 
-      # Standalone mode: single replica, file storage backend on a PVC.
+      # Standalone mode: single replica, raft storage backend on a PVC.
+      # Raft (integrated storage) enables `bao operator raft snapshot save`
+      # for app-consistent backups. Migrated from file storage via
+      # `bao operator migrate` (see README).
       standalone:
         enabled: true
+        # Override the default config to use raft storage instead of file.
+        # This enables `bao operator raft snapshot save` for app-consistent
+        # backups. The data path stays the same (/openbao/data on the PVC).
+        config: |
+          ui = true
+
+          listener "tcp" {
+            tls_disable = 1
+            address = "[::]:8200"
+            cluster_address = "[::]:8201"
+          }
+
+          storage "raft" {
+            path = "/openbao/data"
+            node_id = "openbao-0"
+          }
 
       image:
         repository: openbao/openbao
@@ -54,6 +73,8 @@ spec:
       auditStorage:
         enabled: false
 
+      # Raft storage config. Single-node raft cluster — no retry_join
+      # needed (cluster of 1 bootstraps automatically during init).
       # The unseal key lives in a manually-created Secret `openbao-unseal-key`
       # (not in git). On first boot the Secret doesn't exist yet, so the
       # postStart hook no-ops; you init + unseal manually once, create the
@@ -108,7 +129,7 @@ spec:
               - /
         tls:
           - hosts:
-              - openbao.n8r.ch
+            - openbao.n8r.ch
             secretName: openbao.n8r.ch-tls
 
       # Single replica in standalone mode — don't anti-affinity-coerce onto a
