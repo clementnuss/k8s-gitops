@@ -30,6 +30,7 @@ spec:
             - auth.n8r.ch
 
     config:
+      clientID: "oauth2-proxy"
       configFile: |-
         upstreams = [ "file:///dev/null" ]
 
@@ -46,6 +47,13 @@ spec:
       authenticated-emails-file: /etc/oauth2-proxy/allowed-emails
       prompt: none
 
+    # Secrets injected via envFrom:
+    # - OAUTH2_PROXY_CLIENT_SECRET (from dex secret, via ExternalSecret)
+    # - OAUTH2_PROXY_COOKIE_SECRET (app-specific, in oauth2-proxy-secrets)
+    envFrom:
+      - secretRef:
+          name: oauth2-proxy-secrets
+
     extraVolumes:
       - name: allowed-emails
         secret:
@@ -58,8 +66,3 @@ spec:
       - name: allowed-emails
         mountPath: /etc/oauth2-proxy
         readOnly: true
-
-  valuesFrom:
-    - kind: Secret
-      name: oauth2-proxy-secrets
-      valuesKey: helm-values.yaml
