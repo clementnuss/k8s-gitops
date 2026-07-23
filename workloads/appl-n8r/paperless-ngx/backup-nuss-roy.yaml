@@ -1,0 +1,242 @@
+---
+# Independent Kopia backup of paperless-ngx to syno-nuss-roy over WebDAV.
+# Uses the paperless-kopia ExternalSecret (OpenBao) for repo path + password.
+# WebDAV endpoint creds come from the shared webdav-syno-nuss-roy ExternalSecret
+# (defined in appl-n8r/webdav-syno-nuss-roy.yaml).
+#
+# Shares the paperless-backup ServiceAccount/Role/RoleBinding with the
+# coeuve job (defined in backup-coeuve.yaml) - both need kubectl exec
+# into the paperless pod to run document_exporter.
+#
+# Schedule is staggered: 02:30 (nuss-roy), 03:00 (coeuve). The
+# document_exporter --delete flag wipes the export dir, so overlapping
+# runs would conflict.
+#
+# Secrets:
+#   paperless-kopia          - KOPIA_REPO_PATH + KOPIA_PASSWORD (per-repo, OpenBao)
+#   webdav-syno-nuss-roy      - KOPIA_WEBDAV_URL/USER/PASS (shared endpoint, OpenBao)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: paperless-backup-nuss-roy
+  namespace: appl-n8r
+spec:
+  schedule: "30 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: paperless-backup
+          restartPolicy: OnFailure
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: paperless-ngx
+                  topologyKey: kubernetes.io/hostname
+          initContainers:
+            - name: document-exporter
+              image: alpine/k8s:1.36.2
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  POD=$(kubectl get pods -n appl-n8r -l app.kubernetes.io/name=paperless-ngx -o jsonpath='{.items[0].metadata.name}')
+                  if [ -z "$POD" ]; then
+                    echo "ERROR: paperless-ngx pod not found"
+                    exit 1
+                  fi
+                  echo "Running document_exporter in pod $POD"
+                  kubectl exec -n appl-n8r "$POD" -c app -- \
+                    document_exporter /usr/src/paperless/export \
+                      --delete \
+                      --use-folder-prefix \
+                      --split-manifest \
+                      --compare-checksums \
+                      --no-archive \
+                      --no-thumbnail
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  DST_URL="${KOPIA_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to (or creating) destination repository: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS" \
+                    --override-username=paperless \
+                    --override-hostname=planchettes63 || \
+                  kopia repository create webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS"
+
+                  echo "=== Creating snapshot of /export ==="
+                  kopia snapshot create /export
+
+                  echo "=== Snapshots ==="
+                  kopia snapshot list --all
+
+                  kopia repository disconnect
+                  echo "=== Done ==="
+              envFrom:
+                # Per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD.
+                - secretRef:
+                    name: paperless-kopia
+              env:
+                # Endpoint creds (shared webdav-syno-nuss-roy).
+                - name: KOPIA_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: export
+                  mountPath: /export
+                  readOnly: true
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: export
+              persistentVolumeClaim:
+                claimName: paperless-ngx-export
+            - name: kopia-cache
+              emptyDir: {}
+---
+# Weekly deep verification of the paperless nuss-roy backup repository.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: paperless-verify-nuss-roy
+  namespace: appl-n8r
+spec:
+  schedule: "30 4 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  DST_URL="${KOPIA_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to destination for verification: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS"
+
+                  echo "=== Verifying all snapshots (downloads and hashes every block) ==="
+                  kopia snapshot verify --all-snapshots
+
+                  kopia repository disconnect
+                  echo "=== Verification complete ==="
+              envFrom:
+                # Per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD.
+                - secretRef:
+                    name: paperless-kopia
+              env:
+                # Endpoint creds (shared webdav-syno-nuss-roy).
+                - name: KOPIA_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: kopia-cache
+              emptyDir: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+subjects:
+  - kind: ServiceAccount
+    name: paperless-backup
+    namespace: appl-n8r
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: paperless-backup

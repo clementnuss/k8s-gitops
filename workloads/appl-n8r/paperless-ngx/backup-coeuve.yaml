@@ -1,0 +1,209 @@
+---
+# Independent Kopia backup of paperless-ngx to syno-coeuve over WebDAV.
+# This is a SECOND backup, independent of the existing paperless-backup job
+# (which targets syno-nuss-roy). If one repo is corrupted or compromised,
+# the other is unaffected.
+#
+# Shares the paperless-backup ServiceAccount/Role/RoleBinding with the
+# existing job (defined in backup-cronjob.yaml) - both need kubectl exec
+# into the paperless pod to run document_exporter.
+#
+# Schedule is staggered: 02:30 (existing nuss-roy), 03:00 (coeuve). The
+# document_exporter --delete flag wipes the export dir, so overlapping
+# runs would conflict.
+#
+# Secrets:
+#   paperless-kopia          - KOPIA_REPO_PATH + KOPIA_PASSWORD (per-repo, OpenBao)
+#   webdav-syno-coeuve      - KOPIA_WEBDAV_URL/USER/PASS (shared endpoint, OpenBao)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: paperless-backup-coeuve
+  namespace: appl-n8r
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: paperless-backup
+          restartPolicy: OnFailure
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: paperless-ngx
+                  topologyKey: kubernetes.io/hostname
+          initContainers:
+            - name: document-exporter
+              image: alpine/k8s:1.36.2
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  POD=$(kubectl get pods -n appl-n8r -l app.kubernetes.io/name=paperless-ngx -o jsonpath='{.items[0].metadata.name}')
+                  if [ -z "$POD" ]; then
+                    echo "ERROR: paperless-ngx pod not found"
+                    exit 1
+                  fi
+                  echo "Running document_exporter in pod $POD"
+                  kubectl exec -n appl-n8r "$POD" -c app -- \
+                    document_exporter /usr/src/paperless/export \
+                      --delete \
+                      --use-folder-prefix \
+                      --split-manifest \
+                      --compare-checksums \
+                      --no-archive \
+                      --no-thumbnail
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  DST_URL="${KOPIA_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to (or creating) destination repository: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS" \
+                    --override-username=paperless \
+                    --override-hostname=planchettes63 || \
+                  kopia repository create webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS"
+
+                  echo "=== Creating snapshot of /export ==="
+                  kopia snapshot create /export
+
+                  echo "=== Snapshots ==="
+                  kopia snapshot list --all
+
+                  kopia repository disconnect
+                  echo "=== Done ==="
+              envFrom:
+                # Per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD.
+                - secretRef:
+                    name: paperless-kopia
+              env:
+                # Endpoint creds (shared webdav-syno-coeuve).
+                - name: KOPIA_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: export
+                  mountPath: /export
+                  readOnly: true
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: export
+              persistentVolumeClaim:
+                claimName: paperless-ngx-export
+            - name: kopia-cache
+              emptyDir: {}
+---
+# Weekly deep verification of the paperless coeuve backup repository.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: paperless-verify-coeuve
+  namespace: appl-n8r
+spec:
+  schedule: "0 4 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  DST_URL="${KOPIA_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to destination for verification: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS"
+
+                  echo "=== Verifying all snapshots (downloads and hashes every block) ==="
+                  kopia snapshot verify --all-snapshots
+
+                  kopia repository disconnect
+                  echo "=== Verification complete ==="
+              envFrom:
+                # Per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD.
+                - secretRef:
+                    name: paperless-kopia
+              env:
+                # Endpoint creds (shared webdav-syno-coeuve).
+                - name: KOPIA_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: kopia-cache
+              emptyDir: {}

@@ -1,0 +1,24 @@
+---
+# Shared WebDAV endpoint credentials for syno-nuss-roy, synced into appl-n8r
+# from OpenBao. Used by app backup jobs that target nuss-roy (e.g. paperless).
+# The same OpenBao path is also synced into appl-kopia-repl for replication jobs.
+# This is the only place nuss-roy's WebDAV creds are referenced in appl-n8r.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: webdav-syno-nuss-roy
+  namespace: appl-n8r
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: webdav-syno-nuss-roy
+    creationPolicy: Owner
+  dataFrom:
+    # OpenBao path: secret/k8s/appl-kopia-repl/webdav-syno-nuss-roy
+    # (same path used by appl-kopia-repl - single source of truth)
+    # Keys: KOPIA_WEBDAV_URL, KOPIA_WEBDAV_USER, KOPIA_WEBDAV_PASS
+    - extract:
+        key: k8s/appl-kopia-repl/webdav-syno-nuss-roy
