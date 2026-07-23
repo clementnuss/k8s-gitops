@@ -1,0 +1,23 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: webdav-syno-nuss-roy
+  namespace: appl-kopia-repl
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: webdav-syno-nuss-roy
+    creationPolicy: Owner
+  dataFrom:
+    # Source NAS - where the kopia repositories live.
+    # OpenBao path: secret/k8s/appl-kopia-repl/webdav-syno-nuss-roy
+    # Keys:
+    #   KOPIA_WEBDAV_URL   - e.g. https://nuss-roy.local:5006/backup
+    #   KOPIA_WEBDAV_USER  - Synology WebDAV username
+    #   KOPIA_WEBDAV_PASS  - Synology WebDAV password
+    - extract:
+        key: k8s/appl-kopia-repl/webdav-syno-nuss-roy

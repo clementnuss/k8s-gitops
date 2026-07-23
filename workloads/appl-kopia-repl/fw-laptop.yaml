@@ -1,0 +1,197 @@
+---
+# Replicates the fw-laptop kopia repository from the source NAS (webdav-syno-nuss-roy)
+# to the destination NAS (webdav-syno-coeuve).
+#
+# Secrets:
+#   webdav-syno-nuss-roy   - source endpoint credentials (ExternalSecret from OpenBao)
+#   webdav-syno-coeuve     - destination endpoint credentials (ExternalSecret from OpenBao)
+#   kopia-repl-fw-laptop   - per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD (ExternalSecret from OpenBao)
+#
+# To add another repo, copy this file, change the suffix (fw-laptop -> <repo>),
+# and create a matching kopia-repl-<repo> ExternalSecret in OpenBao with
+# KOPIA_REPO_PATH and KOPIA_PASSWORD keys.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kopia-sync-fw-laptop
+  namespace: appl-kopia-repl
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -euo pipefail
+
+                  SRC_URL="${KOPIA_SRC_WEBDAV_URL}/${KOPIA_REPO_PATH}"
+                  DST_URL="${KOPIA_DST_WEBDAV_URL}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to source: $SRC_URL ==="
+                  kopia repository connect webdav \
+                    --url="$SRC_URL" \
+                    --webdav-username="$KOPIA_SRC_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_SRC_WEBDAV_PASS"
+
+                  echo "=== Source repository status ==="
+                  kopia repository status
+
+                  echo "=== Syncing to destination: $DST_URL ==="
+                  kopia repository sync-to webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_DST_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_DST_WEBDAV_PASS" \
+                    --delete \
+                    --update=true \
+                    --times \
+                    --parallel 8 \
+                    --atomic-writes=false
+
+                  echo "=== Disconnecting from source ==="
+                  kopia repository disconnect
+
+                  echo "=== Verifying destination is connectable ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_DST_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_DST_WEBDAV_PASS"
+
+                  echo "=== Destination snapshots ==="
+                  kopia snapshot list --all
+
+                  kopia repository disconnect
+                  echo "=== Done ==="
+              envFrom:
+                # Per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD.
+                - secretRef:
+                    name: kopia-repl-fw-laptop
+              env:
+                # Source endpoint creds (webdav-syno-nuss-roy).
+                - name: KOPIA_SRC_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_SRC_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_SRC_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_PASS
+                # Destination endpoint creds (webdav-syno-coeuve).
+                - name: KOPIA_DST_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_DST_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_DST_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+          volumes:
+            - name: kopia-cache
+              emptyDir: {}
+---
+# Weekly deep verification of the fw-laptop destination repository.
+# Downloads and hashes every block of every snapshot to prove the
+# destination can actually restore. Runs Sunday 04:00, one hour after
+# the daily sync so they never overlap (concurrencyPolicy: Forbid only
+# guards within one CronJob).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kopia-verify-fw-laptop
+  namespace: appl-kopia-repl
+spec:
+  schedule: "0 4 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -euo pipefail
+
+                  DST_URL="${KOPIA_DST_WEBDAV_URL}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to destination for verification: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_DST_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_DST_WEBDAV_PASS"
+
+                  echo "=== Verifying all snapshots (downloads and hashes every block) ==="
+                  kopia snapshot verify --all-snapshots
+
+                  kopia repository disconnect
+                  echo "=== Verification complete ==="
+              envFrom:
+                # Per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD.
+                - secretRef:
+                    name: kopia-repl-fw-laptop
+              env:
+                - name: KOPIA_DST_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_DST_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_DST_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: kopia-cache
+              emptyDir: {}
