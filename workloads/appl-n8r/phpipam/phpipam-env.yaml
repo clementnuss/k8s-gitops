@@ -1,27 +1,20 @@
-apiVersion: v1
-kind: Secret
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
+  name: phpipam-env
+  namespace: appl-n8r
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
     name: phpipam-env
-    namespace: appl-n8r
-type: Opaque
-stringData:
-    TZ: ENC[AES256_GCM,data:EUJO7zMdMtVI0K2jKQ==,iv:JX8omDn/1oFOnAb0E1nfaK/WTBIlRJiqvNYPnTz5dXc=,tag:cH7gt6BV3cSp8OAoLgi8kg==,type:str]
-    IPAM_DATABASE_HOST: ENC[AES256_GCM,data:yUMPtobS33XxfWac1Jkw9yUvYMfnoyoijpVlYI1YPp15dfH2v9w=,iv:jmAfqY7ElwiyEsKd4C5PmaXbeujCZ8wNz+EAQED+mDY=,tag:cP9Ue3F4IVVitf5PpRzwBw==,type:str]
-    IPAM_DATABASE_USER: ENC[AES256_GCM,data:N/+JYbz5Ww==,iv:cE1E8IUPUVJe+1DMUIPSPWYiDrbMdbRY9B0PncJOk2g=,tag:Wtz77ckXnW18Yta0z9f63g==,type:str]
-    IPAM_DATABASE_PASS: ENC[AES256_GCM,data:BFuwEHlCooMOkbZSMhyLomsEtN2gIBHy,iv:7D9ZZLYlFhqNvLSR1hES/jQfW1UNrKOgyxOzS9dH/b4=,tag:XfGlbVG+d6JxWzf31g6eXQ==,type:str]
-    IPAM_DATABASE_NAME: ENC[AES256_GCM,data:9+VPL08POw==,iv:0k4tuByN+yPJ20xyzD3d8ndx2RSA1E+cfXqW5IWXwkQ=,tag:OgrNm87Q1kqf9CQhkGrd3g==,type:str]
-sops:
-    age:
-        - enc: |
-            -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBEblFXaTVvemxjck1KUG9K
-            TGNQNzBXZlk2cW5mMGtLMWZRY1F4UHU0VlRvCnZLUWRLYk5FWkJlM25xWUsrTnli
-            VlM4RGlNTXN1UjlvcW9xMWg0RG0xalkKLS0tIG9FTlF0VFVNMGVySFhWSlZtejBa
-            VkZEK1ZleE1DMG5lRnc2ZFJucFk2eWMKgSCz72gy49a3pfqiH9otKrqsrW4YPKwq
-            pL5fjIWKWHWnAj1h76mE5E2Wp/MpQAlOhoGZhZKM+V/bGvIWl/w4Qw==
-            -----END AGE ENCRYPTED FILE-----
-          recipient: age1wtd8nd4uwzzllyy9j6eusu4hk9cjuccrgh7e47c3t64uqxact9wqx4wg2w
-    encrypted_regex: ^(data|stringData)$
-    lastmodified: "2026-06-12T12:09:30Z"
-    mac: ENC[AES256_GCM,data:+u9FlUhFd3vCvAVYUknTUEy6UYozsjGzTKZ1/QjaYHy47TDADdCRCYmb/1f8EUtshkj+fTsb6rxyDzgWhBRG7vGFKj2740y/GLpwPVdgAmZD/MigCKIOBO8Ys+Uy/Wj5IFKyFXL6kBew4H20h2nPG+AM5+dZimt7mP3Ec6xUT14=,iv:dS+JN+ATYFj4O5GuKaHtY7Q8l7zmOZRMaZK6N6sSwgk=,tag:tL/WmaiPcRtWD9rgzpHouw==,type:str]
-    version: 3.13.1
+    creationPolicy: Owner
+    template:
+      type: Opaque
+  dataFrom:
+  - extract:
+      key: k8s/appl-n8r/phpipam-env
+
