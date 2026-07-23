@@ -74,6 +74,7 @@ secret is shared by both backup jobs — only the endpoint secret differs.
 | `paperless-backup-coeuve` | appl-n8r | Independent backup | daily 03:00 | paperless-ngx-export PVC | syno-coeuve (WebDAV) |
 | `paperless-verify-coeuve` | appl-n8r | Verify | Sun 04:00 | — | syno-coeuve |
 | `immich-backup-s3` | appl-n8r | Independent backup | daily 03:00 | immich-library PVC | Backblaze B2 (S3) |
+| `immich-verify-s3` | appl-n8r | Verify | Sun 04:30 | — | Backblaze B2 (S3) |
 | `immich-backup-coeuve` | appl-n8r | Independent backup | daily 03:30 | immich-library PVC | syno-coeuve (WebDAV) |
 | `immich-verify-coeuve` | appl-n8r | Verify | Sun 04:00 | — | syno-coeuve |
 
