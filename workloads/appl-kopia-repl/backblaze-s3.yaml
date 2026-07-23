@@ -1,0 +1,24 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: backblaze-s3
+  namespace: appl-kopia-repl
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: backblaze-s3
+    creationPolicy: Owner
+  dataFrom:
+    # Backblaze B2 S3 endpoint - cloud storage for off-site backups.
+    # OpenBao path: secret/k8s/appl-kopia-repl/backblaze-s3
+    # Keys:
+    #   KOPIA_S3_BUCKET      - S3 bucket name
+    #   KOPIA_S3_ENDPOINT    - S3 endpoint URL
+    #   KOPIA_S3_ACCESS_KEY  - S3 access key
+    #   KOPIA_S3_SECRET_KEY  - S3 secret key
+    - extract:
+        key: k8s/appl-kopia-repl/backblaze-s3

@@ -1,0 +1,23 @@
+---
+# Shared Backblaze B2 S3 endpoint credentials, synced into appl-n8r
+# from OpenBao. Used by app backup jobs that target Backblaze (e.g. immich).
+# The same OpenBao path is also synced into appl-kopia-repl.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: backblaze-s3
+  namespace: appl-n8r
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: backblaze-s3
+    creationPolicy: Owner
+  dataFrom:
+    # OpenBao path: secret/k8s/appl-kopia-repl/backblaze-s3
+    # (same path used by appl-kopia-repl - single source of truth)
+    # Keys: KOPIA_S3_BUCKET, KOPIA_S3_ENDPOINT, KOPIA_S3_ACCESS_KEY, KOPIA_S3_SECRET_KEY
+    - extract:
+        key: k8s/appl-kopia-repl/backblaze-s3

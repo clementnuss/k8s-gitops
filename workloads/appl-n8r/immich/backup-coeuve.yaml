@@ -1,0 +1,174 @@
+---
+# Independent Kopia backup of the immich library PVC to syno-coeuve over
+# WebDAV. This is a SECOND backup, independent of the S3 backup
+# (backup-s3.yaml). If one repo is corrupted or compromised, the other is
+# unaffected. Both repos use the same path + password (shared via
+# immich-kopia); only the endpoint creds differ.
+#
+# Lives in appl-n8r (same namespace as immich) so it can mount the
+# immich-library PVC directly.
+#
+# Secrets:
+#   immich-kopia        - KOPIA_REPO_PATH + KOPIA_PASSWORD (shared with S3 job)
+#   webdav-syno-coeuve  - KOPIA_WEBDAV_URL/USER/PASS (shared endpoint)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: immich-backup-coeuve
+  namespace: appl-n8r
+spec:
+  schedule: "30 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  DST_URL="${KOPIA_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to (or creating) destination repository: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS" \
+                    --override-username=immich \
+                    --override-hostname=planchettes63 || \
+                  kopia repository create webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS"
+
+                  echo "=== Repository status ==="
+                  kopia repository status
+
+                  echo "=== Creating snapshot of /data ==="
+                  kopia snapshot create /data
+
+                  echo "=== Snapshots ==="
+                  kopia snapshot list --all
+
+                  kopia repository disconnect
+                  echo "=== Done ==="
+              envFrom:
+                # Per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD.
+                - secretRef:
+                    name: immich-kopia
+              env:
+                # Endpoint creds (shared webdav-syno-coeuve).
+                - name: KOPIA_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+                  readOnly: true
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  memory: 2Gi
+          volumes:
+            # Mount the immich-library PVC directly - same namespace, no cross-NS workaround needed.
+            - name: data
+              persistentVolumeClaim:
+                claimName: immich-library
+            - name: kopia-cache
+              emptyDir: {}
+---
+# Weekly deep verification of the immich coeuve backup repository.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: immich-verify-coeuve
+  namespace: appl-n8r
+spec:
+  schedule: "0 4 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  DST_URL="${KOPIA_WEBDAV_URL%/}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to destination for verification: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS"
+
+                  echo "=== Verifying all snapshots (downloads and hashes every block) ==="
+                  kopia snapshot verify --all-snapshots
+
+                  kopia repository disconnect
+                  echo "=== Verification complete ==="
+              envFrom:
+                # Per-repo: KOPIA_REPO_PATH + KOPIA_PASSWORD.
+                - secretRef:
+                    name: immich-kopia
+              env:
+                # Endpoint creds (shared webdav-syno-coeuve).
+                - name: KOPIA_WEBDAV_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_WEBDAV_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_WEBDAV_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 1Gi
+          volumes:
+            - name: kopia-cache
+              emptyDir: {}

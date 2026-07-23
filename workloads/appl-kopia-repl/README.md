@@ -32,16 +32,18 @@ namespace can read from the same OpenBao paths.
 |---|---|---|---|
 | `webdav-syno-nuss-roy` | appl-kopia-repl | `k8s/appl-kopia-repl/webdav-syno-nuss-roy` | `KOPIA_WEBDAV_URL`, `KOPIA_WEBDAV_USER`, `KOPIA_WEBDAV_PASS` |
 | `webdav-syno-coeuve` | appl-kopia-repl | `k8s/appl-kopia-repl/webdav-syno-coeuve` | same three |
+| `backblaze-s3` | appl-kopia-repl | `k8s/appl-kopia-repl/backblaze-s3` | `KOPIA_S3_BUCKET`, `KOPIA_S3_ENDPOINT`, `KOPIA_S3_ACCESS_KEY`, `KOPIA_S3_SECRET_KEY` |
 | `webdav-syno-nuss-roy` | appl-n8r | `k8s/appl-kopia-repl/webdav-syno-nuss-roy` (same path) | same three |
 | `webdav-syno-coeuve` | appl-n8r | `k8s/appl-kopia-repl/webdav-syno-coeuve` (same path) | same three |
+| `backblaze-s3` | appl-n8r | `k8s/appl-kopia-repl/backblaze-s3` (same path) | same four |
 
-These hold the WebDAV base URL and credentials for each NAS. The OpenBao path
+These hold the transport-level credentials for each storage endpoint (two
+Synology NASes over WebDAV, one Backblaze B2 bucket over S3). The OpenBao path
 is the same regardless of namespace — both `appl-kopia-repl` and `appl-n8r`
-sync from `k8s/appl-kopia-repl/webdav-syno-*`, so there is a single source of
-truth per endpoint. Replication jobs map them into `KOPIA_SRC_*` / `KOPIA_DST_*`
-env vars via `secretKeyRef`; app backup jobs map them into `KOPIA_WEBDAV_*`
-via `secretKeyRef`. (Not `envFrom`, because both endpoint secrets use the same
-key names and would collide if both were `envFrom`-ed.)
+sync from `k8s/appl-kopia-repl/<endpoint>`, so there is a single source of
+truth per endpoint. Jobs map them into `KOPIA_*` env vars via `secretKeyRef`
+(not `envFrom`, because endpoint secrets use distinct key names that are
+mapped explicitly).
 
 ### Per-repo secrets
 
@@ -53,7 +55,7 @@ the WebDAV base URL) and `KOPIA_PASSWORD` (the repo password). These use
 |---|---|---|---|
 | `kopia-repl-fw-laptop` | appl-kopia-repl | `k8s/appl-kopia-repl/fw-laptop` | `KOPIA_REPO_PATH`, `KOPIA_PASSWORD` |
 | `paperless-kopia` | appl-n8r | `k8s/appl-n8r/paperless-ngx/kopia` | `KOPIA_REPO_PATH`, `KOPIA_PASSWORD` |
-| `immich-kopia-coeuve` | appl-n8r | `k8s/appl-n8r/immich/kopia-coeuve` | `KOPIA_REPO_PATH`, `KOPIA_PASSWORD` |
+| `immich-kopia` | appl-n8r | `k8s/appl-n8r/immich/kopia` | `KOPIA_REPO_PATH`, `KOPIA_PASSWORD` |
 
 App namespaces only own "which repo" (path + password). The endpoint creds
 live in `appl-kopia-repl`'s OpenBao paths and are synced into each app
@@ -71,6 +73,7 @@ secret is shared by both backup jobs — only the endpoint secret differs.
 | `paperless-verify-nuss-roy` | appl-n8r | Verify | Sun 04:30 | — | syno-nuss-roy |
 | `paperless-backup-coeuve` | appl-n8r | Independent backup | daily 03:00 | paperless-ngx-export PVC | syno-coeuve (WebDAV) |
 | `paperless-verify-coeuve` | appl-n8r | Verify | Sun 04:00 | — | syno-coeuve |
+| `immich-backup-s3` | appl-n8r | Independent backup | daily 03:00 | immich-library PVC | Backblaze B2 (S3) |
 | `immich-backup-coeuve` | appl-n8r | Independent backup | daily 03:30 | immich-library PVC | syno-coeuve (WebDAV) |
 | `immich-verify-coeuve` | appl-n8r | Verify | Sun 04:00 | — | syno-coeuve |
 
@@ -181,3 +184,8 @@ can mount the PVC directly.
 - **Independent backup vs. replication:** replication (`sync-to --delete`)
   mirrors corruption too. For in-cluster data, a second independent backup
   (Pattern B) is safer — two repos with no shared failure mode.
+- **Synology WebDAV 500 on writes:** if `kopia repository create` or
+  `snapshot create` fails with HTTP 500 on PUT requests, the WebDAV Server
+  package on the NAS may be in a bad state. Restart it (Package Center →
+  WebDAV Server → Stop → Start, or `synoservicectl --restart pkgctl-WebDAVServer`
+  via SSH). This is a Synology issue, not a Kopia or network issue.
