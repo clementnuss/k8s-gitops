@@ -1,0 +1,109 @@
+---
+# Dedicated export job for paperless-ngx. Runs document_exporter inside
+# the paperless pod and writes to the paperless-ngx-export PVC.
+#
+# This was previously an initContainer in each backup job. Extracting it
+# into its own CronJob means:
+#   - document_exporter runs exactly once per backup cycle (not twice)
+#   - the two backup jobs become pure PVC-RO kopia snapshots (no kubectl,
+#     no SA, no exec) and can never corrupt each other's export
+#   - the export step is independently observable/retryable
+#
+# The backup jobs (backup-nuss-roy.yaml, backup-coeuve.yaml) mount the
+# same PVC read-only and must be scheduled on the same node (podAffinity
+# to the paperless pod) because the PVC is ReadWriteOnce.
+#
+# Schedule: 02:00 Zurich, 30 min before paperless-backup-nuss-roy (02:30)
+# and 60 min before paperless-backup-coeuve (03:00). The export is small
+# (2Gi PVC, documents only) and finishes well within 30 min.
+#
+# Owns the paperless-backup ServiceAccount/Role/RoleBinding (moved here
+# from backup-nuss-roy.yaml) since this is the only job that needs
+# kubectl exec into the paperless pod.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: paperless-export
+  namespace: appl-n8r
+spec:
+  schedule: "0 2 * * *"
+  timeZone: Europe/Zurich
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: paperless-backup
+          restartPolicy: OnFailure
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: paperless-ngx
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: document-exporter
+              image: alpine/k8s:1.36.2
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  POD=$(kubectl get pods -n appl-n8r -l app.kubernetes.io/name=paperless-ngx -o jsonpath='{.items[0].metadata.name}')
+                  if [ -z "$POD" ]; then
+                    echo "ERROR: paperless-ngx pod not found"
+                    exit 1
+                  fi
+                  echo "Running document_exporter in pod $POD"
+                  kubectl exec -n appl-n8r "$POD" -c app -- \
+                    document_exporter /usr/src/paperless/export \
+                      --delete \
+                      --use-folder-prefix \
+                      --split-manifest \
+                      --compare-checksums \
+                      --no-archive \
+                      --no-thumbnail
+                  echo "=== Export complete ==="
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: paperless-backup
+  namespace: appl-n8r
+subjects:
+  - kind: ServiceAccount
+    name: paperless-backup
+    namespace: appl-n8r
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: paperless-backup
