@@ -53,8 +53,15 @@ spec:
                   echo "=== Repository status ==="
                   kopia repository status
 
+                  kopia policy set --global \
+                    --keep-latest=7 \
+                    --keep-daily=7 \
+                    --keep-weekly=4 \
+                    --keep-monthly=6 \
+                    --keep-annual=1
+
                   echo "=== Creating snapshot of /data ==="
-                  kopia snapshot create /data
+                  kopia snapshot create /data/backups /data/library /data/upload
 
                   echo "=== Snapshots ==="
                   kopia snapshot list --all
