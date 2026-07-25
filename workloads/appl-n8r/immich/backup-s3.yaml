@@ -48,6 +48,12 @@ spec:
                     --endpoint="$KOPIA_S3_ENDPOINT" \
                     --prefix="$KOPIA_REPO_PATH/"
 
+                  # Ensure this identity is the maintenance owner — the repo
+                  # may have been created by root@<pod-name> before
+                  # --override-username/--override-hostname were set, and
+                  # only the maintenance owner can run maintenance.
+                  kopia maintenance set --owner=immich@planchettes63
+
                   kopia repository throttle set --upload-bytes-per-second=31457280
                   kopia policy set --global \
                     --keep-latest=7 \
