@@ -69,6 +69,10 @@ spec:
                 - secretRef:
                     name: immich-kopia
               env:
+                # Persist the repo connection config on the cache PVC so
+                # reconnects are instant (no index re-download each run).
+                - name: KOPIA_CONFIG_PATH
+                  value: /root/.cache/kopia/repository.config
                 # S3 endpoint creds (shared backblaze-s3).
                 - name: KOPIA_S3_BUCKET
                   valueFrom:
@@ -108,7 +112,8 @@ spec:
               persistentVolumeClaim:
                 claimName: immich-library-backup
             - name: kopia-cache
-              emptyDir: {}
+              persistentVolumeClaim:
+                claimName: immich-kopia-cache-s3
 ---
 # Weekly deep verification of the immich Backblaze B2 backup repository.
 apiVersion: batch/v1

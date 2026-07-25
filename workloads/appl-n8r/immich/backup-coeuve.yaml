@@ -66,6 +66,10 @@ spec:
                 - secretRef:
                     name: immich-kopia
               env:
+                # Persist the repo connection config on the cache PVC so
+                # reconnects are instant (no index re-download each run).
+                - name: KOPIA_CONFIG_PATH
+                  value: /root/.cache/kopia/repository.config
                 # Endpoint creds (shared webdav-syno-coeuve).
                 - name: KOPIA_WEBDAV_URL
                   valueFrom:
@@ -100,7 +104,8 @@ spec:
               persistentVolumeClaim:
                 claimName: immich-library-backup
             - name: kopia-cache
-              emptyDir: {}
+              persistentVolumeClaim:
+                claimName: immich-kopia-cache-coeuve
 ---
 # Weekly deep verification of the immich coeuve backup repository.
 apiVersion: batch/v1

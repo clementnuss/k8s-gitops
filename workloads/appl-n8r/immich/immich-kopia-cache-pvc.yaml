@@ -1,0 +1,51 @@
+---
+# Persistent kopia caches for the two immich backup jobs.
+#
+# kopia keeps two things on local disk:
+#   1. The repository connection config (which repo, encryption keys) at
+#      KOPIA_CONFIG_PATH (default /app/config/repository.config in the image)
+#   2. The per-source hash cache at /root/.cache/kopia — this is what lets
+#      kopia skip re-hashing unchanged files on incremental runs
+#
+# The backup CronJobs previously mounted an emptyDir at /root/.cache/kopia,
+# so both were thrown away every run. With a cold cache, kopia re-reads and
+# re-hashes every file that matches mtime/size against the previous
+# manifest — for 100k+ files on NFS v3 to a DS218play, that was the 23 min.
+#
+# These PVCs persist the cache AND the connection config across runs by
+# pointing KOPIA_CONFIG_PATH inside the same mount. One PVC per job
+# because the two jobs connect to different repositories (B2 vs coeuve);
+# sharing one cache directory would clobber the connection config.
+#
+# 5 Gi is generous — kopia's cache is metadata + recently-read content
+# blocks, and the jobs run with a memory limit of 1-2 Gi so the index
+# fits in RAM once connected. Shrink if the PVCs sit mostly empty.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-kopia-cache-s3
+  namespace: appl-n8r
+  labels:
+    velero.io/exclude-from-backups: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-2-replicas
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-kopia-cache-coeuve
+  namespace: appl-n8r
+  labels:
+    velero.io/exclude-from-backups: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-2-replicas
+  resources:
+    requests:
+      storage: 5Gi
