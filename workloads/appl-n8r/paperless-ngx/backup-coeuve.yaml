@@ -22,6 +22,7 @@ metadata:
   namespace: appl-n8r
 spec:
   schedule: "0 3 * * *"
+  timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
@@ -144,6 +145,7 @@ metadata:
   namespace: appl-n8r
 spec:
   schedule: "0 4 * * 0"
+  timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1

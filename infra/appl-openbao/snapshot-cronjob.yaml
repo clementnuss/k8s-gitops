@@ -89,6 +89,7 @@ metadata:
   namespace: appl-openbao
 spec:
   schedule: "0 * * * *"
+  timeZone: Europe/Zurich
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
