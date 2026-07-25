@@ -103,8 +103,9 @@ spec:
                   memory: 1Gi
           volumes:
             - name: data
+              # Cached NFS mount (actimeo=30, ro) — see immich-library-backup-pvc.yaml.
               persistentVolumeClaim:
-                claimName: immich-library
+                claimName: immich-library-backup
             - name: kopia-cache
               emptyDir: {}
 ---

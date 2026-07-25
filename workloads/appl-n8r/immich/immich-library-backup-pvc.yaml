@@ -1,0 +1,50 @@
+---
+# Second NFS PV pointing at the same immich share, but with caching ENABLED
+# for the kopia backup jobs (which mount it read-only).
+#
+# The main immich-library PV uses noac + lookupcache=none because immich's
+# batch uploads need to see fresh attributes/lookups across pods. The backup
+# jobs are read-only and don't share that constraint, so they can use a
+# cached mount — this is what makes kopia's tree-walk fast.
+#
+# actimeo=30 bounds attribute-cache staleness to 30s. A file written by
+# immich in the last 30s could be seen as unchanged and skipped; it will be
+# picked up on the next backup run. That's an acceptable tradeoff for a
+# once-per-day photo backup and keeps the scan from hammering the NAS.
+#
+# ro is enforced as a mount option (in addition to the jobs mounting the PVC
+# readOnly: true), so a misconfigured job still cannot write to the share.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-library-nfs-backup
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadWriteMany
+  mountOptions:
+    - nfsvers=3
+    - hard
+    - ro
+    - actimeo=30
+  nfs:
+    server: 192.168.63.10
+    path: /volume1/nfs-share/immich/
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-library-backup
+  namespace: appl-n8r
+  labels:
+    velero.io/exclude-from-backups: "true"
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1Ti
+  volumeName: immich-library-nfs-backup

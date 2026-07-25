@@ -94,10 +94,10 @@ spec:
                 limits:
                   memory: 2Gi
           volumes:
-            # Mount the immich-library PVC directly - same namespace, no cross-NS workaround needed.
+            # Cached NFS mount (actimeo=30, ro) — see immich-library-backup-pvc.yaml.
             - name: data
               persistentVolumeClaim:
-                claimName: immich-library
+                claimName: immich-library-backup
             - name: kopia-cache
               emptyDir: {}
 ---
