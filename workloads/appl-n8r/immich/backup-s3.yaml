@@ -62,6 +62,9 @@ spec:
                   echo "=== Snapshots ==="
                   kopia snapshot list --all
 
+                  echo "=== Running quick maintenance ==="
+                  kopia maintenance run
+
                   kopia repository disconnect
                   echo "=== Done ==="
               envFrom:
@@ -151,6 +154,9 @@ spec:
 
                   echo "=== Verifying all snapshots (downloads and hashes every block) ==="
                   kopia snapshot verify --all-snapshots
+
+                  echo "=== Running full maintenance ==="
+                  kopia maintenance run --full
 
                   kopia repository disconnect
                   echo "=== Verification complete ==="
