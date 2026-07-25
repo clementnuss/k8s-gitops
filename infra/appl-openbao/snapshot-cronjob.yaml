@@ -1,0 +1,284 @@
+---
+# OpenBao raft snapshot backup via Kopia to two Synology NAS.
+#
+# Takes an app-consistent raft snapshot (`bao operator raft snapshot save`),
+# then backs up the snapshot file to syno-coeuve and syno-nuss-roy over
+# WebDAV using Kopia. Both NAS use the same repo path + password
+# (from k8s/appl-openbao/kopia), only the endpoint creds differ.
+#
+# The CronJob authenticates to OpenBao via the Kubernetes auth method
+# (role: bao-snapshot, policy: bao-snapshot — configured in the OpenBao
+# TF config at iac/openbao/main.tf).
+#
+# Secrets:
+#   kopia                - KOPIA_REPO_PATH + KOPIA_PASSWORD (shared across NAS)
+#   webdav-syno-coeuve   - KOPIA_WEBDAV_URL/USER/PASS (endpoint creds)
+#   webdav-syno-nuss-roy - KOPIA_WEBDAV_URL/USER/PASS (endpoint creds)
+
+# ExternalSecret: Kopia repo path + password (same for both NAS).
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kopia
+  namespace: appl-openbao
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: kopia
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: k8s/appl-openbao/kopia
+
+# ExternalSecret: WebDAV creds for syno-coeuve (same OpenBao path as appl-n8r).
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: webdav-syno-coeuve
+  namespace: appl-openbao
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: webdav-syno-coeuve
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: k8s/appl-kopia-repl/webdav-syno-coeuve
+
+# ExternalSecret: WebDAV creds for syno-nuss-roy (same OpenBao path as appl-n8r).
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: webdav-syno-nuss-roy
+  namespace: appl-openbao
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: webdav-syno-nuss-roy
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: k8s/appl-kopia-repl/webdav-syno-nuss-roy
+
+# ServiceAccount for OpenBao Kubernetes auth (role: bao-snapshot).
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bao-snapshot
+  namespace: appl-openbao
+
+# CronJob: take raft snapshot, back up to both NAS via Kopia.
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: openbao-backup
+  namespace: appl-openbao
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: bao-snapshot
+          automountServiceAccountToken: true
+          initContainers:
+            # Step 1: take the raft snapshot using the bao CLI.
+            # Authenticates via Kubernetes auth (SA token → OpenBao role).
+            # Runs as root so the snapshot file is world-readable for the
+            # Kopia containers (which run as a different user).
+            - name: snapshot
+              image: openbao/openbao:2.6.1
+              securityContext:
+                runAsUser: 0
+                runAsNonRoot: false
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  echo "=== Logging in to OpenBao via Kubernetes auth ==="
+                  JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                  export BAO_TOKEN=$(bao write -field=token \
+                    auth/kubernetes/login role=bao-snapshot jwt="$JWT")
+
+                  echo "=== Taking raft snapshot ==="
+                  bao operator raft snapshot save /snapshots/openbao.snap
+
+                  echo "=== Making snapshot world-readable ==="
+                  chmod 644 /snapshots/openbao.snap
+
+                  echo "=== Snapshot size ==="
+                  ls -lh /snapshots/openbao.snap
+
+                  echo "=== Done ==="
+              env:
+                - name: BAO_ADDR
+                  value: http://openbao.appl-openbao.svc:8200
+              volumeMounts:
+                - name: snapshots
+                  mountPath: /snapshots
+          containers:
+            # Step 2: back up the snapshot to syno-coeuve via Kopia.
+            - name: kopia-coeuve
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  DST_URL="${KOPIA_WEBDAV_URL_COEUVE%/}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to coeuve: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER_COEUVE" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS_COEUVE" \
+                    --override-username=openbao \
+                    --override-hostname=planchettes63 || \
+                  kopia repository create webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER_COEUVE" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS_COEUVE"
+
+                  echo "=== Creating snapshot of /snapshots ==="
+                  kopia snapshot create /snapshots
+
+                  echo "=== Snapshots ==="
+                  kopia snapshot list --all
+
+                  kopia repository disconnect
+                  echo "=== coeuve done ==="
+              envFrom:
+                # KOPIA_REPO_PATH + KOPIA_PASSWORD (shared across both NAS)
+                - secretRef:
+                    name: kopia
+              env:
+                - name: KOPIA_WEBDAV_URL_COEUVE
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_WEBDAV_USER_COEUVE
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_WEBDAV_PASS_COEUVE
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-coeuve
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: snapshots
+                  mountPath: /snapshots
+                  readOnly: true
+                - name: kopia-cache
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+
+            # Step 3: back up the snapshot to syno-nuss-roy via Kopia.
+            # Runs in parallel with coeuve (same pod, different container).
+            - name: kopia-nuss-roy
+              image: kopia/kopia:0.23.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  DST_URL="${KOPIA_WEBDAV_URL_NUSSROY%/}/${KOPIA_REPO_PATH}"
+
+                  echo "=== Connecting to nuss-roy: $DST_URL ==="
+                  kopia repository connect webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER_NUSSROY" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS_NUSSROY" \
+                    --override-username=openbao \
+                    --override-hostname=planchettes63 || \
+                  kopia repository create webdav \
+                    --url="$DST_URL" \
+                    --webdav-username="$KOPIA_WEBDAV_USER_NUSSROY" \
+                    --webdav-password="$KOPIA_WEBDAV_PASS_NUSSROY"
+
+                  echo "=== Creating snapshot of /snapshots ==="
+                  kopia snapshot create /snapshots
+
+                  echo "=== Snapshots ==="
+                  kopia snapshot list --all
+
+                  kopia repository disconnect
+                  echo "=== nuss-roy done ==="
+              envFrom:
+                - secretRef:
+                    name: kopia
+              env:
+                - name: KOPIA_WEBDAV_URL_NUSSROY
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_URL
+                - name: KOPIA_WEBDAV_USER_NUSSROY
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_USER
+                - name: KOPIA_WEBDAV_PASS_NUSSROY
+                  valueFrom:
+                    secretKeyRef:
+                      name: webdav-syno-nuss-roy
+                      key: KOPIA_WEBDAV_PASS
+              volumeMounts:
+                - name: snapshots
+                  mountPath: /snapshots
+                  readOnly: true
+                - name: kopia-cache-nussroy
+                  mountPath: /root/.cache/kopia
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+          volumes:
+            - name: snapshots
+              emptyDir: {}
+            - name: kopia-cache
+              emptyDir: {}
+            - name: kopia-cache-nussroy
+              emptyDir: {}

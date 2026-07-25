@@ -3,7 +3,7 @@
 OpenBao deployed in standalone mode on the `planchettes63` cluster.
 
 - **Namespace**: `appl-openbao`
-- **Mode**: standalone (single replica, file storage backend)
+- **Mode**: standalone (single replica, raft integrated storage backend)
 - **Storage**: 10Gi PVC on `longhorn-3-replicas` (replicated + backed up)
 - **UI**: <https://openbao.n8r.ch> (traefik ingress, oauth2-proxy middleware, letsencrypt-prod cert)
 - **Chart**: `openbao/openbao` v0.28.4, app `openbao:2.5.5`
@@ -299,8 +299,78 @@ For finer-grained access, create a separate role with a restricted policy
 
 ## Backups
 
-The OpenBao data lives on a 10Gi Longhorn PVC (`longhorn-3-replicas`).
-Recurring Longhorn backups to your backup target are the primary
-recovery mechanism. OpenBao does not make backward-compatibility
-guarantees for its data store across major versions — back up the PVC
-**before** any OpenBao upgrade.
+OpenBao uses raft (integrated) storage, which enables app-consistent
+snapshots via `bao operator raft snapshot save`.
+
+### Layers
+
+1. **Raft snapshots → Kopia → Synology NAS (app-consistent)** — a CronJob
+   (`snapshot-cronjob.yaml`) runs hourly:
+   - **initContainer** (`openbao:2.6.1`): takes a raft snapshot via the
+     OpenBao API, authenticating with Kubernetes auth (role `bao-snapshot`)
+   - **container `kopia-coeuve`**: backs up the snapshot file to
+     syno-coeuve over WebDAV using Kopia
+   - **container `kopia-nuss-roy`**: backs up the same snapshot to
+     syno-nuss-roy over WebDAV (runs in parallel)
+
+   Both NAS use the same Kopia repo path + password
+   (`k8s/appl-openbao/kopia`), only the WebDAV endpoint creds differ
+   (shared from `k8s/appl-kopia-repl/webdav-syno-*`).
+
+   The snapshot policy + role are configured in the OpenBao TF config at
+   [`iac`](https://github.com/clementnuss/iac) -> `openbao/main.tf`.
+
+2. **Longhorn PVC snapshots (crash-consistent)** — the 10Gi PVC on
+   `longhorn-3-replicas` is snapshotted by Longhorn's recurring jobs.
+
+3. **Velero CSI snapshots** — Velero's daily backup includes the
+   `appl-openbao` namespace.
+
+### One-time setup
+
+1. Apply the snapshot policy + role (via the OpenBao TF config):
+   ```bash
+   cd ~/git/github.com/clementnuss/iac/openbao
+   tofu apply
+   ```
+2. Ensure the Kopia repo path + password are stored in OpenBao:
+   ```bash
+   BAO_ADDR=https://openbao.n8r.ch bao kv get secret/k8s/appl-openbao/kopia
+   # Should have: KOPIA_REPO_PATH, KOPIA_PASSWORD
+   ```
+3. Ensure the WebDAV creds for both NAS exist (shared paths):
+   ```bash
+   bao kv get secret/k8s/appl-kopia-repl/webdav-syno-coeuve
+   bao kv get secret/k8s/appl-kopia-repl/webdav-syno-nuss-roy
+   # Should have: KOPIA_WEBDAV_URL, KOPIA_WEBDAV_USER, KOPIA_WEBDAV_PASS
+   ```
+4. Flux will pick up the CronJob from `infra/appl-openbao/snapshot-cronjob.yaml`.
+
+### Manual snapshot
+
+```bash
+export BAO_ADDR=https://openbao.n8r.ch
+bao login -method=oidc -path=dex
+bao operator raft snapshot save openbao-$(date +%Y%m%d-%H%M).snap
+```
+
+### Restore from snapshot
+
+```bash
+# Stop OpenBao, restore the snapshot, restart.
+kubectl scale sts openbao -n appl-openbao --replicas=0
+# Port-forward or exec to restore:
+kubectl exec -n appl-openbao openbao-0 -- bao operator raft snapshot restore /bao-snapshots/latest.snap
+kubectl scale sts openbao -n appl-openbao --replicas=1
+```
+
+### Migration from file to raft storage
+
+OpenBao was originally deployed with `file` storage. It was migrated to
+`raft` (integrated storage) to enable app-consistent snapshots. The
+migration uses `bao operator migrate` (file → raft) with the original
+file data backed up at `file-backup/` on the PVC.
+
+OpenBao does not make backward-compatibility guarantees for its data
+store across major versions — take a snapshot **before** any OpenBao
+upgrade.

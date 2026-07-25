@@ -185,8 +185,24 @@ can mount the PVC directly.
 - **Independent backup vs. replication:** replication (`sync-to --delete`)
   mirrors corruption too. For in-cluster data, a second independent backup
   (Pattern B) is safer — two repos with no shared failure mode.
-- **Synology WebDAV 500 on writes:** if `kopia repository create` or
-  `snapshot create` fails with HTTP 500 on PUT requests, the WebDAV Server
-  package on the NAS may be in a bad state. Restart it (Package Center →
-  WebDAV Server → Stop → Start, or `synoservicectl --restart pkgctl-WebDAVServer`
-  via SSH). This is a Synology issue, not a Kopia or network issue.
+- **Synology WebDAV 500 on writes (DavLockDB permissions):** the root cause
+  of persistent 500 errors on PUT/MKCOL is the `DavLockDB` directory not being
+  writable by all httpd workers. The WebDAV Server package runs httpd workers
+  as multiple users (root + the WebDAV user), but the lock database directory
+  at `/var/packages/WebDAVServer/target/var/run/httpd/` is `drwxr-xr-x root:root`
+  — only root can write. Non-root workers get "Permission denied" on the lock
+  database, causing every DAV write to fail with 500. Fix:
+  ```bash
+  sudo chmod 777 /var/packages/WebDAVServer/target/var/run/httpd/
+  sudo chmod 666 /var/packages/WebDAVServer/target/var/run/httpd/DavLock.*
+  sudo synopkg restart WebDAVServer  # or Package Center → Stop → Start
+  ```
+  This is a known Apache mod_dav issue (not Synology-specific), but Synology's
+  package doesn't set the permissions correctly out of the box. The fix may
+  not survive a DSM update or package reinstall — re-apply if 500s return.
+  See https://serverfault.com/questions/320480 for background.
+- **Synology WebDAV 500 on writes (transient):** if the 500s appear suddenly
+  after previously working, the WebDAV Server daemon may be in a bad state.
+  Restart it (Package Center → WebDAV Server → Stop → Start, or
+  `synopkg restart WebDAVServer` via SSH). If that doesn't help, check the
+  DavLockDB permissions above.
