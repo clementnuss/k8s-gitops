@@ -78,11 +78,6 @@ spec:
           secret: "{{ .Env.LISTMONK_SECRET }}"
           redirectURIs:
             - https://listmonk.n8r.ch/auth/oidc
-        - id: paperless
-          name: Paperless-ngx
-          secret: "{{ .Env.PAPERLESS_SECRET }}"
-          redirectURIs:
-            - https://paperless.n8r.ch/accounts/oidc/dex/login/callback/
         - id: claper
           name: Claper
           secret: "{{ .Env.CLAPER_SECRET }}"
