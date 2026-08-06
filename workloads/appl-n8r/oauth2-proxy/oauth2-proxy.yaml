@@ -35,21 +35,87 @@ spec:
       # (see config.requiredSecretKeys). client-secret is pulled
       # from the dex secret by the ExternalSecret to avoid duplication.
       existingSecret: oauth2-proxy-secrets
-      configFile: |-
-        upstreams = [ "file:///dev/null" ]
+      # With alphaConfig enabled, the chart generates a minimal legacy
+      # config containing only email_domains. All other settings live
+      # in the alpha config below.
+      forceLegacyConfig: false
+
+    alphaConfig:
+      enabled: true
+      configData:
+        # Provider — moved from extraArgs (provider, oidc-issuer-url, prompt).
+        # In alpha config these are structured under providers[].
+        # clientID/clientSecret are injected as env vars by the chart
+        # (OAUTH2_PROXY_CLIENT_ID etc) from the existingSecret.
+        providers:
+          - id: dex
+            provider: oidc
+            name: Dex
+            # In alpha config, clientID/clientSecret must be set in the
+            # providers block. The chart injects OAUTH2_PROXY_CLIENT_ID,
+            # OAUTH2_PROXY_CLIENT_SECRET, OAUTH2_PROXY_COOKIE_SECRET as env
+            # vars from existingSecret — reference them here via ${...}.
+            clientID: ${OAUTH2_PROXY_CLIENT_ID}
+            clientSecret: ${OAUTH2_PROXY_CLIENT_SECRET}
+            oidcConfig:
+              issuerURL: https://dex.n8r.ch
+              # Pull additional claims from Dex's userinfo endpoint.
+              # Dex's Google connector receives name/given_name from
+              # Google's profile scope and passes them through.
+              # Without this, only email + sub are available.
+              # profileURL: https://dex.n8r.ch/userinfo  # enable if claims aren't in id_token
+            additionalClaims:
+              - name
+              - given_name
+              - family_name
+            # prompt=none moved here from extraArgs (prompt is a removed
+            # option in alpha config).
+            loginURLParameters:
+              - name: prompt
+                default:
+                  - none
+
+        # Upstream — moved from configFile (upstreams = [ "file:///dev/null" ]).
+        # In alpha config, upstreams are structured.
+        upstreamConfig:
+          upstreams:
+            - id: noop
+              path: /
+              uri: file:///dev/null
+
+        # Response headers — replaces --set-xauthrequest (removed in alpha
+        # config) and adds X-Auth-Request-Name for the user's display name.
+        # These are injected on the /oauth2/auth response and picked up by
+        # Traefik's forwardAuth middleware.
+        injectResponseHeaders:
+          - name: X-Auth-Request-User
+            values:
+              - claimSource:
+                  claim: user
+          - name: X-Auth-Request-Email
+            values:
+              - claimSource:
+                  claim: email
+          - name: X-Auth-Request-Preferred-Username
+            values:
+              - claimSource:
+                  claim: preferred_username
+          - name: X-Auth-Request-Groups
+            values:
+              - claimSource:
+                  claim: groups
+          - name: X-Auth-Request-Name
+            values:
+              - claimSource:
+                  claim: name
 
     extraArgs:
-      provider: oidc
-      oidc-issuer-url: https://dex.n8r.ch
+      # These flags are NOT in the alpha-config removed list and stay as
+      # extraArgs alongside --alpha-config.
       skip-provider-button: true
-      pass-authorization-header: true
-      set-xauthrequest: true
       cookie-domain: .n8r.ch
       whitelist-domain: .n8r.ch
-      # reverse-proxy: "true"
-      # redirect-url: https://auth.n8r.ch/oauth2/callback
       authenticated-emails-file: /etc/oauth2-proxy/allowed-emails
-      prompt: none
 
     extraVolumes:
       - name: allowed-emails

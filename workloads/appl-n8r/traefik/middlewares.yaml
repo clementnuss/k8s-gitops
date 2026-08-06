@@ -13,4 +13,7 @@ spec:
     authResponseHeaders:
       - X-Auth-Request-User
       - X-Auth-Request-Email
+      - X-Auth-Request-Preferred-Username
+      - X-Auth-Request-Groups
+      - X-Auth-Request-Name
     maxResponseBodySize: 10485760  # 10MiB
