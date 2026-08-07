@@ -1,14 +1,14 @@
 ---
-# reference as: appl-n8r-oauth2-n8r@kubernetescrd
+# reference as: appl-n8r-oauth2-longhorn@kubernetescrd
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: oauth2-n8r
+  name: oauth2-longhorn
   namespace: appl-n8r
 spec:
   forwardAuth:
     address: "https://auth.n8r.ch/oauth2/auth"
-    authSigninURL: "https://auth.n8r.ch/oauth2/start"
+    authSigninURL: "https://auth.n8r.ch/oauth2/start?rd=https://longhorn.n8r.ch/"
     trustForwardHeader: true
     authResponseHeaders:
       - X-Auth-Request-User
