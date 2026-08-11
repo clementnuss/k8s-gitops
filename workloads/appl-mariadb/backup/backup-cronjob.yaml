@@ -1,0 +1,79 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mariadb-restic-backup
+  namespace: appl-mariadb
+spec:
+  schedule: "*/15 * * * *"
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          initContainers:
+            - name: mariadb-dump
+              image: mariadb:12.3-noble
+              env:
+                - name: USER
+                  value: backup
+                - name: PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: mariadb-backup-credentials
+                      key: database_password
+                - name: DB_HOST
+                  value: mariadb.appl-mariadb.svc.cluster.local
+                - name: DB_PORT
+                  value: "3306"
+              workingDir: "/work"
+              command: ["/bin/bash", "-c"]
+              args:
+                - |
+                  set -e
+                  ARGS=(--host="$DB_HOST" --port="$DB_PORT" --user="$USER" --password="$PASSWORD" --skip-ssl)
+                  # echo ${ARGS[@]}
+
+                  databases=$(mariadb "${ARGS[@]}" \
+                      --execute 'show databases' --skip-column-names --batch | \
+                      grep -vE 'mysql|information_schema|performance_schema|sys')
+
+                  for db in  $databases; do
+                      echo "$db"
+                      mariadb-dump --skip-add-locks "${ARGS[@]}" "$db" | \
+                      gzip --rsyncable > ./"$db".sql.gz
+                  done
+              volumeMounts:
+                - mountPath: /work
+                  name: work
+          containers:
+            - name: restic-backup
+              image: restic/restic:0.19.1
+              envFrom:
+                - secretRef:
+                    name: restic-credentials
+                    optional: false
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  restic backup /work && \
+                  restic unlock && \
+                  restic forget --group-by paths --keep-hourly 24 --keep-daily 7 --keep-monthly 24 && \
+                  restic prune
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 256Mi
+                limits:
+                  cpu: 1000m
+                  memory: 512Mi
+              volumeMounts:
+                - mountPath: /work
+                  name: work
+          restartPolicy: OnFailure
+          volumes:
+            - name: work
+              emptyDir:
+                sizeLimit: 512Mi

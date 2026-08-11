@@ -1,0 +1,87 @@
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: mariadb
+  namespace: appl-mariadb
+spec:
+  rootPasswordSecretKeyRef:
+    name: mariadb-credentials
+    key: mariadb-root-password
+
+  database: mariadb
+  username: mariadb
+  passwordSecretKeyRef:
+    name: mariadb-credentials
+    key: mariadb-password
+
+  # Single instance - no Galera
+  replicas: 1
+
+  # Resource configuration matching current deployment
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      memory: 1024Mi
+
+  # Storage configuration - Longhorn handles HA
+  storage:
+    size: 5Gi
+    storageClassName: longhorn-3-replicas
+
+  # Probes
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 6
+
+  readinessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 10
+
+  # Metrics
+  metrics:
+    enabled: true
+
+  # # Security context
+  # podSecurityContext:
+  #   runAsNonRoot: true
+  #   runAsUser: 999
+  #
+  # securityContext:
+  #   runAsNonRoot: true
+  #   allowPrivilegeEscalation: false
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mariadb-network-policy
+  namespace: appl-mariadb
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: mariadb
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app.kubernetes.io/name: invoiceninja
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: appl-grafana
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: appl-n8r
+        - namespaceSelector: {}
+          podSelector: {}
+  egress:
+    - {}

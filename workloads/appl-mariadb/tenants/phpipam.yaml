@@ -1,0 +1,41 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: phpipam
+  namespace: appl-mariadb
+spec:
+  mariaDbRef:
+    name: mariadb
+  passwordSecretKeyRef:
+    name: mariadb-passwords
+    key: phpipam
+  maxUserConnections: 20
+  host: "%"
+  cleanupPolicy: Delete
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  name: grant-phpipam
+  namespace: appl-mariadb
+spec:
+  mariaDbRef:
+    name: mariadb
+  privileges:
+    - "ALL"
+  database: "phpipam"
+  table: "*"
+  username: phpipam
+  grantOption: true
+  host: "%"
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  name: phpipam
+  namespace: appl-mariadb
+spec:
+  mariaDbRef:
+    name: mariadb
+  characterSet: utf8
+  collate: utf8_general_ci

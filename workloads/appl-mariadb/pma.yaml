@@ -1,0 +1,53 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: phpmyadmin
+  namespace: appl-mariadb
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://bjw-s-labs.github.io/helm-charts/
+      chart: app-template
+      version: 5.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 5m
+  values:
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: docker.io/library/phpmyadmin
+              tag: "5.2.3"
+              pullPolicy: IfNotPresent
+            env:
+              PMA_HOST: mariadb.appl-mariadb.svc.cluster.local
+              PMA_PORT: 3306
+
+    service:
+      main:
+        controller: main
+        ports:
+          http:
+            port: 80
+            protocol: HTTP
+
+    ingress:
+      main:
+        enabled: true
+        className: traefik
+        hosts:
+          - host: phpmyadmin.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd
