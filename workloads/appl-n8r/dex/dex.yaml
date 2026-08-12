@@ -90,14 +90,14 @@ spec:
             - https://photos.n8r.ch/auth/login
             - https://photos.n8r.ch/user-settings
             - app.immich:///oauth-callback
-        - id: filebrowser
-          name: Filebrowser
-          secret: "{{ .Env.FILEBROWSER_SECRET }}"
-          redirectURIs:
-            - https://files.n8r.ch/api/auth/oidc/callback
         - id: openbao
           name: OpenBao
           secret: "{{ .Env.OPENBAO_SECRET }}"
           redirectURIs:
             - https://openbao.n8r.ch/ui/vault/auth/dex/oidc/callback
             - http://localhost:8250/oidc/callback
+        - id: seafile
+          name: Seafile
+          secret: "{{ .Env.SEAFILE_OAUTH_SECRET }}"
+          redirectURIs:
+            - https://drive.n8r.ch/oauth/callback/

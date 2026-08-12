@@ -46,7 +46,7 @@ spec:
     secretRef:
       name: sops-age
   path: ./
-  prune: false   # TEMP: disabled during migration to k8s-gitops, re-enable after
+  prune: true
   sourceRef:
     kind: GitRepository
     name: private-k8s-workloads

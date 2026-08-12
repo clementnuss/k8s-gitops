@@ -21,8 +21,8 @@ spec:
                 - name: PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: mariadb-backup-credentials
-                      key: database_password
+                      name: mariadb-passwords
+                      key: backup
                 - name: DB_HOST
                   value: mariadb.appl-mariadb.svc.cluster.local
                 - name: DB_PORT

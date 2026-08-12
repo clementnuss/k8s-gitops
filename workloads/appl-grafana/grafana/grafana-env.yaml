@@ -15,6 +15,10 @@ spec:
     template:
       type: Opaque
   dataFrom:
-  - extract:
-      key: k8s/appl-grafana/grafana-env
-
+    - extract:
+        key: k8s/appl-grafana/grafana-env
+  data:
+    - secretKey: GF_DATABASE_PASSWORD
+      remoteRef:
+        key: k8s/appl-mariadb/mariadb-passwords
+        property: grafana
