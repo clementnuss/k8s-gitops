@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: spegel
-  namespace: spegel
+  namespace: kube-spegel
 spec:
   interval: 5m
   chart:
@@ -16,13 +16,14 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    # Talos uses a different containerd registry config path.
-    containerdRegistryConfigPath: /etc/cri/conf.d/hosts
-    # Only share blobs; do not resolve tags to digests.
-    resolveTags: false
-    # Resource limit for the stateful DaemonSet workload.
-    resources:
-      requests:
-        memory: 128Mi
-      limits:
-        memory: 512Mi
+    spegel:
+      # Talos uses a different containerd registry config path.
+      containerdRegistryConfigPath: /etc/cri/conf.d/hosts
+      # Only share blobs; do not resolve tags to digests.
+      resolveTags: false
+      # Resource limit for the stateful DaemonSet workload.
+      resources:
+        requests:
+          memory: 128Mi
+        limits:
+          memory: 512Mi
