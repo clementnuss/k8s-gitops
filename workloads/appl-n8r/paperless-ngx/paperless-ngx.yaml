@@ -45,15 +45,14 @@ spec:
               PAPERLESS_CONSUMER_RECURSIVE: "true"
               PAPERLESS_DBENGINE: mariadb
               PAPERLESS_DBHOST: mariadb.appl-mariadb.svc.cluster.local
-              # SSO via oauth2-proxy forwardAuth: oauth2-proxy authenticates the
-              # user against Dex (with the email allowlist) and injects
-              # X-Auth-Request-Email, which paperless trusts as the remote user.
-              # NOTE: Django exposes HTTP headers in request.META with an HTTP_
-              # prefix and uppercase, so the value here is the META key, not the
-              # raw header name. X-Auth-Request-Email -> HTTP_X_AUTH_REQUEST_EMAIL.
-              PAPERLESS_ENABLE_HTTP_REMOTE_USER: "true"
-              PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: "HTTP_X_AUTH_REQUEST_EMAIL"
-              PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
+              # OIDC via Pocket ID (django-allauth openid_connect provider).
+              # PAPERLESS_SOCIALACCOUNT_PROVIDERS (JSON) is injected from
+              # OpenBao via paperless-ngx-secret / envFrom below.
+              PAPERLESS_APPS: "allauth.socialaccount.providers.openid_connect"
+              PAPERLESS_DISABLE_REGULAR_LOGIN: "false"
+              PAPERLESS_REDIRECT_LOGIN_TO_SSO: "true"
+              PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+              PAPERLESS_ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS: "false"
             envFrom:
               - secretRef:
                   name: paperless-ngx-secret
@@ -140,8 +139,6 @@ spec:
       main:
         enabled: true
         className: "traefik"
-        annotations:
-          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-paperless@kubernetescrd
         hosts:
           - host: paperless.n8r.ch
             paths:
