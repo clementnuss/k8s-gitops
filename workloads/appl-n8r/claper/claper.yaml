@@ -38,8 +38,8 @@ spec:
               PORT: "4000"
               SECURE_COOKIE: "true"
               ENABLE_ACCOUNT_CREATION: "false"
-              OIDC_ISSUER: https://dex.n8r.ch
-              OIDC_PROVIDER_NAME: Dex
+              OIDC_ISSUER: https://id.n8r.ch
+              OIDC_PROVIDER_NAME: PocketID
               OIDC_AUTO_REDIRECT_LOGIN: "true"
             envFrom:
               - secretRef:

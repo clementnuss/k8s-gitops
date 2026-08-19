@@ -67,7 +67,7 @@ spec:
         enabled: true
         className: "traefik"
         annotations:
-          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-errors@kubernetescrd,appl-n8r-oauth2-auth@kubernetescrd
         hosts:
           - host: peanut.n8r.ch
             paths:

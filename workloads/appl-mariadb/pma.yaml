@@ -50,4 +50,4 @@ spec:
                   identifier: main
                   port: http
         annotations:
-          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-errors@kubernetescrd,appl-n8r-oauth2-auth@kubernetescrd

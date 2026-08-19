@@ -121,7 +121,6 @@ spec:
         enabled: true
         ingressClassName: traefik
         annotations:
-          # traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd
           cert-manager.io/cluster-issuer: letsencrypt-prod
         hosts:
           - host: openbao.n8r.ch
@@ -129,7 +128,7 @@ spec:
               - /
         tls:
           - hosts:
-            - openbao.n8r.ch
+              - openbao.n8r.ch
             secretName: openbao.n8r.ch-tls
 
       # Single replica in standalone mode — don't anti-affinity-coerce onto a

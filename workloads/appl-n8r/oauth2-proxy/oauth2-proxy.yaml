@@ -48,9 +48,9 @@ spec:
         # clientID/clientSecret are injected as env vars by the chart
         # (OAUTH2_PROXY_CLIENT_ID etc) from the existingSecret.
         providers:
-          - id: dex
+          - id: pocket-id
             provider: oidc
-            name: Dex
+            name: Pocket ID
             # In alpha config, clientID/clientSecret must be set in the
             # providers block. The chart injects OAUTH2_PROXY_CLIENT_ID,
             # OAUTH2_PROXY_CLIENT_SECRET, OAUTH2_PROXY_COOKIE_SECRET as env
@@ -58,12 +58,11 @@ spec:
             clientID: ${OAUTH2_PROXY_CLIENT_ID}
             clientSecret: ${OAUTH2_PROXY_CLIENT_SECRET}
             oidcConfig:
-              issuerURL: https://dex.n8r.ch
-              # Pull additional claims from Dex's userinfo endpoint.
-              # Dex's Google connector receives name/given_name from
-              # Google's profile scope and passes them through.
-              # Without this, only email + sub are available.
-              # profileURL: https://dex.n8r.ch/userinfo  # enable if claims aren't in id_token
+              issuerURL: https://id.n8r.ch
+              # Pocket ID doesn't set email_verified=true for admin-created
+              # users. Since we control who's in Pocket ID, trust the email
+              # claim without verification.
+              insecureAllowUnverifiedEmail: true
             additionalClaims:
               - name
               - given_name
@@ -115,17 +114,10 @@ spec:
       skip-provider-button: true
       cookie-domain: .n8r.ch
       whitelist-domain: .n8r.ch
-      authenticated-emails-file: /etc/oauth2-proxy/allowed-emails
-
-    extraVolumes:
-      - name: allowed-emails
-        secret:
-          secretName: oauth2-proxy-secrets
-          items:
-            - key: allowed-emails
-              path: allowed-emails
-
-    extraVolumeMounts:
-      - name: allowed-emails
-        mountPath: /etc/oauth2-proxy
-        readOnly: true
+      email-domain: "*"
+      # Pin the OAuth redirect_uri so it's always auth.n8r.ch regardless of
+      # the incoming Host header. Required for the Traefik `errors`-middleware
+      # pattern, where Traefik calls oauth2-proxy server-side with the
+      # original request's Host (e.g. logs.n8r.ch) — without this, oauth2-proxy
+      # would build redirect_uri from that Host and the IdP would reject it.
+      redirect-url: "https://auth.n8r.ch/oauth2/callback"

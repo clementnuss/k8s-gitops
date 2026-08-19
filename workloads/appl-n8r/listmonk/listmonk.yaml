@@ -1,95 +1,95 @@
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: listmonk
-  namespace: appl-n8r
-spec:
-  interval: 5m
-  chart:
-    spec:
-      chart: app-template
-      version: 5.1.0
-      sourceRef:
-        kind: HelmRepository
-        name: bjw-s
-        namespace: flux-system
-      interval: 15m
-  maxHistory: 3
-  install:
-    createNamespace: true
-    remediation:
-      retries: 3
-    timeout: 10m
-  upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 3
-    timeout: 10m
-  uninstall:
-    keepHistory: false
-  values:
-    controllers:
-      listmonk:
-        initContainers:
-          init-db:
-            image:
-              repository: listmonk/listmonk
-              tag: v6.2.0
-            command:
-              - /bin/sh
-              - -c
-              - ./listmonk --install --idempotent --yes && ./listmonk --upgrade --yes
-            envFrom:
-              - secretRef:
-                  name: listmonk-secret
-
-        containers:
-          app:
-            image:
-              repository: listmonk/listmonk
-              tag: v6.2.0
-            envFrom:
-              - secretRef:
-                  name: listmonk-secret
-            resources:
-              requests:
-                cpu: 50m
-                memory: 128Mi
-              limits:
-                memory: 512Mi
-
-    service:
-      main:
-        type: ClusterIP
-        controller: listmonk
-        ports:
-          http:
-            port: 9000
-
-    ingress:
-      main:
-        enabled: true
-        className: traefik
-        annotations:
-          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-n8r@kubernetescrd
-        hosts:
-          - host: listmonk.n8r.ch
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: main
-                  port: http
-        tls:
-          - hosts:
-              - listmonk.n8r.ch
-
-    persistence:
-      uploads:
-        enabled: true
-        type: persistentVolumeClaim
-        size: 1Gi
-        accessMode: ReadWriteOnce
-        globalMounts:
-          - path: /listmonk/uploads
+# ---
+# apiVersion: helm.toolkit.fluxcd.io/v2
+# kind: HelmRelease
+# metadata:
+#   name: listmonk
+#   namespace: appl-n8r
+# spec:
+#   interval: 5m
+#   chart:
+#     spec:
+#       chart: app-template
+#       version: 5.1.0
+#       sourceRef:
+#         kind: HelmRepository
+#         name: bjw-s
+#         namespace: flux-system
+#       interval: 15m
+#   maxHistory: 3
+#   install:
+#     createNamespace: true
+#     remediation:
+#       retries: 3
+#     timeout: 10m
+#   upgrade:
+#     cleanupOnFail: true
+#     remediation:
+#       retries: 3
+#     timeout: 10m
+#   uninstall:
+#     keepHistory: false
+#   values:
+#     controllers:
+#       listmonk:
+#         initContainers:
+#           init-db:
+#             image:
+#               repository: listmonk/listmonk
+#               tag: v6.2.0
+#             command:
+#               - /bin/sh
+#               - -c
+#               - ./listmonk --install --idempotent --yes && ./listmonk --upgrade --yes
+#             envFrom:
+#               - secretRef:
+#                   name: listmonk-secret
+#
+#         containers:
+#           app:
+#             image:
+#               repository: listmonk/listmonk
+#               tag: v6.2.0
+#             envFrom:
+#               - secretRef:
+#                   name: listmonk-secret
+#             resources:
+#               requests:
+#                 cpu: 50m
+#                 memory: 128Mi
+#               limits:
+#                 memory: 512Mi
+#
+#     service:
+#       main:
+#         type: ClusterIP
+#         controller: listmonk
+#         ports:
+#           http:
+#             port: 9000
+#
+#     ingress:
+#       main:
+#         enabled: true
+#         className: traefik
+#         annotations:
+#           traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-errors@kubernetescrd,appl-n8r-oauth2-auth@kubernetescrd
+#         hosts:
+#           - host: listmonk.n8r.ch
+#             paths:
+#               - path: /
+#                 pathType: Prefix
+#                 service:
+#                   identifier: main
+#                   port: http
+#         tls:
+#           - hosts:
+#               - listmonk.n8r.ch
+#
+#     persistence:
+#       uploads:
+#         enabled: true
+#         type: persistentVolumeClaim
+#         size: 1Gi
+#         accessMode: ReadWriteOnce
+#         globalMounts:
+#           - path: /listmonk/uploads

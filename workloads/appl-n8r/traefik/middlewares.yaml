@@ -1,14 +1,50 @@
 ---
-# reference as: appl-n8r-oauth2-n8r@kubernetescrd
+# Two-middleware pair for oauth2-proxy via Traefik forwardAuth + errors.
+# One pair works for every app — the errors middleware substitutes the
+# original request URL into rd={url}, so users return to the app they
+# came from without per-app middlewares.
+#
+# Usage on an ingress:
+#   traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-errors@kubernetescrd,appl-n8r-oauth2-auth@kubernetescrd
+#
+# oauth2-proxy must pin --redirect-url=https://auth.n8r.ch/oauth2/callback
+# (see oauth2-proxy.yaml extraArgs) so the IdP always sees a registered
+# redirect_uri regardless of the incoming Host header.
+
+# reference as: appl-n8r-oauth2-errors@kubernetescrd
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: oauth2-n8r
+  name: oauth2-errors
+  namespace: appl-n8r
+spec:
+  errors:
+    status:
+      - "401-403"
+    service:
+      kind: Service
+      name: oauth2-proxy
+      namespace: appl-n8r
+      port: 80
+    # {url} is the escaped original request URL, substituted by Traefik
+    # at request time. After IdP login, oauth2-proxy redirects back there.
+    query: "/oauth2/sign_in?rd={url}"
+    # Rewrite 401 -> 302 so the browser follows the redirect automatically
+    # (without this some browsers render "Found." as a link).
+    statusRewrites:
+      "401": 302
+
+---
+# reference as: appl-n8r-oauth2-auth@kubernetescrd
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth2-auth
   namespace: appl-n8r
 spec:
   forwardAuth:
-    address: "https://auth.n8r.ch/oauth2/auth"
-    authSigninURL: "https://auth.n8r.ch/oauth2/start"
+    # Call oauth2-proxy's auth endpoint over the in-cluster Service.
+    address: "http://oauth2-proxy.appl-n8r.svc.cluster.local:80/oauth2/auth"
     trustForwardHeader: true
     authResponseHeaders:
       - X-Auth-Request-User
