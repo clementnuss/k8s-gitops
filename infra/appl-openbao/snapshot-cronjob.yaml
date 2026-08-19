@@ -106,7 +106,7 @@ spec:
             # Runs as root so the snapshot file is world-readable for the
             # Kopia containers (which run as a different user).
             - name: snapshot
-              image: openbao/openbao:2.6.1
+              image: openbao/openbao:2.6.2
               securityContext:
                 runAsUser: 0
                 runAsNonRoot: false
