@@ -1,0 +1,51 @@
+---
+# Longhorn PVC — frozen backup of pre-migration state. Safe to delete
+# once NFS migration is confirmed (see README.md).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seafile-shared
+  namespace: appl-seafile
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-2-replicas
+  resources:
+    requests:
+      storage: 10Gi
+---
+# NFS PV for /shared/seafile (conf + data + everything except logs).
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: seafile-data-nfs
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadWriteMany
+  mountOptions:
+    - nfsvers=3
+    - hard
+    - noac
+    - lookupcache=none
+  nfs:
+    server: 192.168.63.10
+    path: /volume1/nfs-share/seafile/
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seafile-data-nfs
+  namespace: appl-seafile
+  labels:
+    velero.io/exclude-from-backups: "true"
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1Ti
+  volumeName: seafile-data-nfs

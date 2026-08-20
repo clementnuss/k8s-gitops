@@ -1,0 +1,110 @@
+---
+# Seafile Pro (≤3 users = free). Auth via Pocket ID (native OAuth2).
+# See README.md for setup + storage.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: seafile
+  namespace: appl-seafile
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 5.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      seafile:
+        pod:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            fsGroup: 0
+        containers:
+          app:
+            image:
+              repository: seafileltd/seafile-pro-mc
+              tag: 13.0-latest
+              pullPolicy: Always
+            env:
+              TZ: "Europe/Zurich"
+              TIME_ZONE: "Europe/Zurich"
+              SEAFILE_LOG_TO_STDOUT: "true"
+              SITE_ROOT: "/"
+              SEAFILE_SERVER_HOSTNAME: "drive.n8r.ch"
+              SEAFILE_SERVER_PROTOCOL: "https"
+              SEAF_SERVER_STORAGE_TYPE: "disk"
+              ENABLE_GO_FILESERVER: "true"
+              REDIS_HOST: "redis.appl-seafile.svc.cluster.local"
+              REDIS_PORT: "6379"
+              SEAFILE_MYSQL_DB_HOST: "mariadb.appl-mariadb.svc.cluster.local"
+              SEAFILE_MYSQL_DB_PORT: "3306"
+              SEAFILE_MYSQL_DB_USER: "seafile"
+              SEAFILE_MYSQL_DB_CCNET_DB_NAME: "seafile_ccnet_db"
+              SEAFILE_MYSQL_DB_SEAFILE_DB_NAME: "seafile_db"
+              SEAFILE_MYSQL_DB_SEAHUB_DB_NAME: "seafile_seahub_db"
+              ENABLE_SUDO_MODE: "false"
+            envFrom:
+              - secretRef:
+                  name: seafile-secret
+            resources:
+              requests:
+                cpu: 500m
+                memory: 1Gi
+              limits:
+                memory: 4Gi
+
+    service:
+      main:
+        type: ClusterIP
+        controller: seafile
+        ports:
+          http:
+            port: 80
+
+    ingress:
+      main:
+        enabled: true
+        className: "traefik"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+        hosts:
+          - host: drive.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - drive.n8r.ch
+            secretName: drive.n8r.ch-tls
+
+    persistence:
+      data:
+        existingClaim: seafile-data-nfs
+        globalMounts:
+          - path: /shared/seafile
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /shared/seafile/logs
