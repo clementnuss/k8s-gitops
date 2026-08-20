@@ -63,6 +63,9 @@ spec:
       enabled: true
       relay:
         enabled: true
+      tls:
+        auto:
+          method: cronJob
 
     # talos compatibility:
     securityContext:
