@@ -38,7 +38,9 @@ spec:
             fsGroup: 0
         initContainers:
           init-seasearch:
-            image: busybox:1.36
+            image:
+              repository: busybox
+              tag: "1.36"
             env:
               - name: SEASEARCH_ADMIN_USER
                 valueFrom:
