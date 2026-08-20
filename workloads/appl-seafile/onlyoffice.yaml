@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: onlyoffice
-          image: onlyoffice/documentserver:9.3.0
+          image: onlyoffice/documentserver:9.3.1
           command:
             - sh
             - -c
