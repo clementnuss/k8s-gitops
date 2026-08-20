@@ -1,0 +1,108 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: onlyoffice
+  namespace: appl-seafile
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: onlyoffice
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice
+  namespace: appl-seafile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: onlyoffice
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: onlyoffice
+    spec:
+      containers:
+        - name: onlyoffice
+          image: onlyoffice/documentserver:9.3.0
+          command:
+            - sh
+            - -c
+            - |
+              sed -i '/map \$http_cloudfront_forwarded_proto:\$http_x_forwarded_proto \$the_scheme/,/^}/c\map $http_x_forwarded_proto $the_scheme {\n    default https;\n}' /etc/onlyoffice/documentserver/nginx/includes/http-common.conf
+              exec /app/ds/run-document-server.sh
+          env:
+            - name: JWT_ENABLED
+              value: "true"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: seafile-secret
+                  key: ONLYOFFICE_JWT_SECRET
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              memory: 4Gi
+          volumeMounts:
+            - name: data
+              mountPath: /var/www/onlyoffice/Data
+            - name: logs
+              mountPath: /var/log/onlyoffice
+            - name: cache
+              mountPath: /var/lib/onlyoffice
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: onlyoffice-data
+        - name: logs
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: onlyoffice-data
+  namespace: appl-seafile
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-2-replicas
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: onlyoffice
+  namespace: appl-seafile
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - office.n8r.ch
+      secretName: office.n8r.ch-tls
+  rules:
+    - host: office.n8r.ch
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: onlyoffice
+                port:
+                  number: 80

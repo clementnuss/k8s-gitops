@@ -1,6 +1,5 @@
 ---
-# Longhorn PVC — frozen backup of pre-migration state. Safe to delete
-# once NFS migration is confirmed (see README.md).
+# Frozen backup of pre-migration state. Safe to delete once NFS is confirmed.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -14,7 +13,7 @@ spec:
     requests:
       storage: 10Gi
 ---
-# NFS PV for /shared/seafile (conf + data + everything except logs).
+# NFS PV for /shared/seafile.
 apiVersion: v1
 kind: PersistentVolume
 metadata:

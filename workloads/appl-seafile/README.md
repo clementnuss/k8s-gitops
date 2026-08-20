@@ -158,12 +158,109 @@ kubectl -n appl-seafile scale deploy/seafile --replicas=1
 The `seafile-shared` Longhorn PVC remains as a frozen backup; delete it once
 NFS is confirmed working.
 
+## SeaSearch (full-text search)
+
+SeaSearch (`seafileltd/seasearch:1.0-latest`) is a lightweight file content
+indexer, replacing Elasticsearch. Deployed as a standalone Deployment + Service
+(`seasearch.yaml`) on port 4080, with a 20Gi Longhorn PVC at `/data`.
+
+The `seasearch_token` in `seafevents.conf` is injected at boot by an init
+container (`init-seasearch` in `seafile.yaml`) that base64-encodes
+`SEASEARCH_ADMIN_USER:SEASEARCH_ADMIN_PASSWORD` from the `seafile-secret` and
+`sed`-replaces the placeholder. The token never lives in the config file on disk.
+
+### Setup
+
+1. Add `SEASEARCH_ADMIN_USER` and `SEASEARCH_ADMIN_PASSWORD` to OpenBao at
+   `k8s/appl-seafile/seafile-secret`.
+
+2. Let Flux sync `seasearch.yaml` (Deployment + Service + PVC).
+
+3. Append to `/shared/seafile/conf/seafevents.conf`:
+
+```sh
+kubectl -n appl-seafile exec -it deploy/seafile -- sh -c 'cat >> /shared/seafile/conf/seafevents.conf' <<'EOF'
+[SEASEARCH]
+enabled = true
+seasearch_url = http://seasearch.appl-seafile.svc.cluster.local:4080
+seasearch_token = placeholder
+interval = 10m
+index_office_pdf = true
+
+[INDEX FILES]
+enabled = false
+EOF
+```
+
+4. Restart Seafile:
+
+```sh
+kubectl -n appl-seafile rollout restart deploy/seafile
+```
+
+5. Verify: upload a file, wait ~10m, search for its content in the web UI.
+
+### Notes
+
+- `SS_FIRST_ADMIN_USER` / `SS_FIRST_ADMIN_PASSWORD` (init env vars in
+  `seasearch.yaml`) are only needed on first boot. Remove them after the
+  admin account is created.
+- `index_office_pdf = true` enables full-text indexing of Office/PDF content
+  (Pro 13.0 feature).
+- Redis is used as the cache (no memcached needed). The `WARNING:root:Memcached
+  has not been set up` in the logs is harmless.
+
+## OnlyOffice (online document editing)
+
+OnlyOffice Document Server (`onlyoffice/documentserver:8.1.0`) for
+viewing/editing Office files in the browser. Deployed as a standalone
+Deployment + Service + Ingress (`onlyoffice.yaml`), exposed at
+`https://office.n8r.ch/`. Separate hostname because OnlyOffice's internal
+nginx serves from `/` and doesn't support subpath deployment cleanly.
+
+JWT-secured (shared secret between Seafile and OnlyOffice). The
+`ONLYOFFICE_JWT_SECRET` env var is injected from the `seafile-secret`
+Kubernetes Secret, synced from OpenBao via the existing ExternalSecret.
+
+### Setup
+
+1. Add `ONLYOFFICE_JWT_SECRET` to OpenBao at `k8s/appl-seafile/seafile-secret`
+   (`pwgen -s 40 1`).
+
+2. Add a DNS record for `office.n8r.ch` (if not using a wildcard CNAME).
+
+3. Let Flux sync `onlyoffice.yaml`.
+
+4. Verify OnlyOffice is running: `https://office.n8r.ch/welcome`
+   should show "Document Server is running".
+
+5. Append to `seahub_settings.py`:
+
+```sh
+kubectl -n appl-seafile exec -it deploy/seafile -- sh -c 'cat >> /shared/seafile/conf/seahub_settings.py' <<'PY'
+ENABLE_ONLYOFFICE = True
+ONLYOFFICE_APIJS_URL = 'https://office.n8r.ch/web-apps/apps/api/documents/api.js'
+ONLYOFFICE_JWT_SECRET = os.environ['ONLYOFFICE_JWT_SECRET']
+PY
+```
+
+6. Restart Seafile:
+
+```sh
+kubectl -n appl-seafile rollout restart deploy/seafile
+```
+
+7. Verify: open a `.docx` file in the Seafile web UI → should open the
+   OnlyOffice editor inline.
+
 ## Files
 
 | File | Purpose |
 |------|---------|
 | `ns.yaml` | Namespace |
-| `seafile.yaml` | HelmRelease |
+| `seafile.yaml` | HelmRelease (with init-seasearch container) |
 | `seafile-secret.yaml` | ExternalSecret |
 | `seafile-data-pvc.yaml` | Longhorn PVC (frozen) + NFS PV/PVC |
 | `redis.yaml` | Internal Redis |
+| `seasearch.yaml` | SeaSearch Deployment + Service + PVC |
+| `onlyoffice.yaml` | OnlyOffice Deployment + Service + PVC + Ingress (office.n8r.ch) |

@@ -1,6 +1,4 @@
 ---
-# Seafile Pro (≤3 users = free). Auth via Pocket ID (native OAuth2).
-# See README.md for setup + storage.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -38,6 +36,26 @@ spec:
             runAsUser: 0
             runAsGroup: 0
             fsGroup: 0
+        initContainers:
+          init-seasearch:
+            image: busybox:1.36
+            env:
+              - name: SEASEARCH_ADMIN_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: seafile-secret
+                    key: SEASEARCH_ADMIN_USER
+              - name: SEASEARCH_ADMIN_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: seafile-secret
+                    key: SEASEARCH_ADMIN_PASSWORD
+            command:
+              - sh
+              - -c
+              - |
+                TOKEN=$(echo -n "${SEASEARCH_ADMIN_USER}:${SEASEARCH_ADMIN_PASSWORD}" | base64 | tr -d '\n')
+                sed -i "s/^seasearch_token = .*/seasearch_token = ${TOKEN}/" /shared/seafile/conf/seafevents.conf
         containers:
           app:
             image:
@@ -61,7 +79,6 @@ spec:
               SEAFILE_MYSQL_DB_CCNET_DB_NAME: "seafile_ccnet_db"
               SEAFILE_MYSQL_DB_SEAFILE_DB_NAME: "seafile_db"
               SEAFILE_MYSQL_DB_SEAHUB_DB_NAME: "seafile_seahub_db"
-              ENABLE_SUDO_MODE: "false"
             envFrom:
               - secretRef:
                   name: seafile-secret
