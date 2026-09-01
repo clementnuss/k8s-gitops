@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: clement-blog-content
+  namespace: appl-clement-blog
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-2-replicas
+  resources:
+    requests:
+      storage: 2Gi

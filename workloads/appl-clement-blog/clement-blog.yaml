@@ -1,0 +1,230 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clement-blog-realip
+  namespace: appl-clement-blog
+data:
+  realip.conf: |
+    # Trust Traefik (and any in-cluster proxy) so the real client IP from
+    # X-Forwarded-For replaces $remote_addr in access logs.
+    set_real_ip_from 172.16.0.0/16;
+    set_real_ip_from fc00:cafe:beef:ffff::/112;
+    real_ip_header X-Forwarded-For;
+    real_ip_recursive on;
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clement-blog-nginx
+  namespace: appl-clement-blog
+data:
+  default.conf: |
+    # Replaces the stock nginx-unprivileged default server.
+    # Adds gzip compression (Pingdom: "Compress components with gzip")
+    # and long-lived Expires/Cache-Control headers for static assets
+    # (Pingdom: "Add Expires headers", "Make favicon cacheable").
+    server {
+        listen       8080;
+        server_name  _;
+
+        root   /usr/share/nginx/html;
+        index  index.html;
+
+        # --- gzip compression -------------------------------------------------
+        gzip on;
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_min_length 256;
+        gzip_types
+            text/plain
+            text/css
+            text/xml
+            text/javascript
+            application/javascript
+            application/x-javascript
+            application/json
+            application/xml
+            application/xml+rss
+            application/rss+xml
+            application/atom+xml
+            image/svg+xml
+            font/ttf
+            font/otf
+            application/wasm;
+
+        # --- default location -------------------------------------------------
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        # --- static assets: long cache + expires -------------------------------
+        # Images, fonts, audio/video never change (filename-stable), so cache
+        # them for 30 days. Hugo fingerprints CSS/JS when fingerprinting is on,
+        # so those are safe to cache long-term too.
+        # NOTE: nginx's `expires` directive sets BOTH the Expires header and a
+        # `Cache-Control: max-age=N` header, so we don't add a second
+        # Cache-Control via add_header (that would produce duplicate headers).
+        location ~* \.(?:png|jpe?g|gif|webp|ico|svg|bmp|tiff|woff2?|eot|ttf|otf|mp4|webm|mp3|ogg|pdf|wasm)$ {
+            expires 30d;
+            access_log off;
+            add_header X-Content-Type-Options nosniff;
+        }
+
+        location ~* \.(?:css|js)$ {
+            expires 7d;
+            access_log off;
+        }
+
+        # HTML is short-lived: revalidate, but allow the browser to use a stale
+        # copy for a few minutes while revalidating. Here we DO use add_header
+        # (no `expires`), so there's exactly one Cache-Control header.
+        location ~* \.html?$ {
+            add_header Cache-Control "public, max-age=300, must-revalidate";
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clement-blog
+  namespace: appl-clement-blog
+  labels:
+    app: clement-blog
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: clement-blog
+  template:
+    metadata:
+      labels:
+        app: clement-blog
+    spec:
+      securityContext:
+        fsGroup: 101
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: nginx
+          image: nginxinc/nginx-unprivileged:1.27-alpine
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: content
+              mountPath: /usr/share/nginx/html
+            - name: server-config
+              mountPath: /etc/nginx/conf.d/realip.conf
+              subPath: realip.conf
+              readOnly: true
+            - name: nginx-server-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              readOnly: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 101
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+      volumes:
+        - name: content
+          persistentVolumeClaim:
+            claimName: clement-blog-content
+        - name: server-config
+          configMap:
+            name: clement-blog-realip
+        - name: nginx-server-config
+          configMap:
+            name: clement-blog-nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clement-blog
+  namespace: appl-clement-blog
+spec:
+  type: ClusterIP
+  selector:
+    app: clement-blog
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: clement-blog
+  namespace: appl-clement-blog
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - clement.n8r.ch
+  rules:
+    - host: clement.n8r.ch
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: clement-blog
+                port:
+                  name: http
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: blog-redirect
+  namespace: appl-clement-blog
+spec:
+  redirectRegex:
+    regex: ^https?://blog\.n8r\.ch(/.*)?$
+    replacement: https://clement.n8r.ch${1}
+    permanent: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: clement-blog-redirect
+  namespace: appl-clement-blog
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: appl-clement-blog-blog-redirect@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - blog.n8r.ch
+  rules:
+    - host: blog.n8r.ch
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: clement-blog
+                port:
+                  name: http
