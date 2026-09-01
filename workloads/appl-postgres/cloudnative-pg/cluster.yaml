@@ -24,6 +24,13 @@ spec:
       inherit: true
       passwordSecret:
         name: app-admin-secret
+    - name: goatcounter
+      ensure: present
+      login: true
+      createdb: true
+      inherit: true
+      passwordSecret:
+        name: goatcounter-db-secret
 
   bootstrap:
     initdb:

@@ -1,0 +1,122 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: goatcounter
+  namespace: appl-goat-counter
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 5.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      goatcounter:
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: arp242/goatcounter
+              tag: "2.6"
+            command:
+              - goatcounter
+            args:
+              - serve
+              - -automigrate
+              - -listen=*:8080
+              - -tls=http
+              - -public-port=443
+            env:
+              GOATCOUNTER_LISTEN: "*:8080"
+              GOATCOUNTER_TLS: "http"
+              GOATCOUNTER_SMTP: "stdout"
+              GOATCOUNTER_EMAIL_FROM: "goatcounter@n8r.ch"
+            envFrom:
+              - secretRef:
+                  name: goatcounter-secret
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /status
+                    port: 8080
+                    httpHeaders:
+                      - name: Host
+                        value: goat-counter.n8r.ch
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /status
+                    port: 8080
+                    httpHeaders:
+                      - name: Host
+                        value: goat-counter.n8r.ch
+                  initialDelaySeconds: 3
+                  periodSeconds: 5
+
+    service:
+      main:
+        type: ClusterIP
+        controller: goatcounter
+        ports:
+          http:
+            port: 8080
+
+    ingress:
+      main:
+        enabled: true
+        className: traefik
+        hosts:
+          - host: goat-counter.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - goat-counter.n8r.ch
+
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim
+        size: 1Gi
+        accessMode: ReadWriteOnce
+        globalMounts:
+          - path: /home/goatcounter/goatcounter-data
+
+    podAnnotations:
+      backup.velero.io/backup-volumes: data
