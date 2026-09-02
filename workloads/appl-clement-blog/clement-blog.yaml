@@ -106,6 +106,8 @@ spec:
       app: clement-blog
   template:
     metadata:
+      annotations:
+        restart: "v1"
       labels:
         app: clement-blog
     spec:
@@ -233,3 +235,4 @@ spec:
                 name: clement-blog
                 port:
                   name: http
+
