@@ -28,6 +28,11 @@ data:
         listen       8080;
         server_name  _;
 
+        # nginx serves behind Traefik on port 443; don't inject its own
+        # listen port (8080) into auto-generated trailing-slash redirects.
+        port_in_redirect off;
+        absolute_redirect off;
+
         root   /usr/share/nginx/html;
         index  index.html;
 
