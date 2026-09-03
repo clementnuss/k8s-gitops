@@ -1,0 +1,14 @@
+---
+apiVersion: v1alpha1
+kind: KubeNetworkConfig
+podSubnets:
+    - 172.16.0.0/16
+    - 2001:1620:5386:beef:0::/96
+serviceSubnets:
+    - 172.30.0.0/16
+    - fc00:cafe:beef:ffff::/112
+nodeCIDRMaskSizeIPv6: 112
+---
+apiVersion: v1alpha1
+kind: KubeFlannelCNIConfig
+$patch: delete

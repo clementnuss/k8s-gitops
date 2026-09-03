@@ -1,8 +1,9 @@
 ---
-machine:
-  network:
-    interfaces:
-      - interface: eno1
-        dhcp: true
-        vip:
-          ip: 192.168.63.80
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: eno1
+---
+apiVersion: v1alpha1
+kind: Layer2VIPConfig
+name: 192.168.63.80
+link: eno1

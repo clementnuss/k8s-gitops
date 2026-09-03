@@ -1,13 +1,18 @@
 ---
-machine:
-  systemDiskEncryption:
-    ephemeral:
-      provider: luks2
-      keys:
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+encryption:
+    provider: luks2
+    keys:
         - nodeID: {}
           slot: 0
-    state:
-      provider: luks2
-      keys:
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: STATE
+encryption:
+    provider: luks2
+    keys:
         - nodeID: {}
           slot: 0

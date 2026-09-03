@@ -1,0 +1,6 @@
+---
+apiVersion: v1alpha1
+kind: ResolverConfig
+hostDNS:
+    enabled: false
+    forwardKubeDNSToHost: false
