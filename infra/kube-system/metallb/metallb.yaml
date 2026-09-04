@@ -19,6 +19,8 @@ spec:
   values:
     prometheus:
       scrapeAnnotations: true
+    frrk8s:
+      enabled: false
     speaker:
       ignoreExcludeLB: true
 
