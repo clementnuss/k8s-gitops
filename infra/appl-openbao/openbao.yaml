@@ -52,7 +52,7 @@ spec:
 
       image:
         repository: openbao/openbao
-        tag: "2.6.2"
+        tag: "2.6.3"
 
       logFormat: json
       logLevel: info
