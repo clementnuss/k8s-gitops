@@ -35,7 +35,7 @@ spec:
         containers:
           hbbs:
             image:
-              repository: rustdesk/rustdesk-server
+              repository: rustdesk/rustdesk-server-pro
               tag: "latest"
             args:
               - hbbs
@@ -66,7 +66,7 @@ spec:
                   periodSeconds: 5
           hbbr:
             image:
-              repository: rustdesk/rustdesk-server
+              repository: rustdesk/rustdesk-server-pro
               tag: "latest"
             args:
               - hbbr
@@ -106,6 +106,11 @@ spec:
           - IPv4
           - IPv6
         ports:
+          # Pro: API + web console (proxied via Traefik ingress, not LB)
+          api:
+            enabled: true
+            port: 21114
+            targetPort: 21114
           nat-test:
             enabled: true
             port: 21115
@@ -132,6 +137,24 @@ spec:
             enabled: true
             port: 21119
             targetPort: 21119
+
+    # Pro web console + API — plain HTTP inside the cluster, TLS terminated
+    # by Traefik at rustdesk.n8r.ch (443 already DNATed on the router).
+    ingress:
+      main:
+        enabled: true
+        className: traefik
+        hosts:
+          - host: rustdesk.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: api
+        tls:
+          - hosts:
+              - rustdesk.n8r.ch
 
     persistence:
       data:
