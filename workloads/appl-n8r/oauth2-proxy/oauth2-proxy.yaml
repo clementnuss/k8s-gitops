@@ -67,12 +67,6 @@ spec:
               - name
               - given_name
               - family_name
-            # prompt=none moved here from extraArgs (prompt is a removed
-            # option in alpha config).
-            loginURLParameters:
-              - name: prompt
-                default:
-                  - none
 
         # Upstream — moved from configFile (upstreams = [ "file:///dev/null" ]).
         # In alpha config, upstreams are structured.
