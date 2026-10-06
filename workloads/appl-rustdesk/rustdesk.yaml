@@ -105,6 +105,9 @@ spec:
         ipFamilies:
           - IPv4
           - IPv6
+        # Preserve client source IPs: no second-hop SNAT by Cilium.
+        # Safe with MetalLB L2 (announced only on the endpoint node).
+        externalTrafficPolicy: Local
         ports:
           # Pro: API + web console (proxied via Traefik ingress, not LB)
           api:
