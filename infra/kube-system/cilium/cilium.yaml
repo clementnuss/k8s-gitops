@@ -32,6 +32,23 @@ spec:
     tolerations:
       - operator: Exists
 
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-restriction.kubernetes.io/edge
+                  operator: DoesNotExist
+
+    operator:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-restriction.kubernetes.io/edge
+                    operator: DoesNotExist
+
     enableIPv6Masquerade: true
     routingMode: native
     ipv6NativeRoutingCIDR: 2001:1620:5386:beef:0::/104
