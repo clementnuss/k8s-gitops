@@ -27,3 +27,10 @@ spec:
           memory: 128Mi
         limits:
           memory: 512Mi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-restriction.kubernetes.io/edge
+                  operator: DoesNotExist
