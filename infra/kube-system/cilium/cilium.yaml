@@ -37,7 +37,7 @@ spec:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
             - matchExpressions:
-                - key: node-restriction.kubernetes.io/edge
+                - key: n8r.ch/edge
                   operator: DoesNotExist
 
     operator:
@@ -46,7 +46,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: node-restriction.kubernetes.io/edge
+                  - key: n8r.ch/edge
                     operator: DoesNotExist
 
     enableIPv6Masquerade: true
