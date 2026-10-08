@@ -49,6 +49,15 @@ spec:
                   - key: n8r.ch/edge
                     operator: DoesNotExist
 
+    envoy:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: n8r.ch/edge
+                    operator: DoesNotExist
+
     enableIPv6Masquerade: true
     routingMode: native
     ipv6NativeRoutingCIDR: 2001:1620:5386:beef:0::/104
