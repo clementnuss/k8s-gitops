@@ -1,0 +1,125 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rustdesk-nginx
+  namespace: appl-rustdesk
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 5.2.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      rustdesk-nginx:
+        type: statefulset
+        pod:
+          hostNetwork: true
+          dnsPolicy: Default
+          nodeSelector:
+            kubernetes.io/hostname: edge-oci-relay
+          tolerations:
+            - operator: Exists
+        containers:
+          nginx:
+            image:
+              repository: nginx
+              tag: "1.29-alpine"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                memory: 64Mi
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 443
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 443
+                  initialDelaySeconds: 3
+                  periodSeconds: 5
+
+    configMaps:
+      config:
+        enabled: true
+        data:
+          default.conf: |
+            server {
+                listen 443 ssl;
+                listen [::]:443 ssl;
+                server_name rustdesk.n8r.ch;
+
+                ssl_certificate /etc/nginx/tls/tls.crt;
+                ssl_certificate_key /etc/nginx/tls/tls.key;
+
+                location / {
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_pass http://127.0.0.1:21114/;
+                }
+
+                location /ws/id {
+                    proxy_pass http://127.0.0.1:21118;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade $http_upgrade;
+                    proxy_set_header Connection "Upgrade";
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_read_timeout 120s;
+                }
+
+                location /ws/relay {
+                    proxy_pass http://127.0.0.1:21119;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade $http_upgrade;
+                    proxy_set_header Connection "Upgrade";
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_read_timeout 120s;
+                }
+            }
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: rustdesk-nginx # app-template: <release>-<identifier>
+        globalMounts:
+          - path: /etc/nginx/conf.d
+      tls:
+        enabled: true
+        type: secret
+        name: rustdesk-tls
+        globalMounts:
+          - path: /etc/nginx/tls

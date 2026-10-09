@@ -31,7 +31,20 @@ spec:
   values:
     controllers:
       rustdesk:
-        strategy: Recreate
+        # StatefulSet: stable pod name (rustdesk-0) — handy for a single
+        # hostNetwork edge workload.
+        type: statefulset
+        pod:
+          # Edge node (OCI VPS, no CNI): hostNetwork only, ports bind
+          # directly on the public IPs.
+          hostNetwork: true
+          # ClusterFirst points at ClusterIP CoreDNS, unreachable without
+          # CNI — use the node's resolver instead.
+          dnsPolicy: Default
+          nodeSelector:
+            kubernetes.io/hostname: edge-oci-relay
+          tolerations:
+            - operator: Exists # tolerates all edge-node taints (n8r.ch/edge, not-ready, cilium-agent-not-ready)
         containers:
           hbbs:
             image:
@@ -94,82 +107,12 @@ spec:
                   initialDelaySeconds: 3
                   periodSeconds: 5
 
-    service:
-      main:
-        type: LoadBalancer
-        controller: rustdesk
-        annotations:
-          # IPv6 = 21116 in hex (0x527C) — rustdesk's rendezvous port, self-documenting
-          metallb.io/loadBalancerIPs: 192.168.63.237, 2001:1620:5386:cafe::527c
-        ipFamilyPolicy: RequireDualStack
-        ipFamilies:
-          - IPv4
-          - IPv6
-        # Preserve client source IPs: no second-hop SNAT by Cilium.
-        # Safe with MetalLB L2 (announced only on the endpoint node).
-        externalTrafficPolicy: Local
-        ports:
-          # Pro: API + web console (proxied via Traefik ingress, not LB)
-          api:
-            enabled: true
-            port: 21114
-            targetPort: 21114
-          nat-test:
-            enabled: true
-            port: 21115
-            targetPort: 21115
-          id-registration:
-            enabled: true
-            port: 21116
-            targetPort: 21116
-          id-registration-udp:
-            enabled: true
-            port: 21116
-            protocol: UDP
-            targetPort: 21116
-          relay:
-            enabled: true
-            port: 21117
-            targetPort: 21117
-          # hbbs listens on 21118 and hbbr on 21119 for the web clients
-          websocket-hbbs:
-            enabled: true
-            port: 21118
-            targetPort: 21118
-          websocket-hbbr:
-            enabled: true
-            port: 21119
-            targetPort: 21119
-
-    # Pro web console + API — plain HTTP inside the cluster, TLS terminated
-    # by Traefik at rustdesk.n8r.ch (443 already DNATed on the router).
-    ingress:
-      main:
-        enabled: true
-        className: traefik
-        hosts:
-          - host: rustdesk.n8r.ch
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: main
-                  port: api
-        tls:
-          - hosts:
-              - rustdesk.n8r.ch
-
     persistence:
       data:
         enabled: true
-        type: persistentVolumeClaim
-        size: 1Gi
-        accessMode: ReadWriteOnce
-        retain: true # helm.sh/resource-policy: keep — PVC survives helm uninstall
+        type: hostPath
+        hostPath: /var/data/rustdesk
         # /root holds the hbbs keypair (id_ed25519) and db_v2.sqlite3
-        # (registered peer IDs + tags) — genuinely stateful.
+        # (registered peer IDs + tags).
         globalMounts:
           - path: /root
-
-    podAnnotations:
-      backup.velero.io/backup-volumes: data

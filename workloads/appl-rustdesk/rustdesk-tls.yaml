@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: rustdesk-tls
+  namespace: appl-rustdesk
+spec:
+  secretName: rustdesk-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - rustdesk.n8r.ch
