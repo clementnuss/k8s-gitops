@@ -1,0 +1,11 @@
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+taints:
+    n8r.ch/edge: "true:NoSchedule"
+labels:
+    n8r.ch/edge: ""
+nodeIP:
+    validSubnets:
+        # GUA preferred: the VCN-internal IPv4 is unreachable from home
+        - 2603:c022:9:9200::/64
