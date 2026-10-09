@@ -1,0 +1,86 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: wireguard-relay-config
+  namespace: wireguard-relay
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: wireguard-relay-config
+    creationPolicy: Owner
+    template:
+      type: Opaque
+  data:
+    - secretKey: wg0.conf
+      remoteRef:
+        key: iac/tunnels/edge-oci-relay/interface
+        property: wg0_conf
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard-relay
+  namespace: wireguard-relay
+  labels:
+    app: wireguard-relay
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wireguard-relay
+  template:
+    metadata:
+      labels:
+        app: wireguard-relay
+    spec:
+      hostNetwork: true
+      dnsPolicy: Default
+      nodeSelector:
+        kubernetes.io/hostname: edge-oci-relay
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: wireguard
+          image: alpine:3.22
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              apk add --no-cache wireguard-tools >/dev/null
+              wg-quick down /etc/wireguard/wg0.conf 2>/dev/null || true
+              trap 'wg-quick down /etc/wireguard/wg0.conf 2>/dev/null || true' TERM INT
+              wg-quick up /etc/wireguard/wg0.conf
+              echo "wg0 up"
+              while :; do sleep 3600; done
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/wireguard
+              readOnly: true
+          livenessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "wg show wg0"]
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            failureThreshold: 3
+      volumes:
+        - name: config
+          secret:
+            secretName: wireguard-relay-config
+            items:
+              - key: wg0.conf
+                path: wg0.conf
+            defaultMode: 0600
