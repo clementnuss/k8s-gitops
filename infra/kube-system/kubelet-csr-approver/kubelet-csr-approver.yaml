@@ -16,6 +16,6 @@ spec:
         namespace: flux-system
       interval: 5m
   values:
-    providerRegex: '^talos-node-\d*$'
+    providerRegex: '^(talos-node-\d*|edge-oci-relay)$'
     bypassDnsResolution: true
     skipDenyStep: true
