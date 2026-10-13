@@ -62,7 +62,7 @@ spec:
           app:
             image:
               repository: seafileltd/seafile-pro-mc
-              tag: 13.0-latest
+              tag: 14.0-latest
               pullPolicy: Always
             env:
               TZ: "Europe/Zurich"
