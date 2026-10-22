@@ -1,0 +1,178 @@
+# kopiur: immich — per-app repo, folder-level NFS sources, NAS replication.
+#
+# Repo layout: primary on Backblaze S3 (cloud-first), replicated to syno-coeuve
+# (WebDAV). 3-2-1: live data on nuss-roy NFS / backup in the cloud / mirror on
+# the offsite NAS.
+#
+# Sources: the read-only cached NFS PVC (immich-library-backup) — the same
+# mount the legacy cronjob used; the snapshot root covers the whole export
+# (backups/, library/, upload/ as subdirectories).
+#
+# Root mover: the export's files are root-owned (immich server runs as root);
+# the NFS server denies reads to any other uid, so moverDefaults pin uid 0 and
+# the namespace carries the kopiur privileged-movers annotation.
+#
+# Secrets (OpenBao -> ExternalSecret):
+#   kopiur-repo-password    - k8s/appl-kopiur/kopia: KOPIA_PASSWORD (shared across all kopiur repos)
+#   kopiur-backblaze-s3     - primary backend creds (remap KOPIA_S3_* -> AWS_*)
+#   kopiur-webdav-coeuve    - replication destination creds (remap USER/PASS -> USERNAME/PASSWORD)
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kopiur-repo-password
+  namespace: appl-n8r
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: kopiur-repo-password
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: k8s/appl-kopiur/kopia
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kopiur-webdav-coeuve
+  namespace: appl-n8r
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: kopiur-webdav-coeuve
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        KOPIA_WEBDAV_USERNAME: "{{ .KOPIA_WEBDAV_USER }}"
+        KOPIA_WEBDAV_PASSWORD: "{{ .KOPIA_WEBDAV_PASS }}"
+  dataFrom:
+    - extract:
+        key: k8s/appl-kopia-repl/webdav-syno-coeuve
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kopiur-backblaze-s3
+  namespace: appl-n8r
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: kopiur-backblaze-s3
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        AWS_ACCESS_KEY_ID: "{{ .KOPIA_S3_ACCESS_KEY }}"
+        AWS_SECRET_ACCESS_KEY: "{{ .KOPIA_S3_SECRET_KEY }}"
+  dataFrom:
+    - extract:
+        key: k8s/appl-kopia-repl/backblaze-s3
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: Repository
+metadata:
+  name: immich-backup
+  namespace: appl-n8r
+spec:
+  backend:
+    s3:
+      # <S3_BASE=bucket>/kopiur/<app> — primary in the cloud, replicated to coeuve
+      bucket: kopia-planchettes
+      prefix: kopiur/immich/
+      endpoint: s3.eu-central-003.backblazeb2.com
+      region: eu-central-003
+      auth:
+        secretRef:
+          name: kopiur-backblaze-s3
+  encryption:
+    passwordSecretRef:
+      name: kopiur-repo-password
+      key: KOPIA_PASSWORD
+  create:
+    enabled: true
+  maintenance:
+    enabled: true
+  moverDefaults:
+    # the export's files are root-owned (immich server runs as root); the
+    # legacy kopia pod ran as root too — same reach, declared here
+    securityContext:
+      runAsUser: 0
+      runAsNonRoot: false
+    cache:
+      capacity: 1Gi
+      storageClassName: longhorn-2-replicas
+      mode: Persistent
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 4Gi
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: immich-backup
+  namespace: appl-n8r
+spec:
+  repository:
+    name: immich-backup
+  # uid-0 mover with drop:[ALL] obeys mode bits; DAC_OVERRIDE restores exactly
+  # the reach the legacy kopia pod (root, default caps) always had — both for
+  # root-owned files on the NFS export and the fsGroup-normalized cache volume.
+  mover:
+    privilegedMode: true
+  # NFS PV: no CSI snapshot support -> direct ro mount of the cached export
+  # (same mount the legacy cronjob used; see immich-library-backup-pvc.yaml)
+  copyMethod: Direct
+  sources:
+    - pvc:
+        name: immich-library-backup
+  retention:
+    keepDaily: 14
+    keepWeekly: 8
+    keepMonthly: 12
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: immich-backup-nightly
+  namespace: appl-n8r
+spec:
+  policyRef:
+    name: immich-backup
+  schedule:
+    cron: "H 3 * * *"
+    jitter: 1h
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: RepositoryReplication
+metadata:
+  name: immich-backup-to-coeuve
+  namespace: appl-n8r
+spec:
+  sourceRef:
+    kind: Repository
+    name: immich-backup
+  destination:
+    webDav:
+      # <WEBDAV_BASE>/kopiur/<app>
+      url: https://syno-coeuve.n8r.ch:5006/backup/kopiur/immich
+      auth:
+        secretRef:
+          name: kopiur-webdav-coeuve
+  schedule:
+    cron: "0 6 * * *"
+    jitter: 1h
+  sync:
+    parallel: 8

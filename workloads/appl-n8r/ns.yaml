@@ -3,6 +3,9 @@ kind: Namespace
 metadata:
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
+    # kopiur: allow root movers — the immich NFS export is only readable by
+    # uid 0 (immich server runs as root)
+    kopiur.home-operations.com/privileged-movers: "true"
   labels:
     pod-security.kubernetes.io/enforce: privileged
   name: appl-n8r
