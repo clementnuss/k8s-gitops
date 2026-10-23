@@ -1,12 +1,7 @@
-# kopia-main: shared ClusterRepository for the long tail of longhorn PVCs.
-#
-# One kopia repo on syno-nuss-roy, replicated to syno-coeuve. Any namespace may
-# reference it (allowedNamespaces: all); which PVCs actually get backed up is
-# decided ONLY by the PVC label kopiur.n8r.ch/backup=true plus a per-namespace
-# SnapshotPolicy (kopiur refuses cross-namespace pvcSelectors — a mover can
-# only mount PVCs in its own namespace).
-#
-# Bespoke backups (immich NFS, DBs) keep their own per-app repos/policies.
+# kopia-main: one shared ClusterRepository for all namespaces. Which PVCs get
+# backed up is decided per-namespace by label (opt-out via
+# velero.io/exclude-from-backups). Immich keeps its own per-app repo (bespoke
+# NFS/root policy) — do not fold it in here.
 ---
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
