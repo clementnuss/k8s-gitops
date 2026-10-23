@@ -28,8 +28,8 @@ spec:
             - key: velero.io/exclude-from-backups
               operator: DoesNotExist
             - key: app.kubernetes.io/managed-by
-              value: kopiur
-              operator: DoesNotExist
+              operator: NotIn
+              values: [kopiur]
   retention:
     keepDaily: 14
     keepWeekly: 4
