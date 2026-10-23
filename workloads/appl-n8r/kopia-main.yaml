@@ -14,6 +14,13 @@ spec:
   # project repo credential secrets into mover jobs (no per-ns secrets needed)
   credentialProjection:
     enabled: true
+  # movers run as root + DAC_OVERRIDE: fleet PVCs have heterogeneous owners
+  # (homeassistant .storage is 0600 root); non-root mover can't read them
+  mover:
+    securityContext:
+      runAsUser: 0
+      runAsNonRoot: false
+    privilegedMode: true
   sources:
     - pvcSelector:
         labelSelector:
@@ -21,6 +28,7 @@ spec:
             - key: velero.io/exclude-from-backups
               operator: DoesNotExist
             - key: app.kubernetes.io/managed-by
+              value: kopiur
               operator: DoesNotExist
   retention:
     keepDaily: 14
