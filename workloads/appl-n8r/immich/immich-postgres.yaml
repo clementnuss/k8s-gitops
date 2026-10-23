@@ -5,6 +5,12 @@ metadata:
   name: immich-postgres
   namespace: appl-n8r
 spec:
+  # labels inherited by all generated resources (incl. the PVC):
+  # PGDATA is 0700 postgres-owned — excluded from the kopiur fleet
+  # policy (kopia-main). DBs get bespoke/stream backups instead.
+  inheritedMetadata:
+    labels:
+      velero.io/exclude-from-backups: "true"
   instances: 1
   imageName: ghcr.io/tensorchord/cloudnative-vectorchord:18.3-1.1.1
   enableSuperuserAccess: true

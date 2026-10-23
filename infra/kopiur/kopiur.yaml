@@ -25,5 +25,10 @@ spec:
     remediation:
       retries: 3
   # defaults are sane: replicaCount 1, leader election on, no mem limit on the
-  # controller by design (startup reconcile burst OOMs under a low ceiling)
-  values: {}
+  # controller by design (startup reconcile burst OOMs under a low ceiling).
+  # credentialProjection: operator copies the ClusterRepository's credential
+  # secrets into each mover namespace per-run (GC'd after) — no per-tenant ES.
+  values:
+    features:
+      credentialProjection:
+        enabled: true

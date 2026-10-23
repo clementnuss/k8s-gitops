@@ -1,0 +1,43 @@
+# kopiur kopia-main fleet backup for this namespace: every PVC is
+# snapshotted (CSI-staged) into the shared kopia-main ClusterRepository
+# (syno-nuss-roy, replicated to coeuve) EXCEPT those labeled
+# velero.io/exclude-from-backups=true. Opt-out semantics — new PVCs are
+# backed up by default; label problem volumes to exclude them
+# (NFS-backed, 0700-root/postgres-owned, caches).
+#
+# No secrets needed here: the operator projects the repository's
+# credential secrets into mover jobs per-run (credentialProjection).
+#
+# To onboard another namespace: copy this whole file, change the two
+# namespaces.
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: kopia-main
+  namespace: appl-n8r
+spec:
+  repository:
+    kind: ClusterRepository
+    name: kopia-main
+  sources:
+    - pvcSelector:
+        labelSelector:
+          matchExpressions:
+            - key: velero.io/exclude-from-backups
+              operator: DoesNotExist
+  retention:
+    keepDaily: 14
+    keepWeekly: 4
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: kopia-main-nightly
+  namespace: appl-n8r
+spec:
+  policyRef:
+    name: kopia-main
+  schedule:
+    cron: "H 2 * * *"
+    jitter: 30m

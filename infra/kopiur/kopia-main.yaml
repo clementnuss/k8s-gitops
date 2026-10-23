@@ -1,0 +1,121 @@
+# kopia-main: shared ClusterRepository for the long tail of longhorn PVCs.
+#
+# One kopia repo on syno-nuss-roy, replicated to syno-coeuve. Any namespace may
+# reference it (allowedNamespaces: all); which PVCs actually get backed up is
+# decided ONLY by the PVC label kopiur.n8r.ch/backup=true plus a per-namespace
+# SnapshotPolicy (kopiur refuses cross-namespace pvcSelectors — a mover can
+# only mount PVCs in its own namespace).
+#
+# Bespoke backups (immich NFS, DBs) keep their own per-app repos/policies.
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kopiur-webdav-nuss-roy
+  namespace: appl-kopiur
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: kopiur-webdav-nuss-roy
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        KOPIA_WEBDAV_USERNAME: "{{ .KOPIA_WEBDAV_USER }}"
+        KOPIA_WEBDAV_PASSWORD: "{{ .KOPIA_WEBDAV_PASS }}"
+  dataFrom:
+    - extract:
+        key: k8s/appl-kopia-repl/webdav-syno-nuss-roy
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kopiur-webdav-coeuve
+  namespace: appl-kopiur
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: kopiur-webdav-coeuve
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        KOPIA_WEBDAV_USERNAME: "{{ .KOPIA_WEBDAV_USER }}"
+        KOPIA_WEBDAV_PASSWORD: "{{ .KOPIA_WEBDAV_PASS }}"
+  dataFrom:
+    - extract:
+        key: k8s/appl-kopia-repl/webdav-syno-coeuve
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kopiur-repo-password
+  namespace: appl-kopiur
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: kopiur-repo-password
+    creationPolicy: Owner
+  dataFrom:
+    # shared repo password for all kopiur repos
+    - extract:
+        key: k8s/appl-kopiur/kopia
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: ClusterRepository
+metadata:
+  name: kopia-main
+spec:
+  backend:
+    webDav:
+      url: https://syno-nuss-roy.n8r.ch:5006/backup/kopiur/kopia-main
+      auth:
+        secretRef:
+          name: kopiur-webdav-nuss-roy
+          namespace: appl-kopiur
+  encryption:
+    passwordSecretRef:
+      # shared repo password: k8s/appl-kopiur/kopia -> KOPIA_PASSWORD
+      name: kopiur-repo-password
+      namespace: appl-kopiur
+      key: KOPIA_PASSWORD
+  create:
+    enabled: true
+  allowedNamespaces:
+    all: true
+  # project the repo's credential secrets (webdav + password) into each
+  # mover namespace for the run — consumers need no secrets of their own
+  credentialProjection:
+    allowed: true
+  maintenance:
+    enabled: true
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: RepositoryReplication
+metadata:
+  name: kopia-main-to-coeuve
+  namespace: appl-kopiur
+spec:
+  sourceRef:
+    kind: ClusterRepository
+    name: kopia-main
+  destination:
+    webDav:
+      url: https://syno-coeuve.n8r.ch:5006/backup/kopiur/kopia-main
+      auth:
+        secretRef:
+          name: kopiur-webdav-coeuve
+  schedule:
+    cron: "0 5 * * *"
+    jitter: 1h
+  sync:
+    parallel: 8
