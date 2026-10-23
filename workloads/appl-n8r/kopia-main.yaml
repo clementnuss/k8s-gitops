@@ -21,6 +21,8 @@ spec:
       runAsUser: 0
       runAsNonRoot: false
     privilegedMode: true
+  # longhorn has no VolumeGroupSnapshotClass — capture PVCs independently
+  groupBy: None
   sources:
     - pvcSelector:
         labelSelector:
@@ -28,8 +30,8 @@ spec:
             - key: velero.io/exclude-from-backups
               operator: DoesNotExist
             - key: app.kubernetes.io/managed-by
-              value: kopiur
-              operator: DoesNotExist
+              operator: NotIn
+              values: [kopiur]
   retention:
     keepDaily: 14
     keepWeekly: 4
