@@ -87,6 +87,13 @@ spec:
     enabled: true
   allowedNamespaces:
     all: true
+  # UI on demand: uncomment, port-forward svc/kopia-main-kopia-ui 51515:51515,
+  # creds in secret kopia-main-kopia-ui-auth
+  # server:
+  #   namespace: appl-kopiur
+  #   readOnly: true
+  #   auth:
+  #     generate: {}
   # project the repo's credential secrets (webdav + password) into each
   # mover namespace for the run — consumers need no secrets of their own
   credentialProjection:

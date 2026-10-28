@@ -102,6 +102,12 @@ spec:
     enabled: true
   maintenance:
     enabled: true
+  # UI on demand: uncomment, k port-forward svc/immich-backup-kopia-ui 51515:51515,
+  # creds in secret immich-backup-kopia-ui-auth
+  server:
+    readOnly: false
+    auth:
+      generate: {}
   moverDefaults:
     # the export's files are root-owned (immich server runs as root); the
     # legacy kopia pod ran as root too — same reach, declared here
@@ -109,7 +115,9 @@ spec:
       runAsUser: 0
       runAsNonRoot: false
     cache:
-      capacity: 1Gi
+      # full maintenance on a ~100GiB repo needs several GiB of scratch
+      # (index compaction, logs) — 1Gi filled up
+      capacity: 5Gi
       storageClassName: longhorn-2-replicas
       mode: Persistent
     resources:
@@ -138,6 +146,19 @@ spec:
   sources:
     - pvc:
         name: immich-library-backup
+  # explicit ignoreRules REPLACE the operator's default set — re-added below.
+  # thumbs/ and encoded-video/ are regeneratable via immich jobs; originals +
+  # DB are what matters (docs.immich.app backup-and-restore), and they'd bloat
+  # the 40Mbit/s coeuve replication for nothing.
+  files:
+    ignoreRules:
+      - "/lost+found"
+      - "System Volume Information"
+      - "$RECYCLE.BIN"
+      - "@eaDir"
+      - ".snapshot"
+      - "/thumbs"
+      - "/encoded-video"
   retention:
     keepDaily: 14
     keepWeekly: 8
