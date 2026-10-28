@@ -1,0 +1,25 @@
+---
+# Composes DATABASE_URL for Open WebUI from the shared OpenBao secret
+# k8s/appl-llm/openwebui-db. The same secret also backs the CNPG managed
+# role password (see appl-postgres/cloudnative-pg/openwebui-db-secret.yaml
+# and the `openwebui` role in cluster.yaml).
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: openwebui-db-url
+  namespace: appl-llm
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: openbao
+    kind: ClusterSecretStore
+  target:
+    name: openwebui-db-url
+    creationPolicy: Owner
+    template:
+      data:
+        DATABASE_URL: "postgresql://{{ .username }}:{{ .password }}@postgres-cnpg-rw.appl-postgres.svc.cluster.local:5432/openwebui"
+  dataFrom:
+    # Expected keys: username, password
+    - extract:
+        key: k8s/appl-llm/openwebui-db

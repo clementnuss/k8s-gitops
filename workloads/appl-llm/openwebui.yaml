@@ -1,0 +1,126 @@
+---
+# Open WebUI at llm.n8r.ch — multi-user chat UI with native OIDC
+# against Pocket ID (id.n8r.ch), backed by Ollama Cloud (glm-5.3).
+#
+# Requires a Pocket ID OIDC client with redirect URI:
+#   https://llm.n8r.ch/oauth/oidc/callback
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openwebui
+  namespace: appl-llm
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 5.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      openwebui:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/open-webui/open-webui
+              tag: v0.12.4
+              pullPolicy: IfNotPresent
+            env:
+              # Public URL (used to build OAuth redirects correctly).
+              WEBUI_URL: "https://llm.n8r.ch"
+              # Native OIDC via Pocket ID. Client ID is public; the client
+              # secret, session key and Ollama Cloud key come from
+              # openwebui-secret via envFrom below.
+              ENABLE_OAUTH_SIGNUP: "true"   # create accounts on first OIDC login
+              ENABLE_SIGNUP: "false"        # no self-serve local accounts
+              OAUTH_PROVIDER_NAME: "Pocket ID"
+              OPENID_PROVIDER_URL: "https://id.n8r.ch/.well-known/openid-configuration"
+              OAUTH_SCOPES: "openid email profile"
+              OAUTH_TOKEN_ENDPOINT_AUTH_METHOD: "client_secret_basic"
+              # Default OpenAI-compatible connection = Ollama Cloud
+              # (glm-5.3 etc.). API key comes from openwebui-secret.
+              OPENAI_API_BASE_URL: "https://ollama.com/v1"
+              # Users connect through an ingress proxy.
+              FORWARDED_ALLOW_IPS: "*"
+            envFrom:
+              # OAUTH_CLIENT_SECRET, WEBUI_SECRET_KEY, OLLAMA_API_KEY
+              - secretRef:
+                  name: openwebui-secret
+              # DATABASE_URL (composed from the CNPG openwebui role creds)
+              - secretRef:
+                  name: openwebui-db-url
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: http
+                  initialDelaySeconds: 30
+              readiness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: http
+                  initialDelaySeconds: 10
+
+    service:
+      main:
+        type: ClusterIP
+        controller: openwebui
+        ports:
+          http:
+            port: 8080
+
+    ingress:
+      main:
+        enabled: true
+        className: traefik
+        hosts:
+          - host: llm.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - llm.n8r.ch
+
+    persistence:
+      data:
+        # App data not kept in Postgres (uploads, KB files, caches).
+        enabled: true
+        type: persistentVolumeClaim
+        size: 5Gi
+        accessMode: ReadWriteOnce
+        globalMounts:
+          - path: /app/backend/data
+
+    podAnnotations:
+      backup.velero.io/backup-volumes: data

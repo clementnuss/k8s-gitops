@@ -31,6 +31,12 @@ spec:
       inherit: true
       passwordSecret:
         name: goatcounter-db-secret
+    - name: openwebui
+      ensure: present
+      login: true
+      inherit: true
+      passwordSecret:
+        name: openwebui-db-secret
 
   bootstrap:
     initdb:
