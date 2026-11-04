@@ -19,7 +19,6 @@ nodes:
   - host: edge-oci-relay
     ip: 2603:c022:9:9200:0:310a:bf46:7935
     role: worker
-    data:
-      talosPlatform: oracle
+    platform: oracle
 data:
   nutClientPassword: ref+openbao://secret/iac/talos/config?#/nut-password
