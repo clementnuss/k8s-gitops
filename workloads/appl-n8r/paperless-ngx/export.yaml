@@ -46,7 +46,7 @@ spec:
                   topologyKey: kubernetes.io/hostname
           containers:
             - name: document-exporter
-              image: alpine/k8s:1.37.1
+              image: alpine/k8s:1.37.2
               command:
                 - /bin/sh
                 - -c
