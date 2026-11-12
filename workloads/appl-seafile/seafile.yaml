@@ -81,6 +81,8 @@ spec:
               SEAFILE_MYSQL_DB_CCNET_DB_NAME: "seafile_ccnet_db"
               SEAFILE_MYSQL_DB_SEAFILE_DB_NAME: "seafile_db"
               SEAFILE_MYSQL_DB_SEAHUB_DB_NAME: "seafile_seahub_db"
+              ENABLE_SEARCH: "true"
+              SEARCH_ENGINE: seasearch
             envFrom:
               - secretRef:
                   name: seafile-secret
