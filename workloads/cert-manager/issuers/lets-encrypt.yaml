@@ -51,4 +51,4 @@ spec:
   - '*.astutus.org'
   - n8r.ch
   - '*.n8r.ch'
-  # - '*.'
+  - '*.bandito.n8r.ch'
