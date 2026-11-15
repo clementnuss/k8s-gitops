@@ -23,6 +23,19 @@ spec:
         cpu: 200m
       limits:
         memory: "1Gi"
+    # Idle sidecar for manual vmbackup/vmrestore tests; backups go to /vm-data/backups on the same PVC.
+    containers:
+      - name: vmbackup
+        image: victoriametrics/vmbackup:v1.155.0
+        command: ["/bin/sh", "-c", "sleep infinity"]
+        volumeMounts:
+          - name: vmstorage-db
+            mountPath: /vm-data
+        resources:
+          requests:
+            cpu: 10m
+          limits:
+            memory: "256Mi"
 
   vmselect:
     # image:
