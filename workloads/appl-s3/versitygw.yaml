@@ -1,0 +1,124 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: versitygw
+  namespace: appl-s3
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 5.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      versitygw:
+        # object-lock-mode=local only serialises writes within one process
+        strategy: Recreate
+        initContainers:
+          mkdirs:
+            image:
+              repository: versity/versitygw
+              tag: v1.11.0
+            command: ["sh", "-c", "mkdir -p /srv/data /srv/meta"]
+        containers:
+          app:
+            image:
+              repository: versity/versitygw
+              tag: v1.11.0
+            args:
+              - --port=:7070
+              - --health=/health
+              - --virtual-domain=s3.n8r.ch
+              - posix
+              # NFSv3 has no xattrs: keep object metadata in a sidecar tree
+              - --sidecar=/srv/meta
+              # copy_file_range can hang on some NFS servers
+              - --disable-copy-file-range
+              # avoid flock over NFSv3 (NLM)
+              - --object-lock-mode=local
+              - /srv/data
+            envFrom:
+              - secretRef:
+                  name: versitygw-secret
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                memory: 512Mi
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 7070
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 7070
+                  periodSeconds: 10
+
+    service:
+      main:
+        type: ClusterIP
+        controller: versitygw
+        ports:
+          http:
+            port: 7070
+
+    ingress:
+      main:
+        enabled: true
+        className: traefik
+        hosts:
+          - host: s3.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+          - host: "*.s3.n8r.ch"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - s3.n8r.ch
+              - "*.s3.n8r.ch"
+
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim
+        existingClaim: s3-data-nfs
+        globalMounts:
+          - path: /srv

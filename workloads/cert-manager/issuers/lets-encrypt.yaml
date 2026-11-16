@@ -52,3 +52,4 @@ spec:
   - n8r.ch
   - '*.n8r.ch'
   - '*.bandito.n8r.ch'
+  - '*.s3.n8r.ch'
