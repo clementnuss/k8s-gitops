@@ -27,7 +27,8 @@ spec:
     containers:
       - name: vmbackup
         image: victoriametrics/vmbackup:v1.156.0
-        command: ["/bin/sh", "-c", "sleep infinity"]
+        # PID 1 ignores SIGTERM without a handler; trap it so the pod stops immediately
+        command: ["/bin/sh", "-c", "trap 'exit 0' TERM; sleep infinity & wait"]
         envFrom:
           - secretRef:
               name: vmbackup-s3
