@@ -28,6 +28,15 @@ spec:
       - name: vmbackup
         image: victoriametrics/vmbackup:v1.156.0
         command: ["/bin/sh", "-c", "sleep infinity"]
+        envFrom:
+          - secretRef:
+              name: vmbackup-s3
+        env:
+          - name: AWS_REGION
+            value: us-east-1
+          # in-cluster: skips Traefik's 60s read timeout on big uploads
+          - name: S3_ENDPOINT
+            value: http://versitygw.appl-s3.svc:7070
         volumeMounts:
           - name: vmstorage-db
             mountPath: /vm-data
