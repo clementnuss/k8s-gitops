@@ -48,6 +48,8 @@ spec:
               - --port=:7070
               - --health=/health
               - --virtual-domain=s3.n8r.ch
+              # users.json from the versitygw-users ExternalSecret; re-read on change
+              - --iam-dir=/iam
               - posix
               # NFSv3 has no xattrs: keep object metadata in a sidecar tree
               - --sidecar=/srv/meta
@@ -122,3 +124,11 @@ spec:
         existingClaim: s3-data-nfs
         globalMounts:
           - path: /srv
+      iam:
+        enabled: true
+        type: secret
+        name: versitygw-users
+        # no subPath: kubelet must be able to swap the file on secret updates
+        globalMounts:
+          - path: /iam
+            readOnly: true
