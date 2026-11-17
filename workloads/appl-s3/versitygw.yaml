@@ -48,6 +48,10 @@ spec:
               - --port=:7070
               - --health=/health
               - --virtual-domain=s3.n8r.ch
+              # web UI at https://s3.n8r.ch/ui (shadows a path-style bucket named "ui")
+              - --webui-s3-prefix=/ui
+              # browser must call the public endpoint, not the auto-detected pod address
+              - --webui-gateways=https://s3.n8r.ch
               # users.json from the versitygw-users ExternalSecret; re-read on change
               - --iam-dir=/iam
               - posix
