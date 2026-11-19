@@ -59,7 +59,7 @@ spec:
           nginx:
             image:
               repository: nginx
-              tag: alpine
+              tag: 1.31.9-alpine
             resources:
               requests:
                 cpu: 50m
