@@ -28,9 +28,11 @@ spec:
     timeout: 10m
   upgrade:
     cleanupOnFail: true
+    # No rollback: the new version migrates the DB on start and the old one
+    # can't run against it. Image is ~1.6 GB, so pulls can be slow.
     remediation:
-      retries: 3
-    timeout: 10m
+      retries: 0
+    timeout: 30m
   uninstall:
     keepHistory: false
   values:
@@ -73,6 +75,16 @@ spec:
               limits:
                 memory: 1Gi
             probes:
+              # Migrations run before the server listens; give them 10 min.
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8080
+                  periodSeconds: 10
+                  failureThreshold: 60
               liveness:
                 enabled: true
                 spec:
