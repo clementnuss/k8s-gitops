@@ -47,9 +47,9 @@ spec:
             env:
               # Public URL (used to build OAuth redirects correctly).
               WEBUI_URL: "https://llm.n8r.ch"
-              # Native OIDC via Pocket ID. Client ID is public; the client
-              # secret, session key and Ollama Cloud key come from
-              # openwebui-secret via envFrom below.
+              # Native OIDC via Pocket ID. Client ID/secret, session key and
+              # Ollama Cloud key come from openwebui-secret via envFrom below.
+              # Since v0.13, OAuth config is env-only, not read from the DB.
               ENABLE_OAUTH_SIGNUP: "true"   # create accounts on first OIDC login
               ENABLE_SIGNUP: "false"        # no self-serve local accounts
               OAUTH_PROVIDER_NAME: "Pocket ID"
@@ -62,7 +62,7 @@ spec:
               # Users connect through an ingress proxy.
               FORWARDED_ALLOW_IPS: "*"
             envFrom:
-              # OAUTH_CLIENT_SECRET, WEBUI_SECRET_KEY, OLLAMA_API_KEY
+              # OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, WEBUI_SECRET_KEY, OPENAI_API_KEY
               - secretRef:
                   name: openwebui-secret
               # DATABASE_URL (composed from the CNPG openwebui role creds)
