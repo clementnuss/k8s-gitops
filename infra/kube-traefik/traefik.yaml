@@ -44,6 +44,12 @@ spec:
       kubernetesGateway:
         enabled: true
 
+    # Gateway + GatewayClass are managed in gateway.yaml
+    gateway:
+      enabled: false
+    gatewayClass:
+      enabled: false
+
     ports:
       web:
         http:
