@@ -22,7 +22,7 @@ spec:
       features: EnableCSI
       defaultVolumesToFsBackup: false
       backupSyncPeriod: 60m
-      defaultRepoMaintainFrequency: 120m
+      defaultRepoMaintainFrequency: 24h
       backupStorageLocation:
         - name: backblaze
           provider: aws

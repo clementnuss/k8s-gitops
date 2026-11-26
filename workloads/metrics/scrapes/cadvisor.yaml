@@ -13,8 +13,9 @@ spec:
     caFile: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
   bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
   relabelConfigs:
-    - action: labelmap
-      regex: __meta_kubernetes_node_label_(.+)
+    # only the hostname: copying all node labels bloats the index and re-creates series on Talos upgrades
+    - sourceLabels: [__meta_kubernetes_node_label_kubernetes_io_hostname]
+      targetLabel: kubernetes_io_hostname
     - targetLabel: __address__
       replacement: kubernetes.default.svc:443
     - sourceLabels: [__meta_kubernetes_node_name]
@@ -23,3 +24,8 @@ spec:
       replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
     - targetLabel: "job"
       replacement: "cadvisor"
+  # never queried
+  metricRelabelConfigs:
+    - sourceLabels: [__name__]
+      regex: container_(tasks_state|memory_failures_total|blkio_device_usage_total|network_(receive|transmit)_(packets|packets_dropped|errors)_total)
+      action: drop

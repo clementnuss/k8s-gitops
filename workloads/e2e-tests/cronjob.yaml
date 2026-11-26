@@ -6,7 +6,7 @@ metadata:
   labels:
     app: e2e-tests
 spec:
-  schedule: "*/15 * * * *" # Every 15 minutes
+  schedule: "0 6 * * *"
   timeZone: UTC
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 5
