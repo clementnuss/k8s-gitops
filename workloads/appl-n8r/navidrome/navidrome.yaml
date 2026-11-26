@@ -30,10 +30,11 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
+        # owner of the NAS share (DSM user 1026, group users); export is mode 700
+        runAsUser: 1026
+        runAsGroup: 100
         runAsNonRoot: true
-        fsGroup: 1000
+        fsGroup: 100
         fsGroupChangePolicy: OnRootMismatch
 
     controllers:
