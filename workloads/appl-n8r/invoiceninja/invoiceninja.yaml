@@ -34,7 +34,7 @@ spec:
           app:
             image:
               repository: invoiceninja/invoiceninja-debian
-              tag: 5.13.50
+              tag: 5.14.0
             env:
               APP_URL: "https://invoiceninja.n8r.ch"
               APP_ENV: production
@@ -46,6 +46,10 @@ spec:
               DB_USERNAME: "invoiceninja-n8r"
               REDIS_HOST: "invoiceninja-redis"
               REDIS_PORT: "6379"
+              # OIDC_CLIENT_ID/OIDC_CLIENT_SECRET come from invoiceninja-env
+              OIDC_ISSUER: https://id.n8r.ch
+              OIDC_PROVIDER_LABEL: PocketID
+              OIDC_AUTO: "false"
             envFrom:
               - secretRef:
                   name: invoiceninja-env
