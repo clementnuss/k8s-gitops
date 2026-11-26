@@ -1,0 +1,36 @@
+---
+# Read-only, cached mount: navidrome only reads and rescans the library.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: navidrome-music-nfs
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadOnlyMany
+  mountOptions:
+    - nfsvers=3
+    - hard
+    - ro
+    - actimeo=30
+  nfs:
+    server: 192.168.63.10
+    path: /volume1/nfs-share/music/
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: navidrome-music
+  namespace: appl-n8r
+  labels:
+    velero.io/exclude-from-backups: "true"
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1Ti
+  volumeName: navidrome-music-nfs

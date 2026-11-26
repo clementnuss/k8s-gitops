@@ -1,0 +1,183 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: navidrome
+  namespace: appl-n8r
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 5.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    remediation:
+      retries: 3
+    timeout: 10m
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+    timeout: 10m
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+
+    controllers:
+      navidrome:
+        # SQLite on an RWO volume: never run two pods at once
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: deluan/navidrome
+              tag: 0.64.2
+            env:
+              ND_MUSICFOLDER: /music
+              ND_DATAFOLDER: /data
+              ND_BASEURL: ""
+              ND_LOGLEVEL: info
+              ND_ENABLEINSIGHTSCOLLECTOR: "false"
+              # inotify doesn't fire on NFS: rely on periodic scans
+              ND_SCANNER_WATCHERWAIT: "0"
+              ND_SCANNER_SCHEDULE: "@every 1h"
+              # consistent SQLite copies (a live-volume snapshot may not be)
+              ND_BACKUP_PATH: /data/backup
+              ND_BACKUP_SCHEDULE: "@daily"
+              ND_BACKUP_COUNT: "7"
+              # SSO: oauth2-proxy (pocket-id) sets this header; users are
+              # auto-created on first login. Only Traefik can reach the pod
+              # (see NetworkPolicy below), so trusting the pod CIDRs is safe.
+              ND_EXTAUTH_TRUSTEDSOURCES: "172.16.0.0/16,2001:1620:5386:beef::/96"
+              ND_EXTAUTH_USERHEADER: X-Auth-Request-Preferred-Username
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: 4533
+                  periodSeconds: 30
+              readiness: *probe
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 1Gi
+
+    service:
+      main:
+        type: ClusterIP
+        controller: navidrome
+        ports:
+          http:
+            port: 4533
+
+    ingress:
+      # web UI behind pocket-id
+      main:
+        enabled: true
+        className: traefik
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-oauth2-errors@kubernetescrd,appl-n8r-oauth2-auth@kubernetescrd
+        hosts:
+          - host: music.n8r.ch
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - music.n8r.ch
+      # Subsonic API for mobile/desktop apps: no SSO, Navidrome checks its own
+      # per-user password. The header is stripped, else anyone could forge it.
+      subsonic:
+        enabled: true
+        className: traefik
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: appl-n8r-navidrome-strip-auth-header@kubernetescrd
+        hosts:
+          - host: music.n8r.ch
+            paths:
+              - path: /rest
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - music.n8r.ch
+
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim
+        storageClass: longhorn-2-replicas
+        size: 2Gi
+        accessMode: ReadWriteOnce
+        globalMounts:
+          - path: /data
+      music:
+        enabled: true
+        type: persistentVolumeClaim
+        existingClaim: navidrome-music
+        globalMounts:
+          - path: /music
+            readOnly: true
+
+    podAnnotations:
+      backup.velero.io/backup-volumes: data
+---
+# reference as: appl-n8r-navidrome-strip-auth-header@kubernetescrd
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: navidrome-strip-auth-header
+  namespace: appl-n8r
+spec:
+  headers:
+    customRequestHeaders:
+      # empty value removes the header
+      X-Auth-Request-Preferred-Username: ""
+---
+# Only Traefik may talk to navidrome: ExtAuth trusts the whole pod CIDR.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: navidrome
+  namespace: appl-n8r
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: navidrome
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-traefik
+      ports:
+        - port: 4533
+          protocol: TCP
