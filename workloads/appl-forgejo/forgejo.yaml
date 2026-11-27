@@ -78,6 +78,7 @@ spec:
           DISABLE_SSH: true
           START_SSH_SERVER: false
           LANDING_PAGE: login
+          LFS_START_SERVER: true
         database:
           DB_TYPE: postgres
           HOST: postgres-cnpg-rw.appl-postgres.svc.cluster.local:5432
