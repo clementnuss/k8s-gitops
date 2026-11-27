@@ -25,7 +25,8 @@ spec:
   create:
     enabled: true
   allowedNamespaces:
-    list: [appl-n8r, appl-s3, appl-seafile]
+    # appl-kopiur: the RepositoryReplication lives there
+    list: [appl-kopiur, appl-n8r, appl-s3, appl-seafile]
   credentialProjection:
     allowed: true
   maintenance:

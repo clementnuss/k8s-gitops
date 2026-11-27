@@ -47,7 +47,8 @@ spec:
   resources:
     requests:
       storage: 1Ti
-  volumeName: seafile-data-nfs---
+  volumeName: seafile-data-nfs
+---
 # Read-only, cached twin of seafile-data-nfs for kopiur (kopiur.yaml).
 # The live PV needs noac for seafile; the backup can tolerate 30s staleness.
 apiVersion: v1
