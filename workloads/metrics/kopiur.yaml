@@ -1,0 +1,45 @@
+# kopiur: Longhorn PVCs -> kopia-main. Same in every namespace; see infra/kopiur/README.md.
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: kopia-main
+  namespace: metrics
+spec:
+  repository:
+    kind: ClusterRepository
+    name: kopia-main
+  credentialProjection:
+    enabled: true
+  # read-only root mover: volumes mix owners and 0600 files
+  mover:
+    securityContext:
+      runAsUser: 0
+      runAsNonRoot: false
+    privilegedMode: true
+  # longhorn has no VolumeGroupSnapshotClass
+  groupBy: None
+  sources:
+    - pvcSelector:
+        labelSelector:
+          # long-term only; short-term and vmselect cache are disposable
+          matchLabels:
+            app.kubernetes.io/name: vmstorage
+            app.kubernetes.io/instance: vmcluster-long-term
+  retention:
+    keepDaily: 14
+    keepWeekly: 4
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: kopia-main-nightly
+  namespace: metrics
+spec:
+  policyRef:
+    name: kopia-main
+  # after paperless-export (02:00 Zurich)
+  schedule:
+    cron: "H 3 * * *"
+    timezone: Europe/Zurich
+    jitter: 30m

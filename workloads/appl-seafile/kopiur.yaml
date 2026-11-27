@@ -1,0 +1,44 @@
+# kopiur: NAS folder -> kopia-nas (Backblaze, replicated to coeuve). Read-only
+# cached NFS PV mounted Direct, like immich (the kopiur nfs source didn't work).
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: kopia-nas
+  namespace: appl-seafile
+spec:
+  repository:
+    kind: ClusterRepository
+    name: kopia-nas
+  credentialProjection:
+    enabled: true
+  # NAS files are root-owned
+  mover:
+    securityContext:
+      runAsUser: 0
+      runAsNonRoot: false
+    privilegedMode: true
+    cache:
+      mode: Persistent
+      capacity: 2Gi
+      storageClassName: longhorn-2-replicas
+  copyMethod: Direct
+  sources:
+    - pvc:
+        name: seafile-data-backup
+  retention:
+    keepDaily: 14
+    keepWeekly: 8
+    keepMonthly: 12
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: kopia-nas-nightly
+  namespace: appl-seafile
+spec:
+  policyRef:
+    name: kopia-nas
+  schedule:
+    cron: "H 1 * * *"
+    timezone: Europe/Zurich
+    jitter: 30m

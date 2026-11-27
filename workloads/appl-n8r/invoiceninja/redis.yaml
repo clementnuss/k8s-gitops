@@ -58,10 +58,10 @@ spec:
       data:
         enabled: true
         type: persistentVolumeClaim
+        # cache/queue, not worth a backup
+        labels:
+          backup.n8r.ch/skip: "true"
         size: 1Gi
         accessMode: ReadWriteOnce
         globalMounts:
           - path: /data
-
-    podLabels:
-      velero.io/exclude-from-backup: "true"

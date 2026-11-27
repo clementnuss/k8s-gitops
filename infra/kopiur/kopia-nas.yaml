@@ -1,0 +1,54 @@
+# kopia-nas: NAS folders (NFS) -> Backblaze, replicated to syno-coeuve. The
+# NAS itself is not backed up otherwise. Policies:
+# <namespace>/kopiur.yaml (seafile, s3, appl-n8r). Immich has its own repo.
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: ClusterRepository
+metadata:
+  name: kopia-nas
+spec:
+  backend:
+    s3:
+      bucket: kopia-planchettes
+      prefix: kopiur/kopia-nas/
+      endpoint: s3.eu-central-003.backblazeb2.com
+      region: eu-central-003
+      auth:
+        secretRef:
+          name: kopiur-backblaze-s3
+          namespace: appl-kopiur
+  encryption:
+    passwordSecretRef:
+      name: kopiur-repo-password
+      namespace: appl-kopiur
+      key: KOPIA_PASSWORD
+  create:
+    enabled: true
+  allowedNamespaces:
+    list: [appl-n8r, appl-s3, appl-seafile]
+  credentialProjection:
+    allowed: true
+  maintenance:
+    enabled: true
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: RepositoryReplication
+metadata:
+  name: kopia-nas-to-coeuve
+  namespace: appl-kopiur
+spec:
+  sourceRef:
+    kind: ClusterRepository
+    name: kopia-nas
+  destination:
+    webDav:
+      # Synology returns 409 unless this folder already exists
+      url: https://syno-coeuve.n8r.ch:5006/backup/kopiur/kopia-nas
+      auth:
+        secretRef:
+          name: kopiur-webdav-coeuve
+  schedule:
+    cron: "30 6 * * *"
+    jitter: 1h
+  sync:
+    parallel: 8

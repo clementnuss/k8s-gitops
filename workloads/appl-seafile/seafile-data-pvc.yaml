@@ -39,7 +39,7 @@ metadata:
   name: seafile-data-nfs
   namespace: appl-seafile
   labels:
-    velero.io/exclude-from-backups: "true"
+    backup.n8r.ch/skip: "true"
 spec:
   accessModes:
     - ReadWriteMany
@@ -47,4 +47,38 @@ spec:
   resources:
     requests:
       storage: 1Ti
-  volumeName: seafile-data-nfs
+  volumeName: seafile-data-nfs---
+# Read-only, cached twin of seafile-data-nfs for kopiur (kopiur.yaml).
+# The live PV needs noac for seafile; the backup can tolerate 30s staleness.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: seafile-data-nfs-backup
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadOnlyMany
+  mountOptions:
+    - nfsvers=3
+    - hard
+    - ro
+    - actimeo=30
+  nfs:
+    server: 192.168.63.10
+    path: /volume1/nfs-share/seafile/
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seafile-data-backup
+  namespace: appl-seafile
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1Ti
+  volumeName: seafile-data-nfs-backup

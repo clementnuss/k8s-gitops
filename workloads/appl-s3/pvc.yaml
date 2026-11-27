@@ -22,7 +22,7 @@ metadata:
   name: s3-data-nfs
   namespace: appl-s3
   labels:
-    velero.io/exclude-from-backups: "true"
+    backup.n8r.ch/skip: "true"
 spec:
   accessModes:
     - ReadWriteMany
@@ -31,3 +31,37 @@ spec:
     requests:
       storage: 1Ti
   volumeName: s3-data-nfs
+---
+# Read-only, cached twin of s3-data-nfs for kopiur (kopiur.yaml).
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: s3-data-nfs-backup
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadOnlyMany
+  mountOptions:
+    - nfsvers=3
+    - hard
+    - ro
+    - actimeo=30
+  nfs:
+    server: 192.168.63.10
+    path: /volume1/nfs-share/s3/
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: s3-data-backup
+  namespace: appl-s3
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1Ti
+  volumeName: s3-data-nfs-backup

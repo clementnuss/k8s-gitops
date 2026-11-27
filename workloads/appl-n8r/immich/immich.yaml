@@ -64,7 +64,7 @@ spec:
           type: persistentVolumeClaim
           accessMode: ReadWriteOnce
           labels:
-            velero.io/exclude-from-backups: "true"
+            backup.n8r.ch/skip: "true"
       resources:
         requests:
           cpu: 100m

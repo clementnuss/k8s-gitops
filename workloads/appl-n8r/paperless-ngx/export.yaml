@@ -1,25 +1,8 @@
 ---
-# Dedicated export job for paperless-ngx. Runs document_exporter inside
-# the paperless pod and writes to the paperless-ngx-export PVC.
-#
-# This was previously an initContainer in each backup job. Extracting it
-# into its own CronJob means:
-#   - document_exporter runs exactly once per backup cycle (not twice)
-#   - the two backup jobs become pure PVC-RO kopia snapshots (no kubectl,
-#     no SA, no exec) and can never corrupt each other's export
-#   - the export step is independently observable/retryable
-#
-# The backup jobs (backup-nuss-roy.yaml, backup-coeuve.yaml) mount the
-# same PVC read-only and must be scheduled on the same node (podAffinity
-# to the paperless pod) because the PVC is ReadWriteOnce.
-#
-# Schedule: 02:00 Zurich, 30 min before paperless-backup-nuss-roy (02:30)
-# and 60 min before paperless-backup-coeuve (03:00). The export is small
-# (2Gi PVC, documents only) and finishes well within 30 min.
-#
-# Owns the paperless-backup ServiceAccount/Role/RoleBinding (moved here
-# from backup-nuss-roy.yaml) since this is the only job that needs
-# kubectl exec into the paperless pod.
+# Runs document_exporter inside the paperless pod into the
+# paperless-ngx-export PVC: a consistent, self-contained copy (the DB lives
+# in mariadb). Picked up by the kopiur backup (appl-n8r/kopiur.yaml),
+# which must run after this: 02:00 Zurich here vs. 03:00-04:30 Zurich there.
 apiVersion: batch/v1
 kind: CronJob
 metadata:

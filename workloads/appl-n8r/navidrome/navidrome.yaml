@@ -47,7 +47,7 @@ spec:
               repository: deluan/navidrome
               tag: 0.64.2
             env:
-              ND_MUSICFOLDER: /music
+              ND_MUSICFOLDER: /music/pop  # default library; others added in the UI
               ND_DATAFOLDER: /data
               ND_BASEURL: ""
               ND_LOGLEVEL: info

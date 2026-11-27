@@ -102,6 +102,9 @@ spec:
       public:
         enabled: true
         type: persistentVolumeClaim
+        # app assets copied from the image, not worth a backup
+        labels:
+          backup.n8r.ch/skip: "true"
         size: 5Gi
         accessMode: ReadWriteOnce
         advancedMounts:

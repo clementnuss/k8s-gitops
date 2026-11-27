@@ -25,7 +25,7 @@ metadata:
   name: navidrome-music
   namespace: appl-n8r
   labels:
-    velero.io/exclude-from-backups: "true"
+    backup.n8r.ch/skip: "true"
 spec:
   accessModes:
     - ReadOnlyMany
