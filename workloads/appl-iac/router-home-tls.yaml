@@ -1,0 +1,17 @@
+# Webfig cert for the home MikroTik; iac/routers/home reads this Secret and imports it.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: router-home-tls
+  namespace: appl-iac
+spec:
+  secretName: router-home-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - router.n8r.ch
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always
