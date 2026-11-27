@@ -1,0 +1,109 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+  namespace: appl-forgejo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: forgejo
+      version: 17.3.3
+      sourceRef:
+        kind: HelmRepository
+        name: forgejo
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    strategy:
+      type: Recreate
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
+
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: longhorn-2-replicas
+
+    ingress:
+      enabled: true
+      className: traefik
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - host: git.n8r.ch
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: forgejo-tls
+          hosts:
+            - git.n8r.ch
+
+    gitea:
+      admin:
+        existingSecret: forgejo-admin
+        # placeholder, only used at account creation; set the real one in the UI
+        email: admin@git.n8r.ch
+        passwordMode: initialOnlyNoReset
+
+      # Callback URL to register in Pocket ID: https://git.n8r.ch/user/oauth2/PocketID/callback
+      oauth:
+        - name: PocketID
+          provider: openidConnect
+          existingSecret: forgejo-oauth
+          autoDiscoverUrl: https://id.n8r.ch/.well-known/openid-configuration
+
+      config:
+        APP_NAME: Forgejo
+        server:
+          DOMAIN: git.n8r.ch
+          ROOT_URL: https://git.n8r.ch/
+          DISABLE_SSH: true
+          START_SSH_SERVER: false
+          LANDING_PAGE: login
+        database:
+          DB_TYPE: postgres
+          HOST: postgres-cnpg-rw.appl-postgres.svc.cluster.local:5432
+          NAME: forgejo
+          USER: forgejo
+          SSL_MODE: require
+        service:
+          # SSO logins link to the existing admin account instead of creating users
+          DISABLE_REGISTRATION: true
+          SHOW_REGISTRATION_BUTTON: false
+          REQUIRE_SIGNIN_VIEW: true
+        oauth2_client:
+          ACCOUNT_LINKING: login
+          ENABLE_AUTO_REGISTRATION: false
+        repository:
+          DEFAULT_PRIVATE: private
+        actions:
+          ENABLED: false
+        mailer:
+          ENABLED: false
+        cron.update_checker:
+          ENABLED: false
+
+      additionalConfigFromEnvs:
+        - name: FORGEJO__DATABASE__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: forgejo-db
+              key: password

@@ -37,6 +37,12 @@ spec:
       inherit: true
       passwordSecret:
         name: openwebui-db-secret
+    - name: forgejo
+      ensure: present
+      login: true
+      inherit: true
+      passwordSecret:
+        name: forgejo-db-secret
 
   bootstrap:
     initdb:
